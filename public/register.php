@@ -81,12 +81,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="register-section">
                         <p>Already have an account?</p>
                         <button
-                                class="register-button"
-                                onclick="location.href='./register.php'"
-                                type="button"
-                        >
-                                Back to Login
-                        </button>
+                                 class="register-button"
+                                 onclick="window.location.href='login.php'"
+                                 type="button"
+                                >
+                                  Back to Login
+                                </button>
                 </div>
         </div>
 </body>
