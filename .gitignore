@@ -1,10 +1,2 @@
-SQLMQ.ini
-SQLMQ.ini
-db.php
-rabbitmq_config.php
-vendor/
-490-001-octo-fishstick/
-host.ini
-local.ini
-BrokerComms/host.ini
-BrokerComms/local.ini
+*.ini
+

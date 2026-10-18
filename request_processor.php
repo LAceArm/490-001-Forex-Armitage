@@ -1,6 +1,6 @@
 <?php
 
-require_once "auth.php";
+require_once "authentication.php";
 
 function requestProcessor($request)
 {

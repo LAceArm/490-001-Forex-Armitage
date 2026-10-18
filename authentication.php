@@ -1,6 +1,6 @@
 <?php
 
-require_once "db.php";
+require_once "database.php";
 
 function registerUser($username, $email, $password, $firstName = null, $lastName = null)
 {
@@ -14,7 +14,6 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
         VALUES (?, ?, ?, ?, ?)"
     );
 
-
     $stmt->bind_param(
         "sssss",
         $username,
@@ -24,24 +23,17 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
         $lastName
     );
 
-    try {
     if ($stmt->execute()) {
         return [
             "success" => true,
             "user_id" => $conn->insert_id
         ];
     }
-} catch (mysqli_sql_exception $e) {
+
     return [
         "success" => false,
-        "error" => "User already exists"
+        "error" => $stmt->error
     ];
-}
-
-return [
-    "success" => false,
-    "error" => $stmt->error
-];
 }
 
 function loginUser($username, $password)
