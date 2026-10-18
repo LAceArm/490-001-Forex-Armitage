@@ -20,12 +20,15 @@ function sqlRequestProcessor($request)
 
     switch (strtolower($request['type'])) {
 
-        case "login":
-            return loginUser(
-                $request['username'],
-                $request['password']
-            );
+	case "login":
+   		$result = loginUser(
+        	$request['username'],
+        	$request['password']
+    );
 
+    		var_dump($result);
+
+    return $result;
         case "register":
             return registerUser(
                 $request['username'],
@@ -45,11 +48,11 @@ function sqlRequestProcessor($request)
 
 $server = new rabbitMQServer("SQLMQ.ini", "sqlServer");
 
-echo "SQL/Auth Server BEGIN" . PHP_EOL;
+echo "SQL/Auth server running" . PHP_EOL;
 
 $server->process_requests('sqlRequestProcessor');
 
-echo "SQL/Auth Server END" . PHP_EOL;
+echo "SQL/Auth Server Ended" . PHP_EOL;
 
 exit();
 

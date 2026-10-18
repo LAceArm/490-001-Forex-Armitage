@@ -14,6 +14,7 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
         VALUES (?, ?, ?, ?, ?)"
     );
 
+
     $stmt->bind_param(
         "sssss",
         $username,
@@ -23,17 +24,24 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
         $lastName
     );
 
+    try {
     if ($stmt->execute()) {
         return [
             "success" => true,
             "user_id" => $conn->insert_id
         ];
     }
-
+} catch (mysqli_sql_exception $e) {
     return [
         "success" => false,
-        "error" => $stmt->error
+        "error" => "User already exists"
     ];
+}
+
+return [
+    "success" => false,
+    "error" => $stmt->error
+];
 }
 
 function loginUser($username, $password)
