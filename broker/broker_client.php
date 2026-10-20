@@ -54,7 +54,7 @@ function send_to_broker(array $payload): array
 		// arrives. The reply comes back already decoded.
 		echo date("Y/m/d H:i:s").": SENDING REQUEST TO BROKER".PHP_EOL > ~/WebsiteLogs/Requests.log;
                 $reply = $client->send_request($payload);
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
                 // Broker down, bad credentials, wrong vhost, and so on.
                 // The real cause is hidden from the page on purpose; uncomment
                 // the next line while debugging to write it to Apache's
