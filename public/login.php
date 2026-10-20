@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once __DIR__ . '/../lib/broker_client.php';
+require_once __DIR__ . '/../broker/broker_client.php';
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

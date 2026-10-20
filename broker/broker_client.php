@@ -24,13 +24,13 @@ function send_to_broker(array $payload): array
         // (host.ini, WebServer.ini), so it only finds them from inside the
         // broker/ folder. __DIR__ is the folder this file lives in, so the
         // path works regardless of where Apache or the CLI was started.
-        chdir(__DIR__ . '/../broker');
+        chdir(__DIR__ . '/../lib');
 
         // Course library:
         //   path.inc            sets PHP's include path
         //   get_host_info.inc   reads the ini files
         //   rabbitMQLib.inc     defines the rabbitMQClient class
-        require_once('path.inc');
+        // require_once('path.inc');
         require_once('get_host_info.inc');
         require_once('rabbitMQLib.inc');
 
@@ -43,7 +43,7 @@ function send_to_broker(array $payload): array
                 // Which ini section to use. Defaults to "broker"; set the
                 // BROKER_SECTION environment variable to switch (for example,
                 // to point at a different broker while testing).
-                $section = getenv('BROKER_SECTION') ?: 'broker';
+                $section = getenv('BROKER_SECTION') ?: 'adminServer';
 
                 // Reads host, port, user, password, vhost, exchange and queue
                 // from that section of WebServer.ini.
