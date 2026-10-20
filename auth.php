@@ -4,6 +4,7 @@ require_once "db.php";
 
 function registerUser($username, $email, $password, $firstName = null, $lastName = null)
 {
+    echo date("Y/m/d H:i:s").": REGISTER ATTEMPT FROM $username".PHP_EOL > ~/WebsiteLogs/Registration.log	
     global $conn;
 
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
