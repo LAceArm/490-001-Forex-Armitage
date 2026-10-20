@@ -1,6 +1,6 @@
 <?php
 
-require_once "db.php";
+require_once "database.php";
 
 function registerUser($username, $email, $password, $firstName = null, $lastName = null)
 {
