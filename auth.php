@@ -4,7 +4,7 @@ require_once "db.php";
 
 function registerUser($username, $email, $password, $firstName = null, $lastName = null)
 {
-    echo date("Y/m/d H:i:s").": REGISTER ATTEMPT FROM $username".PHP_EOL > ~/WebsiteLogs/Registration.log	
+    echo date("Y/m/d H:i:s").": REGISTER ATTEMPT FROM $username".PHP_EOL > ~/WebsiteLogs/Registration.log;	
     global $conn;
 
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
@@ -25,12 +25,13 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
     );
 
     if ($stmt->execute()) {
+	    echo date("Y/m/d H:i:s")."REGISTRATION ATTEMPT WAS SUCCESSFUL".PHP_EOL >~/WebsiteLogs/Registration.log;
         return [
             "success" => true,
             "user_id" => $conn->insert_id
         ];
     }
-
+	echo date("Y/m/d H:i:s")."REGISTRATION ATTEMPT WAS UNSUCCESSFUL".PHP_EOL >~/WebsiteLogs/Registration.log;
     return [
         "success" => false,
         "error" => $stmt->error
@@ -38,7 +39,9 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
 }
 
 function loginUser($username, $password)
-{
+{	
+	
+	echo date("Y/m/d H:i:s")."LOGIN ATTEMPT FROM $username".PHP_EOL >~/WebsiteLogs/Login.log;
     global $conn;
 
     $stmt = $conn->prepare(
@@ -53,6 +56,8 @@ function loginUser($username, $password)
     $result = $stmt->get_result();
 
     if ($result->num_rows !== 1) {
+	    
+	echo date("Y/m/d H:i:s")."LOGIN ATTEMPT WAS UNSUCCESSFUL: USER DOES NOT EXIST.".PHP_EOL >~/WebsiteLogs/Login.log;
         return ["success" => false];
     }
 
@@ -63,9 +68,12 @@ function loginUser($username, $password)
     }
 
     if (!password_verify($password, $user["password_hash"])) {
+
+	echo date("Y/m/d H:i:s")."LOGIN ATTEMPT WAS UNSUCCESSFUL: PASSWORD DOES NOT MATCH.".PHP_EOL >~/WebsiteLogs/Login.log;
         return ["success" => false];
     }
 
+    echo date("Y/m/d H:i:s")."LOGIN ATTEMPT WAS SUCCESSFUL".PHP_EOL > ~/WebsiteLogs/Login.log;
     return [
         "success" => true,
         "user_id" => $user["user_id"],
