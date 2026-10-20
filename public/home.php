@@ -9,7 +9,7 @@ if (empty($_SESSION['user_id'])) {
 }
 */
 ?>
-//php section removed for now for editing
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
