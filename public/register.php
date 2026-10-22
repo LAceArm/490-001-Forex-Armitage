@@ -11,10 +11,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email    = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
         $confirm  = $_POST['confirm_password'] ?? '';
+	$compliant_password=preg_match($regex,$password);
 
         if ($password !== $confirm) {
                 $error = 'Passwords do not match';
-        } else {
+	}
+	else if (!$compliant_password){ 
+		$error="Password needs at least one special character and one number";
+	}
+	else {
                 $r = send_to_broker([
                         'type'     => 'register',
                         'username' => $username,
