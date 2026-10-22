@@ -52,7 +52,7 @@ function send_to_broker(array $payload): array
                 // Publishes $payload as JSON, tagged with a reply queue and
                 // a correlation id, then blocks until the matching reply
 		// arrives. The reply comes back already decoded.
-		error_log(date("Y/m/d H:i:s") . " REQUEST TO BROKER FAILED: " . $e->getMessage() . PHP_EOL, 3, "/home/jdk39/WebsiteLogs/Requests.log");
+		error_log(date("Y/m/d H:i:s") . ": REQUEST TO BROKER " PHP_EOL, 3, "/home/jdk39/WebsiteLogs/Requests.log");
                 $reply = $client->send_request($payload);
         } catch (Exception $e) {
                 // Broker down, bad credentials, wrong vhost, and so on.
