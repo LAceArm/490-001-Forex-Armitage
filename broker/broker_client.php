@@ -3,13 +3,6 @@
  * broker_client.php  (Web VM)
  *
  * Sends one request to the RabbitMQ broker and returns the reply.
- * Every page (login, register, home) calls send_to_broker() instead of
- * talking to RabbitMQ itself. The web VM never connects to MySQL; it only
- * asks the DB listener a question through the broker and gets an answer back.
- *
- * Usage:
- *     $r = send_to_broker(['type' => 'login', 'username' => $u, 'password' => $p]);
- *     if (!empty($r['success'])) { ... }
  *
  * Always returns an array. On any failure it returns:
  *     ['success' => false, 'error' => 'Service unavailable']
@@ -45,21 +38,15 @@ function send_to_broker(array $payload): array
                 // to point at a different broker while testing).
                 $section = getenv('BROKER_SECTION') ?: 'adminServer';
 
-                // Reads host, port, user, password, vhost, exchange and queue
-                // from that section of WebServer.ini.
+                // Creates a new RabbitMQClient. This is what will communicate with the broker.
                 $client = new rabbitMQClient('WebServer.ini', $section);
 
-                // Publishes $payload as JSON, tagged with a reply queue and
-                // a correlation id, then blocks until the matching reply
-		// arrives. The reply comes back already decoded.
+		// Logs the occurence
 		error_log(date("Y/m/d H:i:s") . ": REQUEST TO BROKER " PHP_EOL, 3, "/home/jdk39/WebsiteLogs/Requests.log");
+
                 $reply = $client->send_request($payload);
         } catch (Exception $e) {
-                // Broker down, bad credentials, wrong vhost, and so on.
-                // The real cause is hidden from the page on purpose; uncomment
-                // the next line while debugging to write it to Apache's
-                // error log (/var/log/apache2/error.log).
-		// error_log('send_to_broker: ' . $e->getMessage());
+                // Something went wrong. Event logged accordingly
 		error_log(date("Y/m/d H:i:s") . " REQUEST TO BROKER FAILED: " . $e->getMessage() . PHP_EOL, 3, "/home/jdk39/WebsiteLogs/Requests.log");		
                 $reply = null;
         } finally {
