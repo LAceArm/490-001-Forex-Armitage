@@ -56,15 +56,15 @@ function loginUser($username, $password)
     } catch (mysqli_sql_exception $e) {
 	if ($e->getCode() === 1062) {
 	    $field = str_contains($e->getMessage(), 'email') ? "Email" : "Username";
-            error_log(date("Y/m/d H:i:s") . " REGISTRATION ATTEMPT WAS UNSUCCESSFUL: DUPLICATE " . strtoupper($field) . PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
+    #        error_log(date("Y/m/d H:i:s") . " REGISTRATION ATTEMPT WAS UNSUCCESSFUL: DUPLICATE " . strtoupper($field) . PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
             return ["success" => false, "error" => "$field already exists"];
 	}
 
-        error_log(date("Y/m/d H:i:s") . " REGISTRATION ATTEMPT WAS UNSUCCESSFUL: " . $e->getMessage() . PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
+   #     error_log(date("Y/m/d H:i:s") . " REGISTRATION ATTEMPT WAS UNSUCCESSFUL: " . $e->getMessage() . PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
         return ["success" => false, "error" => "Registration failed"];
     }
 
-    error_log(date("Y/m/d H:i:s") . " REGISTRATION ATTEMPT WAS SUCCESSFUL" . PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
+ //   error_log(date("Y/m/d H:i:s") . " REGISTRATION ATTEMPT WAS SUCCESSFUL" . PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
     return ["success" => true, "user_id" => $conn->insert_id];
 }
 
