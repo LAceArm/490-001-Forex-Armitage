@@ -3,6 +3,9 @@ session_start();
 require_once __DIR__ . '/../broker/broker_client.php';
 
 $error = '';
+$regex="/(?=(.*[0-9]))((?=.*[A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z]))^.{8,}$/";
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $username = trim($_POST['username'] ?? '');
         $email    = trim($_POST['email'] ?? '');
