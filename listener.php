@@ -9,7 +9,7 @@
  */
 
 // Load code first, using paths relative to this file.
-require_once __DIR__ . '/lib/rabbitMQLib.inc';
+require_once __DIR__ . '/lib/RabbitMQLib.inc';
 require_once __DIR__ . '/request_processor.php';
 
 // The course library opens its ini files by bare filename, so move into
