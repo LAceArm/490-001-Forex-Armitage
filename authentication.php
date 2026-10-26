@@ -51,7 +51,6 @@ function loginUser($username, $password)
     );
 
 	 $stmt->bind_param("s", $username);
-	 $hash=password_hash($password,PASSWORD_DEFAULT);
 
     try{
 	    $stmt->execute();
@@ -59,7 +58,7 @@ function loginUser($username, $password)
 	    $result= $stmt->get_result();
 
 	    if($result->num_rows !== 1){ 
-		    return ["sucess"=>false];
+		    return ["success"=>false];
 	    }
 
 	    $user = $result->fetch_assoc();
@@ -68,7 +67,7 @@ function loginUser($username, $password)
 		    return ["success"=>false];
 	    }
 
-	    if(!password_verify($hash,$user["password_hash"])){ 
+	    if(!password_verify($password,$user["password_hash"])){ 
 		    	return["success"=>false];
 	    }
 	    return ["success"=>true,"user_id"=>$user["user_id"],"username"=>$user["username"],"role"=>$user["role"]];
