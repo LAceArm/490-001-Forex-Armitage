@@ -1,5 +1,2 @@
 config/*.ini
-
-adzuna_config.php
-sample_adzuna.json
 *.ini
