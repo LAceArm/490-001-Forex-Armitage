@@ -1,5 +1,4 @@
 <?php
-<<<<<<< HEAD
 /*
  * broker_client.php  (Web VM)
  *
@@ -8,8 +7,6 @@
  * Always returns an array. On any failure it returns:
  *     ['success' => false, 'error' => 'Service unavailable']
  */
-=======
->>>>>>> a62124b (Commented out logging temporarily)
 
 function send_to_broker(array $payload): array
 {
@@ -25,7 +22,6 @@ function send_to_broker(array $payload): array
 
                 $section = getenv('BROKER_SECTION') ?: 'adminServer';
 
-<<<<<<< HEAD
                 // Creates a new RabbitMQClient. This is what will communicate with the broker.
                 $client = new rabbitMQClient('WebServer.ini', $section);
 
@@ -36,14 +32,12 @@ function send_to_broker(array $payload): array
         } catch (Exception $e) {
                 // Something went wrong. Event logged accordingly
 		error_log(date("Y/m/d H:i:s") . " REQUEST TO BROKER FAILED: " . $e->getMessage() . PHP_EOL, 3, "/home/jdk39/WebsiteLogs/Requests.log");		
-=======
                 $client = new rabbitMQClient('WebServer.ini', $section);
 
 		//error_log(date("Y/m/d H:i:s") . " REQUEST TO BROKER FAILED: " . $e->getMessage() . PHP_EOL, 3, "/home/jdk39/WebsiteLogs/Requests.log");
                 $reply = $client->send_request($payload);
         } catch (Exception $e) {
 		//error_log(date("Y/m/d H:i:s") . " REQUEST TO BROKER FAILED: " . $e->getMessage() . PHP_EOL, 3, "/home/jdk39/WebsiteLogs/Requests.log");		
->>>>>>> a62124b (Commented out logging temporarily)
                 $reply = null;
         } finally {
                 ob_end_clean();
