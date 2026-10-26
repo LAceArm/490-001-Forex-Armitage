@@ -50,22 +50,34 @@ function loginUser($username, $password)
          WHERE username = ?"
     );
 
-    $stmt->bind_param("s", $username);
-    try {
-	$stmt->execute();
-    } catch (mysqli_sql_exception $e) {
-	if ($e->getCode() === 1062) {
-	    $field = str_contains($e->getMessage(), 'email') ? "Email" : "Username";
-    #        error_log(date("Y/m/d H:i:s") . " REGISTRATION ATTEMPT WAS UNSUCCESSFUL: DUPLICATE " . strtoupper($field) . PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
-            return ["success" => false, "error" => "$field already exists"];
-	}
+	 $stmt->bind_param("s", $username);
+	 $hash=password_hash($password,PASSWORD_DEFAULT);
 
-   #     error_log(date("Y/m/d H:i:s") . " REGISTRATION ATTEMPT WAS UNSUCCESSFUL: " . $e->getMessage() . PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
-        return ["success" => false, "error" => "Registration failed"];
+    try{
+	    $stmt->execute();
+
+	    $result= $stmt->get_result();
+
+	    if($result->num_rows !== 1){ 
+		    return ["sucess"=>false];
+	    }
+
+	    $user = $result->fetch_assoc();
+
+	    if(!$user["is_active"]){ 
+		    return ["success"=>false];
+	    }
+
+	    if(!password_verify($hash,$user["password_hash"])){ 
+		    	return["success"=>false];
+	    }
+	    return ["success"=>true,"user_id"=>$user["user_id"],"username"=>$user["username"],"role"=>$user["role"]];
+
     }
 
- //   error_log(date("Y/m/d H:i:s") . " REGISTRATION ATTEMPT WAS SUCCESSFUL" . PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
-    return ["success" => true, "user_id" => $conn->insert_id];
+    catch (Exception $e){ 
+	    return array("success"=>false);
+    }
 }
 
 ?>
