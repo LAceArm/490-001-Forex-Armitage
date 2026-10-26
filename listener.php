@@ -16,6 +16,6 @@ require_once __DIR__ . '/request_processor.php';
 // config/ before creating the server.
 chdir(__DIR__ . '/config');
 
-$server = new rabbitMQServer('RabbitMQ.ini', 'testServer');
+$server = new rabbitMQServer('RabbitMQ.ini', 'adminServer');
 echo "SQL listener BEGIN\n";
 $server->process_requests('requestProcessor');
