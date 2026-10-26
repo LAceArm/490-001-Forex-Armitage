@@ -1,0 +1,187 @@
+/* Makes sizing more predictable */
+* {
+        box-sizing: border-box;
+}
+
+/* Entire page */
+body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f4f6f8;
+        font-family: Arial, sans-serif;
+}
+
+/* Login container */
+.login-box {
+        background-color: white;
+        width: 380px;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Login title */
+h1 {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 10px;
+}
+
+/* Welcome message */
+.welcome {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+}
+
+/* Username and Password labels */
+label {
+        display: block;
+        margin-bottom: 7px;
+        font-weight: bold;
+}
+
+/* Username and Password boxes */
+input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 15px;
+}
+
+/* Changes border when clicking an input */
+input:focus {
+        outline: none;
+        border-color: #2563eb;
+}
+
+/* Login button */
+.login-button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 6px;
+        background-color: #2563eb;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+}
+
+/* Login button when mouse is over it */
+.login-button:hover {
+        background-color: #1d4ed8;
+}
+
+/* Bottom registration section */
+.register-section {
+        text-align: center;
+        margin-top: 25px;
+}
+
+/* Create Account button */
+.register-button {
+        background: none;
+        border: none;
+        color: #2563eb;
+        font-size: 15px;
+        cursor: pointer;
+        text-decoration: underline;
+}
+
+/* Create Account button hover */
+.register-button:hover {
+        color: #1d4ed8;
+}
+
+/* Error message for incorrect login */
+.error {
+        background-color: #ffe5e5;
+        color: #b00020;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        text-align: center;
+}
+
+/* HOME PAGE */
+
+.home-page {
+        display: block;
+        height: auto;
+        min-height: 100vh;
+        background-color: #f4f6f8;
+}
+
+.navbar {
+        width: 100%;
+        background-color: white;
+        padding: 15px 40px;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar h2 {
+        margin: 0;
+}
+
+.nav-links {
+        display: flex;
+        gap: 25px;
+}
+
+.nav-links a {
+        text-decoration: none;
+        color: #2563eb;
+        font-weight: bold;
+}
+
+.home-content {
+        text-align: center;
+        padding: 80px 20px;
+}
+
+.home-content h1 {
+        font-size: 40px;
+}
+
+.home-content > p {
+        color: #666;
+        font-size: 18px;
+}
+
+.dashboard {
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+        margin-top: 40px;
+}
+
+.card {
+        background-color: white;
+        width: 280px;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card button {
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+}
+
+.card button:hover {
+        background-color: #1d4ed8;
+} 
