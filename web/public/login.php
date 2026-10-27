@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	if (!empty($r['success'])) {
 		$_SESSION['user_id']  = $r['user_id'];
 		$_SESSION['username'] = $r['username'];
+		$_SESSION['session_key'] = $r['session_key'] ?? '';
 		header('Location: home.php');
 		exit;
 	}
