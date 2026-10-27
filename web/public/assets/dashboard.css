@@ -1,0 +1,136 @@
+
+
+
+/* Dashboard Container */
+
+.dashboard-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 45px auto;
+    font-family: Arial, sans-serif;
+}
+
+/* Dashboard Header */
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.dashboard-header h1 {
+    font-size: 32px;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.dashboard-header p {
+    color: #666;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.dashboard-header .demo-notice {
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+/* Statistics Grid */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+/* Statistics Cards */
+
+.stat-card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 28px 20px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card h2 {
+    color: #666;
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+.stat-card p {
+    color: #007bff;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.stat-card p.positive {
+    color: #28a745;
+}
+
+/* Recent Trades Section */
+
+.activity-section {
+    background-color: white;
+    border-radius: 12px;
+    padding: 30px;
+    margin-top: 35px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.activity-section h2 {
+    font-size: 23px;
+    margin-bottom: 25px;
+}
+
+/* Recent Trades Table */
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.activity-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.activity-table th,
+.activity-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.activity-table th {
+    background-color: #f4f6f9;
+    font-weight: bold;
+}
+
+.activity-table tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Back to Home Button */
+
+.dashboard-footer {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.back-button {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: #555;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.back-button:hover {
+    background-color: #333;
+}
