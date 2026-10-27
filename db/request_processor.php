@@ -2,6 +2,45 @@
 
 require_once "authentication.php";
 
+function getRates()
+{
+    global $conn;
+
+    $sql = "
+        SELECT
+            b.currency_code AS base_currency,
+            q.currency_code AS quote_currency,
+            r.rate,
+            r.updated_at
+        FROM rates r
+        JOIN currencies b
+            ON r.base_currency_id = b.currency_id
+        JOIN currencies q
+            ON r.quote_currency_id = q.currency_id
+        ORDER BY b.currency_code, q.currency_code
+    ";
+
+    $result = $conn->query($sql);
+
+    if (!$result) {
+        return [
+            "success" => false,
+            "error" => $conn->error
+        ];
+    }
+
+    $rates = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $rates[] = $row;
+    }
+
+    return [
+        "success" => true,
+        "rates" => $rates
+    ];
+}
+
 function requestProcessor($request)
 {
     if (!isset($request["type"])) {
@@ -26,7 +65,9 @@ function requestProcessor($request)
             return loginUser(
                 $request["username"],
                 $request["password"]
-            );
+	    );
+	case "get_rates":
+	    return getRates();    
 
         default:
             return [
