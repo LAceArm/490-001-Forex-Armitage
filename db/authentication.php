@@ -4,7 +4,7 @@ require_once "database.php";
 
 function registerUser($username, $email, $password, $firstName = null, $lastName = null)
 {
-    //error_log(date("Y/m/d H:i:s").": Registration Attempt
+    error_log(date("Y/m/d H:i:s").": REGISTRATION ATTEMPT".PHP_EOL,3,"/home/seif490/WebsiteLogs/Registration.log");
     global $conn;
 
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
@@ -25,13 +25,13 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
     );
 
     if ($stmt->execute()) {
-	 //   error_log(date("Y/m/d H:i:s").": Registration success".PHP_EOL, 3, "~/WebsiteLogs/Registration.log");
+        error_log(date("Y/m/d H:i:s").": REGISTRATION WAS SUCCESSFUL".PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
         return [
             "success" => true,
             "user_id" => $conn->insert_id
         ];
     }
-	//echo date("Y/m/d H:i:s")."REGISTRATION ATTEMPT WAS UNSUCCESSFUL".PHP_EOL >~/WebsiteLogs/Registration.log;
+    error_log(date("Y/m/d H:i:s").": REGISTRATION ATTEMPT WAS UNSUCCESSFUL".PHP_EOL,3,"/home/seif490/WebsiteLogs/Registration.log");
     return [
         "success" => false,
         "error" => $stmt->error
@@ -40,8 +40,7 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
 
 function loginUser($username, $password)
 {	
-	
-	//echo date("Y/m/d H:i:s")."LOGIN ATTEMPT FROM $username".PHP_EOL >~/WebsiteLogs/Login.log;
+	error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT FROM $username".PHP_EOL,3,"/home/seif490/WebsiteLogs/Login.log");
 	 global $conn;
 
     $stmt = $conn->prepare(
@@ -58,23 +57,28 @@ function loginUser($username, $password)
 	    $result= $stmt->get_result();
 
 	    if($result->num_rows !== 1){ 
+error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT WAS UNSUCCESSFUL; USER $username DOES NOT EXIST".PHP_EOL,3,"/home/seif490/WebsiteLogs/Login.log");
 		    return ["success"=>false];
 	    }
 
 	    $user = $result->fetch_assoc();
 
 	    if(!$user["is_active"]){ 
+	error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT WAS UNSUCCESSUL; USER $username IS INACTIVE".PHP_EOL,3,"/home/seif490/WebsiteLogs/Login.log");
 		    return ["success"=>false];
 	    }
 
 	    if(!password_verify($password,$user["password_hash"])){ 
+		  error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT WAS UNSUCCESSUL; PASSWORD MISMATCH".PHP_EOL,3,"/home/seif490/WebsiteLogs/Login.log");
 		    	return["success"=>false];
 	    }
+	    error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT WAS SUCCESSFUL".PHP_EOL,3,"/home/seif490/WebsiteLogs/Login.log");
 	    return ["success"=>true,"user_id"=>$user["user_id"],"username"=>$user["username"],"role"=>$user["role"]];
 
     }
 
-    catch (Exception $e){ 
+	catch (Exception $e){ 
+	error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT WAS UNSUCCESSFUL; AN EXCEPTION OCCURED: ".$e->getMessage().PHP_EOL,3,"/home/seif490/WebsiteLogs/Login.log");	
 	    return array("success"=>false);
     }
 }
