@@ -17,6 +17,8 @@ function send_to_broker(array $payload): array
         require_once('get_host_info.inc');
         require_once('rabbitMQLib.inc');
 
+        $reply = null;
+
         try {
                 ob_start();
 
@@ -25,19 +27,8 @@ function send_to_broker(array $payload): array
                 // Creates a new RabbitMQClient. This is what will communicate with the broker.
                 $client = new rabbitMQClient('WebServer.ini', $section);
 
-		// Logs the occurence
-		//error_log(date("Y/m/d H:i:s") . ": REQUEST TO BROKER " PHP_EOL, 3, "/home/jdk39/WebsiteLogs/Requests.log");
-
                 $reply = $client->send_request($payload);
         } catch (Exception $e) {
-                // Something went wrong. Event logged accordingly
-		//error_log(date("Y/m/d H:i:s") . " REQUEST TO BROKER FAILED: " . $e->getMessage() . PHP_EOL, 3, "/home/jdk39/WebsiteLogs/Requests.log");		
-                $client = new rabbitMQClient('WebServer.ini', $section);
-
-		//error_log(date("Y/m/d H:i:s") . " REQUEST TO BROKER FAILED: " . $e->getMessage() . PHP_EOL, 3, "/home/jdk39/WebsiteLogs/Requests.log");
-                $reply = $client->send_request($payload);
-        } catch (Exception $e) {
-		//error_log(date("Y/m/d H:i:s") . " REQUEST TO BROKER FAILED: " . $e->getMessage() . PHP_EOL, 3, "/home/jdk39/WebsiteLogs/Requests.log");		
                 $reply = null;
         } finally {
                 ob_end_clean();
