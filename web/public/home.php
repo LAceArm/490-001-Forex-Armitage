@@ -2,13 +2,13 @@
 <?php
 session_start();
 
-// Uncomment when testing with your login system.
-// if (empty($_SESSION['user_id'])) {
-//     header('Location: login.php');
-//     exit;
-// }
 
-$username = $_SESSION['username'] ?? 'TestUser';
+ if (empty($_SESSION['user_id'])) {
+     header('Location: login.php');
+     exit;
+ }
+
+
 ?>
 
 <!DOCTYPE html>
