@@ -66,6 +66,13 @@ function requestProcessor($request)
                 $request["username"],
                 $request["password"]
 	    );
+
+	case "validate_session":
+		return validateSession($request["session_key"] ?? "");
+
+	case "logout":
+		return destroySession($request["session_key"] ?? "");
+
 	case "get_rates":
 	    return getRates();    
 
