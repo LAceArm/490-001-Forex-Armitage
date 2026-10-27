@@ -4,7 +4,7 @@ require_once "database.php";
 
 function registerUser($username, $email, $password, $firstName = null, $lastName = null)
 {
-    error_log(date("Y/m/d H:i:s").": REGISTRATION ATTEMPT".PHP_EOL,3,"~/WebsiteLogs/Registration.log");
+    error_log(date("Y/m/d H:i:s").": REGISTRATION ATTEMPT".PHP_EOL,3,"/home/seif490/WebsiteLogs/Registration.log");
     global $conn;
 
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
@@ -25,13 +25,13 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
     );
 
     if ($stmt->execute()) {
-        error_log(date("Y/m/d H:i:s").": REGISTRATION WAS SUCCESSFUL".PHP_EOL, 3, "~/WebsiteLogs/Registration.log");
+        error_log(date("Y/m/d H:i:s").": REGISTRATION WAS SUCCESSFUL".PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
         return [
             "success" => true,
             "user_id" => $conn->insert_id
         ];
     }
-    error_log(date("Y/m/d H:i:s").": REGISTRATION ATTEMPT WAS UNSUCCESSFUL".PHP_EOL,3,"~/WebsiteLogs/Registration.log");
+    error_log(date("Y/m/d H:i:s").": REGISTRATION ATTEMPT WAS UNSUCCESSFUL".PHP_EOL,3,"/home/seif490/WebsiteLogs/Registration.log");
     return [
         "success" => false,
         "error" => $stmt->error
