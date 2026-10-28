@@ -5,6 +5,11 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
 }
 
+if (empty($_SESSION['session_key'])) {
+        header('Location: login.php');
+        exit;
+}
+
 $reply = send_to_broker([
         'type' => 'validate_session',
         'session_key' => $_SESSION['session_key'] ?? ''
