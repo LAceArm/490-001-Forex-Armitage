@@ -2,6 +2,59 @@
 
 require_once "database.php";
 
+function createSession($userId)
+{
+    global $conn;
+
+    $key = bin2hex(random_bytes(32));
+
+    $stmt = $conn->prepare(
+        "INSERT INTO sessions (session_key, user_id, created_at, expires_at)
+         VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 1 HOUR))"
+    );
+    $stmt->bind_param("si", $key, $userId);
+    $stmt->execute();
+
+    return $key;
+}
+
+function validateSession($key)
+{
+    global $conn;
+
+    $stmt = $conn->prepare(
+        "SELECT u.user_id, u.username, u.role
+         FROM sessions s
+         JOIN users u ON u.user_id = s.user_id
+         WHERE s.session_key = ? AND s.expires_at > NOW()"
+    );
+    $stmt->bind_param("s", $key);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+
+    if (!$row) {
+        return ["success" => false];
+    }
+
+    return [
+        "success" => true,
+        "user_id" => $row["user_id"],
+        "username" => $row["username"],
+        "role" => $row["role"]
+    ];
+}
+
+function destroySession($key)
+{
+    global $conn;
+
+    $stmt = $conn->prepare("DELETE FROM sessions WHERE session_key = ?");
+    $stmt->bind_param("s", $key);
+    $stmt->execute();
+
+    return ["success" => true];
+}
+
 function registerUser($username, $email, $password, $firstName = null, $lastName = null)
 {
     error_log(date("Y/m/d H:i:s").": REGISTRATION ATTEMPT".PHP_EOL,3,"/home/seif490/WebsiteLogs/Registration.log");
@@ -25,7 +78,22 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
     );
 
     if ($stmt->execute()) {
-        error_log(date("Y/m/d H:i:s").": REGISTRATION WAS SUCCESSFUL".PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
+	$newUserId = $conn->insert_id;
+	$pstmt = $conn->prepare("INSERT INTO portfolios (user_id) VALUES (?)");
+	$pstmt->bind_param("i", $newUserId);
+	$pstmt->execute();
+	
+	$ustmt = $conn->prepare(
+		"INSERT INTO positions (user_id, currency_id, amount)
+		SELECT p.user_id, c.currency_id, p.starting_cash
+		FROM portfolios p
+		JOIN currencies c ON c.currency_code = 'USD'
+		WHERE p.user_id = ?"
+	);
+	$ustmt->bind_param("i", $newUserId);
+	$ustmt->execute();
+
+	error_log(date("Y/m/d H:i:s").": REGISTRATION WAS SUCCESSFUL".PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
         return [
             "success" => true,
             "user_id" => $conn->insert_id
@@ -73,7 +141,7 @@ error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT WAS UNSUCCESSFUL; USER $username 
 		    	return["success"=>false];
 	    }
 	    error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT WAS SUCCESSFUL".PHP_EOL,3,"/home/seif490/WebsiteLogs/Login.log");
-	    return ["success"=>true,"user_id"=>$user["user_id"],"username"=>$user["username"],"role"=>$user["role"]];
+	    return ["success"=>true,"user_id"=>$user["user_id"],"username"=>$user["username"],"role"=>$user["role"], "session_key"=>createSession($user["user_id"])];
 
     }
 
