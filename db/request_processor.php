@@ -1,6 +1,7 @@
 <?php
 
 require_once "authentication.php";
+require_once "trading.php"
 
 function getRates()
 {
@@ -73,14 +74,28 @@ function requestProcessor($request)
 	case "logout":
 		return destroySession($request["session_key"] ?? "");
 
-	case "get_rates":
-	    return getRates();    
+	case "trade":
+		$s = validateSession($request["session_key"] ?? "");
+		if (empty($s["success"])) {
+			return ["success" => false, "error" => "Not logged in"];
+		}
+
+		return executeTrade(
+			$s["user_id"],
+			$request["from"] ?? "",
+			$request["to"] ?? "",
+			$request["amount"] ?? 0
+		);
+
+		case "get_rates":
+			return getRates();    
 
         default:
             return [
                 "success" => false,
                 "error" => "Unknown request type"
             ];
+
     }
 }
 ?>
