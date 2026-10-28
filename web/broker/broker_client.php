@@ -27,8 +27,14 @@ function send_to_broker(array $payload): array
                 // Creates a new RabbitMQClient. This is what will communicate with the broker.
                 $client = new rabbitMQClient('WebServer.ini', $section);
 
+                // Logs the occurrence
+                error_log(date("Y/m/d H:i:s") . ": REQUEST TO BROKER " . PHP_EOL, 3, "/home/jdk39/WebsiteLogs/BrokerLogs.log");
+
                 $reply = $client->send_request($payload);
         } catch (Exception $e) {
+                // Something went wrong. Event logged accordingly.
+                error_log(date("Y/m/d H:i:s") . ": REQUEST TO BROKER FAILED: " . $e->getMessage() . PHP_EOL, 3, "/home/jdk39/WebsiteLogs/BrokerLogs.log");
+
                 $reply = null;
         } finally {
                 ob_end_clean();
