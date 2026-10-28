@@ -47,7 +47,7 @@ ksort($currencies);   // alphabetical by code
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Currency Browser | Currency Trading</title>
+    <title>Currency Browser | Forex Armitage</title>
 
     <!-- Shared site styles, then styles for this page -->
     <link rel="stylesheet" href="assets/style.css?v=5">
@@ -59,7 +59,7 @@ ksort($currencies);   // alphabetical by code
     <!-- Navigation bar (same links as the other pages) -->
     <nav class="main-navbar">
         <div class="main-nav-container">
-            <a href="home.php" class="main-logo">Currency Trading</a>
+            <a href="home.php" class="main-logo">Forex Armitage</a>
 
             <div class="main-nav-links">
                 <a href="dashboard.php">Dashboard</a>

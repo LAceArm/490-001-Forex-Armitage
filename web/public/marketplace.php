@@ -120,11 +120,11 @@ foreach ($portfolio['positions'] ?? [] as $p) {
     <!-- Navigation bar (same links as the other pages) -->
     <nav class="main-navbar">
         <div class="main-nav-container">
-<<<<<<< HEAD
+
             <a href="home.php" class="main-logo">Currency Trading</a>
-=======
+
             <a href="home.php" class="main-logo">Forex Armitage</a>
->>>>>>> 582041c (Fixing Header Name)
+
 
             <div class="main-nav-links">
                 <a href="dashboard.php">Dashboard</a>

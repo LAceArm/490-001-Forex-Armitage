@@ -108,7 +108,7 @@ $watchlist = $_SESSION['watchlists'][$userId];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Watchlist | Currency Trading</title>
+    <title>Watchlist | Forex Armitage</title>
 
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/watchlist.css">
@@ -120,7 +120,7 @@ $watchlist = $_SESSION['watchlists'][$userId];
         <div class="main-nav-container">
 
             <a href="home.php" class="main-logo">
-                Currency Trading
+                Forex Armitage
             </a>
 
             <div class="main-nav-links">

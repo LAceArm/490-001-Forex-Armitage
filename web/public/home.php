@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/../broker/session_check.php';
 $username = $currentUser['username'];
 ?>
