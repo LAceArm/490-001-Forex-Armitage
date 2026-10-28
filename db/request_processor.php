@@ -163,7 +163,14 @@ function requestProcessor($request)
 		if (empty($s["success"])) {
                 	return ["success" => false, "error" => "Not logged in"];
             	}
-            	return getPortfolio($s["user_id"]);	
+            	return getPortfolio($s["user_id"]);
+	
+        case "get_trades":
+                $s = validateSession($request["session_key"] ?? "");
+                if (empty($s["success"])) {
+                        return ["success" => false, "error" => "Not logged in"];
+                }
+                return getTrades($s["user_id"]);
 
         default:
             return [
