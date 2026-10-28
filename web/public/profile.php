@@ -1,12 +1,5 @@
-
 <?php
-session_start();
-
-
- if (empty($_SESSION['user_id'])) {
-     header('Location: login.php');
-     exit;
- }
+require_once __DIR__ . '/../broker/session_check.php';
 
 $username = $_SESSION['username'] ?? '';
 $email = $_SESSION['email'] ?? '';
