@@ -9,5 +9,5 @@ curl -X POST 'https://api.resend.com/emails' \
   "from": "Acme <onboarding@resend.dev>",
   "to": ["delivered@resend.dev"],
   "subject": "hello world",
-  "html": "<p>it works!</p>"
+  "html": "<p>ALERT: One of the currencies you follow has experienced extreme fluctuations</p>"
 }'
