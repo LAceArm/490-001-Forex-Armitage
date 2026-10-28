@@ -1,0 +1,167 @@
+
+.watchlist-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 25px;
+}
+
+.watchlist-header {
+    margin-bottom: 35px;
+}
+
+.watchlist-header h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #1e293b;
+    font-size: 30px;
+}
+
+.watchlist-header p {
+    color: #64748b;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.watchlist-card {
+    padding: 30px;
+    margin-bottom: 25px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.watchlist-card h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #1e293b;
+    font-size: 22px;
+}
+
+.watchlist-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.watchlist-form select {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background-color: white;
+    color: #222;
+    font-size: 15px;
+}
+
+.watchlist-form select:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.watchlist-button {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+}
+
+.watchlist-button:hover {
+    background-color: #1d4ed8;
+    color: white;
+}
+
+.watchlist-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.watchlist-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.watchlist-table th,
+.watchlist-table td {
+    padding: 15px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.watchlist-table th {
+    background-color: #f8fafc;
+    color: #334155;
+    font-size: 14px;
+}
+
+.watchlist-table td {
+    color: #475569;
+    font-size: 14px;
+}
+
+.watchlist-table tr:hover {
+    background-color: #f8fafc;
+}
+
+.remove-button {
+    padding: 9px 15px;
+    background-color: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.remove-button:hover {
+    background-color: #b91c1c;
+}
+
+.watchlist-message {
+    margin-top: 25px;
+    color: #64748b;
+    font-size: 15px;
+    text-align: center;
+}
+
+.watchlist-error {
+    margin-top: 20px;
+    color: #dc2626;
+    font-size: 14px;
+}
+
+.watchlist-success {
+    margin-top: 20px;
+    color: #16a34a;
+    font-size: 14px;
+}
+
+.watchlist-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.watchlist-actions .back-home-button {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: #e2e8f0;
+    color: #1e293b;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.watchlist-actions .back-home-button:hover {
+    background-color: #cbd5e1;
+    color: #1e293b;
+}

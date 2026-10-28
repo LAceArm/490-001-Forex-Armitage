@@ -1,187 +1,417 @@
-/* Makes sizing more predictable */
+
+/* GENERAL STYLING */
+
 * {
-        box-sizing: border-box;
+    box-sizing: border-box;
 }
 
-/* Entire page */
 body {
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #f4f6f8;
-        font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: #f4f6f9;
+    color: #222;
+    font-family: Arial, sans-serif;
 }
 
-/* Login container */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+
+/* LOGIN AND REGISTER PAGES */
+
+body:has(.login-box) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
 .login-box {
-        background-color: white;
-        width: 380px;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 420px;
+    padding: 35px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Login title */
-h1 {
-        text-align: center;
-        margin-top: 0;
-        margin-bottom: 10px;
+.login-box h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #1e293b;
+    font-size: 28px;
+    text-align: center;
 }
 
-/* Welcome message */
-.welcome {
-        text-align: center;
-        color: #666;
-        margin-bottom: 30px;
+.login-box .welcome {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #64748b;
+    font-size: 14px;
+    text-align: center;
 }
 
-/* Username and Password labels */
-label {
-        display: block;
-        margin-bottom: 7px;
-        font-weight: bold;
+.login-box form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-/* Username and Password boxes */
-input {
-        width: 100%;
-        padding: 12px;
-        margin-bottom: 20px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 15px;
+.login-box label {
+    color: #334155;
+    font-size: 14px;
+    font-weight: bold;
 }
 
-/* Changes border when clicking an input */
-input:focus {
-        outline: none;
-        border-color: #2563eb;
+.login-box input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background-color: white;
+    color: #222;
+    font-size: 15px;
 }
 
-/* Login button */
-.login-button {
-        width: 100%;
-        padding: 12px;
-        border: none;
-        border-radius: 6px;
-        background-color: #2563eb;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
+.login-box input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 
-/* Login button when mouse is over it */
-.login-button:hover {
-        background-color: #1d4ed8;
+.login-box input::placeholder {
+    color: #94a3b8;
 }
 
-/* Bottom registration section */
-.register-section {
-        text-align: center;
-        margin-top: 25px;
+.login-box .login-button {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
-/* Create Account button */
-.register-button {
-        background: none;
-        border: none;
-        color: #2563eb;
-        font-size: 15px;
-        cursor: pointer;
-        text-decoration: underline;
+.login-box .login-button:hover {
+    background-color: #1d4ed8;
 }
 
-/* Create Account button hover */
-.register-button:hover {
-        color: #1d4ed8;
+.login-box .login-button:active {
+    background-color: #1e40af;
 }
 
-/* Error message for incorrect login */
-.error {
-        background-color: #ffe5e5;
-        color: #b00020;
-        padding: 10px;
-        border-radius: 6px;
-        margin-bottom: 20px;
-        text-align: center;
+.login-box .error {
+    margin-bottom: 20px;
+    padding: 12px;
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
 }
+
+.login-box .register-section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+    text-align: center;
+}
+
+.login-box .register-section p {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.login-box .register-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #e2e8f0;
+    color: #1e293b;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.login-box .register-button:hover {
+    background-color: #cbd5e1;
+}
+
+.login-box .register-button:active {
+    background-color: #94a3b8;
+}
+
 
 /* HOME PAGE */
 
 .home-page {
-        display: block;
-        height: auto;
-        min-height: 100vh;
-        background-color: #f4f6f8;
+    display: block;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f6f9;
 }
 
-.navbar {
-        width: 100%;
-        background-color: white;
-        padding: 15px 40px;
 
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+/* HOME NAVIGATION BAR */
 
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.home-page .main-navbar {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #1e293b;
+    color: white;
 }
 
-.navbar h2 {
-        margin: 0;
+/* NAVIGATION CONTAINER */
+
+.home-page .main-nav-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 25px;
+    padding: 18px 40px;
 }
 
-.nav-links {
-        display: flex;
-        gap: 25px;
+/* WEBSITE NAME - LEFT SIDE */
+
+.home-page .main-logo {
+    flex-shrink: 0;
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    text-decoration: none;
+    white-space: nowrap;
 }
 
-.nav-links a {
-        text-decoration: none;
-        color: #2563eb;
-        font-weight: bold;
+.home-page .main-logo:hover {
+    color: #93c5fd;
 }
 
-.home-content {
-        text-align: center;
-        padding: 80px 20px;
+/* NAVIGATION LINKS - RIGHT SIDE */
+
+.home-page .main-nav-links {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 25px;
+    margin-left: auto;
 }
 
-.home-content h1 {
-        font-size: 40px;
+/* INDIVIDUAL NAVIGATION LINKS */
+
+.home-page .main-nav-links a {
+    display: inline-block;
+    color: white;
+    font-size: 15px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s;
 }
 
-.home-content > p {
-        color: #666;
-        font-size: 18px;
+.home-page .main-nav-links a:hover {
+    color: #93c5fd;
 }
 
-.dashboard {
-        display: flex;
-        justify-content: center;
-        gap: 25px;
-        margin-top: 40px;
+/* LOGOUT BUTTON */
+
+.home-page .main-nav-links a:last-child {
+    padding: 10px 16px;
+    background-color: #dc2626;
+    color: white;
+    border-radius: 6px;
+    text-align: center;
 }
 
-.card {
-        background-color: white;
-        width: 280px;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+.home-page .main-nav-links a:last-child:hover {
+    background-color: #b91c1c;
+    color: white;
 }
 
-.card button {
-        background-color: #2563eb;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 6px;
-        cursor: pointer;
+
+/* HOME MAIN CONTENT */
+
+.home-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 25px;
 }
 
-.card button:hover {
-        background-color: #1d4ed8;
-} 
+
+/* HOME HEADER */
+
+.home-page .home-header {
+    margin-bottom: 35px;
+}
+
+.home-page .home-header h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #1e293b;
+    font-size: 30px;
+}
+
+.home-page .home-header p {
+    color: #64748b;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+
+/* HOME FEATURE CARDS */
+
+.home-page .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 25px;
+    margin-top: 25px;
+}
+
+.home-page .feature-card {
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.home-page .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.home-page .feature-card h2 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: #1e293b;
+    font-size: 21px;
+}
+
+.home-page .feature-card p {
+    margin-bottom: 20px;
+    color: #64748b;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+
+/* HOME FEATURE BUTTONS */
+
+.home-page .feature-button {
+    display: inline-block;
+    align-self: flex-start;
+    margin-top: auto;
+    padding: 11px 18px;
+    background-color: #2563eb;
+    color: white;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.home-page .feature-button:hover {
+    background-color: #1d4ed8;
+    color: white;
+}
+
+
+/* GENERAL BUTTONS */
+
+.btn,
+.primary-btn {
+    display: inline-block;
+    padding: 11px 20px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.btn:hover,
+.primary-btn:hover {
+    background-color: #1d4ed8;
+}
+
+.secondary-btn {
+    display: inline-block;
+    padding: 11px 20px;
+    background-color: #e2e8f0;
+    color: #1e293b;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.secondary-btn:hover {
+    background-color: #cbd5e1;
+}
+
+
+/* CONTENT CARDS */
+
+.content-card {
+    margin-bottom: 25px;
+    padding: 25px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+
+/* TABLES */
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+.data-table th,
+.data-table td {
+    padding: 14px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.data-table th {
+    background-color: #f8fafc;
+    color: #334155;
+}
+
+.data-table tr:hover {
+    background-color: #f8fafc;
+}
+
+
+/* FOOTER */
+
+.footer {
+    margin-top: 40px;
+    padding: 25px;
+    color: #64748b;
+    font-size: 14px;
+    text-align: center;
+}

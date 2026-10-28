@@ -8,6 +8,18 @@
 
 session_start();
 
+error_log("LOGOUT key=" . ($_SESSION['session_key'] ?? 'NONE'));
+
+require_once __DIR__ . '/../broker/broker_client.php';
+
+// Tell the DB side to delete this session's key, so it can't be reused.
+if (!empty($_SESSION['session_key'])) {
+        send_to_broker([
+                'type'        => 'logout',
+                'session_key' => $_SESSION['session_key'],
+        ]);
+}
+
 // Empty the session data for this request.
 $_SESSION = [];
 

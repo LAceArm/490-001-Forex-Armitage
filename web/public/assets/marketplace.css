@@ -1,0 +1,168 @@
+
+.marketplace-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 25px;
+}
+
+.marketplace-header {
+    margin-bottom: 35px;
+}
+
+.marketplace-header h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #1e293b;
+    font-size: 30px;
+}
+
+.marketplace-header p {
+    color: #64748b;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.marketplace-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.marketplace-card {
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.marketplace-card h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #1e293b;
+    font-size: 22px;
+}
+
+.marketplace-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.marketplace-card label {
+    color: #334155;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.marketplace-card input,
+.marketplace-card select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background-color: white;
+    color: #222;
+    font-size: 15px;
+}
+
+.marketplace-card input:focus,
+.marketplace-card select:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.marketplace-card input[readonly] {
+    background-color: #f1f5f9;
+}
+
+.marketplace-button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.marketplace-button:hover {
+    background-color: #1d4ed8;
+}
+
+.trade-summary {
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #e2e8f0;
+    color: #475569;
+    font-size: 15px;
+}
+
+.summary-row strong {
+    color: #1e293b;
+    text-align: right;
+}
+
+.total-row {
+    margin-top: 10px;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.trade-message {
+    margin-top: 25px;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.confirm-button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    background-color: #16a34a;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.confirm-button:hover {
+    background-color: #15803d;
+}
+
+.confirm-button:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.marketplace-footer {
+    margin-top: 30px;
+}
+
+.back-portfolio-button {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: #e2e8f0;
+    color: #1e293b;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.back-portfolio-button:hover {
+    background-color: #cbd5e1;
+    color: #1e293b;
+}
