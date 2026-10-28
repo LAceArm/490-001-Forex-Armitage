@@ -2,103 +2,15 @@
 <?php
 session_start();
 
-if (empty($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit;
-}
-
 $currencies = [
-    'USD' => ['name' => 'US Dollar', 'rate' => null],
-    'EUR' => ['name' => 'Euro', 'rate' => null],
-    'GBP' => ['name' => 'British Pound', 'rate' => null],
-    'JPY' => ['name' => 'Japanese Yen', 'rate' => null],
-    'CNY' => ['name' => 'Chinese Yuan', 'rate' => null],
-    'CHF' => ['name' => 'Swiss Franc', 'rate' => null],
-    'AED' => ['name' => 'UAE Dirham', 'rate' => null]
+    'USD' => ['name' => 'US Dollar', 'rate' => null, 'change' => null],
+    'EUR' => ['name' => 'Euro', 'rate' => null, 'change' => null],
+    'GBP' => ['name' => 'British Pound', 'rate' => null, 'change' => null],
+    'JPY' => ['name' => 'Japanese Yen', 'rate' => null, 'change' => null],
+    'CNY' => ['name' => 'Chinese Yuan', 'rate' => null, 'change' => null],
+    'CHF' => ['name' => 'Swiss Franc', 'rate' => null, 'change' => null],
+    'AED' => ['name' => 'UAE Dirham', 'rate' => null, 'change' => null]
 ];
-
-$userId = (string) $_SESSION['user_id'];
-
-if (!isset($_SESSION['watchlists'])) {
-    $_SESSION['watchlists'] = [];
-}
-
-if (!isset($_SESSION['watchlists'][$userId])) {
-    $_SESSION['watchlists'][$userId] = [];
-}
-
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-$error = '';
-$message = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    $action = $_POST['action'] ?? '';
-    $currencyCode = $_POST['currency'] ?? '';
-    $submittedToken = $_POST['csrf_token'] ?? '';
-
-    if (!is_string($submittedToken) ||
-        !hash_equals($_SESSION['csrf_token'], $submittedToken)) {
-
-        $error = 'Invalid request. Please try again.';
-
-    } elseif ($action === 'add') {
-
-        if (!isset($currencies[$currencyCode])) {
-
-            $error = 'Please select a valid currency.';
-
-        } elseif (in_array(
-            $currencyCode,
-            $_SESSION['watchlists'][$userId],
-            true
-        )) {
-
-            $error = 'This currency is already in your watchlist.';
-
-        } else {
-
-            $_SESSION['watchlists'][$userId][] = $currencyCode;
-            $message = 'Currency added to your watchlist.';
-
-        }
-
-    } elseif ($action === 'remove') {
-
-        if (!in_array(
-            $currencyCode,
-            $_SESSION['watchlists'][$userId],
-            true
-        )) {
-
-            $error = 'Currency not found in your watchlist.';
-
-        } else {
-
-            $_SESSION['watchlists'][$userId] = array_values(
-                array_filter(
-                    $_SESSION['watchlists'][$userId],
-                    function ($code) use ($currencyCode) {
-                        return $code !== $currencyCode;
-                    }
-                )
-            );
-
-            $message = 'Currency removed from your watchlist.';
-
-        }
-
-    } else {
-
-        $error = 'Invalid action.';
-
-    }
-}
-
-$watchlist = $_SESSION['watchlists'][$userId];
 ?>
 
 <!DOCTYPE html>
@@ -108,7 +20,7 @@ $watchlist = $_SESSION['watchlists'][$userId];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Watchlist | Forex Armitage</title>
+    <title>Watchlists | Currency Trading</title>
 
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/watchlist.css">
@@ -120,7 +32,7 @@ $watchlist = $_SESSION['watchlists'][$userId];
         <div class="main-nav-container">
 
             <a href="home.php" class="main-logo">
-                Forex Armitage
+                Currency Trading
             </a>
 
             <div class="main-nav-links">
@@ -136,190 +48,33 @@ $watchlist = $_SESSION['watchlists'][$userId];
     <main class="watchlist-container">
 
         <div class="watchlist-header">
-
-            <h1>My Watchlist</h1>
-
-            <p>
-                Track your favorite currencies and monitor exchange rates.
-            </p>
-
+            <h1>My Watchlists</h1>
+            <p>Create watchlists to organize and track currencies.</p>
         </div>
 
         <section class="watchlist-card">
 
-            <h2>Add Currency</h2>
+            <h2>Create New Watchlist</h2>
 
-            <form
-                method="POST"
-                action="watchlist.php"
-                class="watchlist-form"
-            >
+            <form id="create-watchlist-form" class="watchlist-form">
 
                 <input
-                    type="hidden"
-                    name="action"
-                    value="add"
+                    type="text"
+                    id="watchlist-name"
+                    placeholder="Enter watchlist name"
+                    maxlength="50"
+                    required
                 >
-
-                <input
-                    type="hidden"
-                    name="csrf_token"
-                    value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>"
-                >
-
-                <select name="currency" required>
-
-                    <option value="">Select a currency</option>
-
-                    <?php foreach ($currencies as $code => $currency): ?>
-
-                        <option value="<?php echo htmlspecialchars($code); ?>">
-
-                            <?php
-                            echo htmlspecialchars(
-                                $code . ' - ' . $currency['name']
-                            );
-                            ?>
-
-                        </option>
-
-                    <?php endforeach; ?>
-
-                </select>
 
                 <button type="submit" class="watchlist-button">
-                    Add to Watchlist
+                    Create Watchlist
                 </button>
 
             </form>
 
-            <?php if ($error !== ''): ?>
-
-                <p class="watchlist-error">
-                    <?php echo htmlspecialchars($error); ?>
-                </p>
-
-            <?php endif; ?>
-
-            <?php if ($message !== ''): ?>
-
-                <p class="watchlist-success">
-                    <?php echo htmlspecialchars($message); ?>
-                </p>
-
-            <?php endif; ?>
-
         </section>
 
-        <section class="watchlist-card">
-
-            <h2>Tracked Currencies</h2>
-
-            <div class="watchlist-table-wrapper">
-
-                <table class="watchlist-table">
-
-                    <thead>
-
-                        <tr>
-                            <th>Currency Code</th>
-                            <th>Currency Name</th>
-                            <th>Exchange Rate (USD)</th>
-                            <th>Rate Change</th>
-                            <th>Action</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        <?php foreach ($watchlist as $code): ?>
-
-                            <?php if (isset($currencies[$code])): ?>
-
-                                <tr>
-
-                                    <td>
-                                        <?php echo htmlspecialchars($code); ?>
-                                    </td>
-
-                                    <td>
-                                        <?php
-                                        echo htmlspecialchars(
-                                            $currencies[$code]['name']
-                                        );
-                                        ?>
-                                    </td>
-
-                                    <td>
-                                        <?php
-                                        echo $currencies[$code]['rate'] !== null
-                                            ? number_format($currencies[$code]['rate'], 4)
-                                            : 'Not available';
-                                        ?>
-                                    </td>
-
-                                    <td>
-                                        Not available
-                                    </td>
-
-                                    <td>
-
-                                        <form
-                                            method="POST"
-                                            action="watchlist.php"
-                                        >
-
-                                            <input
-                                                type="hidden"
-                                                name="action"
-                                                value="remove"
-                                            >
-
-                                            <input
-                                                type="hidden"
-                                                name="currency"
-                                                value="<?php echo htmlspecialchars($code); ?>"
-                                            >
-
-                                            <input
-                                                type="hidden"
-                                                name="csrf_token"
-                                                value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>"
-                                            >
-
-                                            <button
-                                                type="submit"
-                                                class="remove-button"
-                                            >
-                                                Remove
-                                            </button>
-
-                                        </form>
-
-                                    </td>
-
-                                </tr>
-
-                            <?php endif; ?>
-
-                        <?php endforeach; ?>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-            <?php if (empty($watchlist)): ?>
-
-                <p class="watchlist-message">
-                    Your watchlist is empty. Add a currency to get started.
-                </p>
-
-            <?php endif; ?>
-
-        </section>
+        <div id="watchlists-container"></div>
 
         <div class="watchlist-actions">
 
@@ -334,6 +89,285 @@ $watchlist = $_SESSION['watchlists'][$userId];
         </div>
 
     </main>
+
+    <script>
+        const currencies = <?php
+            echo json_encode(
+                $currencies,
+                JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+            );
+        ?>;
+
+        let watchlists = [];
+        let nextWatchlistId = 1;
+
+        const watchlistsContainer = document.getElementById(
+            'watchlists-container'
+        );
+
+        const createForm = document.getElementById(
+            'create-watchlist-form'
+        );
+
+        createForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const nameInput = document.getElementById('watchlist-name');
+            const name = nameInput.value.trim();
+
+            if (name === '') {
+                return;
+            }
+
+            const watchlist = {
+                id: nextWatchlistId++,
+                name: name,
+                currencies: []
+            };
+
+            watchlists.push(watchlist);
+
+            nameInput.value = '';
+
+            renderWatchlists();
+        });
+
+        function addCurrency(watchlistId, currencyCode) {
+            const watchlist = watchlists.find(function(list) {
+                return list.id === watchlistId;
+            });
+
+            if (!watchlist || !Object.hasOwn(currencies, currencyCode)) {
+                return;
+            }
+
+            if (watchlist.currencies.includes(currencyCode)) {
+                return;
+            }
+
+            watchlist.currencies.push(currencyCode);
+
+            renderWatchlists();
+        }
+
+        function removeCurrency(watchlistId, currencyCode) {
+            const watchlist = watchlists.find(function(list) {
+                return list.id === watchlistId;
+            });
+
+            if (!watchlist) {
+                return;
+            }
+
+            watchlist.currencies = watchlist.currencies.filter(
+                function(code) {
+                    return code !== currencyCode;
+                }
+            );
+
+            renderWatchlists();
+        }
+
+        function deleteWatchlist(watchlistId) {
+            watchlists = watchlists.filter(function(list) {
+                return list.id !== watchlistId;
+            });
+
+            renderWatchlists();
+        }
+
+        function formatRate(value) {
+            if (value === null || value === undefined) {
+                return 'Not available';
+            }
+
+            const number = Number(value);
+
+            if (!Number.isFinite(number)) {
+                return 'Not available';
+            }
+
+            return number.toFixed(4);
+        }
+
+        function formatChange(value) {
+            if (value === null || value === undefined) {
+                return 'Not available';
+            }
+
+            const number = Number(value);
+
+            if (!Number.isFinite(number)) {
+                return 'Not available';
+            }
+
+            return (number > 0 ? '+' : '') + number.toFixed(2) + '%';
+        }
+
+        function renderWatchlists() {
+            watchlistsContainer.replaceChildren();
+
+            if (watchlists.length === 0) {
+                const emptyMessage = document.createElement('p');
+
+                emptyMessage.className = 'watchlist-message';
+                emptyMessage.textContent =
+                    'No watchlists created yet. Create one to get started.';
+
+                watchlistsContainer.appendChild(emptyMessage);
+                return;
+            }
+
+            watchlists.forEach(function(watchlist) {
+                const section = document.createElement('section');
+                section.className = 'watchlist-card';
+
+                const header = document.createElement('div');
+                header.className = 'watchlist-section-header';
+
+                const title = document.createElement('h2');
+                title.textContent = watchlist.name;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.className = 'delete-watchlist-button';
+                deleteButton.textContent = 'Delete Watchlist';
+
+                deleteButton.addEventListener('click', function() {
+                    deleteWatchlist(watchlist.id);
+                });
+
+                header.append(title, deleteButton);
+
+                const form = document.createElement('form');
+                form.className = 'watchlist-form';
+
+                const select = document.createElement('select');
+                select.required = true;
+
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = 'Select a currency';
+
+                select.appendChild(defaultOption);
+
+                Object.entries(currencies).forEach(function(entry) {
+                    const code = entry[0];
+                    const currency = entry[1];
+
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.textContent = code + ' - ' + currency.name;
+
+                    select.appendChild(option);
+                });
+
+                const addButton = document.createElement('button');
+                addButton.type = 'submit';
+                addButton.className = 'watchlist-button';
+                addButton.textContent = 'Add Currency';
+
+                form.append(select, addButton);
+
+                form.addEventListener('submit', function(event) {
+                    event.preventDefault();
+
+                    addCurrency(watchlist.id, select.value);
+                });
+
+                const tableWrapper = document.createElement('div');
+                tableWrapper.className = 'watchlist-table-wrapper';
+
+                const table = document.createElement('table');
+                table.className = 'watchlist-table';
+
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+
+                const headings = [
+                    'Currency Code',
+                    'Currency Name',
+                    'Exchange Rate (USD)',
+                    'Rate Change',
+                    'Action'
+                ];
+
+                headings.forEach(function(heading) {
+                    const th = document.createElement('th');
+                    th.textContent = heading;
+
+                    headerRow.appendChild(th);
+                });
+
+                thead.appendChild(headerRow);
+
+                const tbody = document.createElement('tbody');
+
+                watchlist.currencies.forEach(function(code) {
+                    const currency = currencies[code];
+
+                    if (!currency) {
+                        return;
+                    }
+
+                    const row = document.createElement('tr');
+
+                    const codeCell = document.createElement('td');
+                    codeCell.textContent = code;
+
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = currency.name;
+
+                    const rateCell = document.createElement('td');
+                    rateCell.textContent = formatRate(currency.rate);
+
+                    const changeCell = document.createElement('td');
+                    changeCell.textContent = formatChange(currency.change);
+
+                    const actionCell = document.createElement('td');
+
+                    const removeButton = document.createElement('button');
+                    removeButton.type = 'button';
+                    removeButton.className = 'remove-button';
+                    removeButton.textContent = 'Remove';
+
+                    removeButton.addEventListener('click', function() {
+                        removeCurrency(watchlist.id, code);
+                    });
+
+                    actionCell.appendChild(removeButton);
+
+                    row.append(
+                        codeCell,
+                        nameCell,
+                        rateCell,
+                        changeCell,
+                        actionCell
+                    );
+
+                    tbody.appendChild(row);
+                });
+
+                table.append(thead, tbody);
+                tableWrapper.appendChild(table);
+
+                section.append(header, form, tableWrapper);
+
+                if (watchlist.currencies.length === 0) {
+                    const emptyMessage = document.createElement('p');
+                    emptyMessage.className = 'watchlist-message';
+                    emptyMessage.textContent =
+                        'This watchlist is empty. Add a currency to get started.';
+
+                    section.appendChild(emptyMessage);
+                }
+
+                watchlistsContainer.appendChild(section);
+            });
+        }
+
+        renderWatchlists();
+    </script>
 
 </body>
 </html>
