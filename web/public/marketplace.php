@@ -1,3 +1,4 @@
+
 <?php
 // ---------------------------------------------------------------------------
 // marketplace.php: preview and confirm currency trades.
@@ -120,11 +121,7 @@ foreach ($portfolio['positions'] ?? [] as $p) {
     <!-- Navigation bar (same links as the other pages) -->
     <nav class="main-navbar">
         <div class="main-nav-container">
-
-            <a href="home.php" class="main-logo">Currency Trading</a>
-
             <a href="home.php" class="main-logo">Forex Armitage</a>
-
 
             <div class="main-nav-links">
                 <a href="dashboard.php">Dashboard</a>
@@ -238,6 +235,7 @@ foreach ($portfolio['positions'] ?? [] as $p) {
 
         <div class="marketplace-footer">
             <a href="portfolio.php" class="back-portfolio-button">Back to Portfolio</a>
+            <a href="home.php" class="back-portfolio-button">Back to Home</a>
         </div>
 
     </main>
