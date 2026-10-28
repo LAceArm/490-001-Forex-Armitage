@@ -1,0 +1,162 @@
+
+/* PORTFOLIO MAIN CONTAINER */
+
+.portfolio-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 25px;
+}
+
+/* PORTFOLIO HEADER */
+
+.portfolio-header {
+    margin-bottom: 35px;
+}
+
+.portfolio-header h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #1e293b;
+    font-size: 30px;
+}
+
+.portfolio-header p {
+    color: #64748b;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* PORTFOLIO SUMMARY CARDS */
+
+.portfolio-summary {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(230px, 1fr)
+    );
+    gap: 25px;
+    margin-bottom: 35px;
+}
+
+.portfolio-card {
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.portfolio-card h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #64748b;
+    font-size: 17px;
+}
+
+.portfolio-card p {
+    margin: 0;
+    color: #1e293b;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* CURRENCY HOLDINGS SECTION */
+
+.portfolio-holdings {
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.portfolio-holdings h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #1e293b;
+    font-size: 22px;
+}
+
+/* TABLE WRAPPER */
+
+.portfolio-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* PORTFOLIO TABLE */
+
+.portfolio-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.portfolio-table th,
+.portfolio-table td {
+    padding: 15px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.portfolio-table th {
+    background-color: #f8fafc;
+    color: #334155;
+    font-size: 14px;
+}
+
+.portfolio-table td {
+    color: #475569;
+    font-size: 14px;
+}
+
+.portfolio-table tr:hover {
+    background-color: #f8fafc;
+}
+
+/* EMPTY PORTFOLIO MESSAGE */
+
+.portfolio-message {
+    margin-top: 25px;
+    color: #64748b;
+    font-size: 15px;
+    text-align: center;
+}
+
+/* PORTFOLIO ACTION BUTTONS */
+
+.portfolio-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.portfolio-button {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: #2563eb;
+    color: white;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.portfolio-button:hover {
+    background-color: #1d4ed8;
+    color: white;
+}
+
+.back-home-button {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: #e2e8f0;
+    color: #1e293b;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.back-home-button:hover {
+    background-color: #cbd5e1;
+    color: #1e293b;
+}

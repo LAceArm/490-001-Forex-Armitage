@@ -1,0 +1,153 @@
+
+.gains-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 25px;
+}
+
+.gains-header {
+    margin-bottom: 35px;
+}
+
+.gains-header h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #1e293b;
+    font-size: 30px;
+}
+
+.gains-header p {
+    color: #64748b;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.gains-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 25px;
+    margin-bottom: 35px;
+}
+
+.gains-card {
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.gains-card h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #64748b;
+    font-size: 17px;
+}
+
+.gains-card p {
+    margin: 0;
+    color: #1e293b;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.gains-card p.positive,
+.gains-table td.positive {
+    color: #16a34a;
+}
+
+.gains-card p.negative,
+.gains-table td.negative {
+    color: #dc2626;
+}
+
+.gains-holdings {
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.gains-holdings h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #1e293b;
+    font-size: 22px;
+}
+
+.gains-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.gains-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.gains-table th,
+.gains-table td {
+    padding: 15px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.gains-table th {
+    background-color: #f8fafc;
+    color: #334155;
+    font-size: 14px;
+}
+
+.gains-table td {
+    color: #475569;
+    font-size: 14px;
+}
+
+.gains-table tr:hover {
+    background-color: #f8fafc;
+}
+
+.gains-message {
+    margin-top: 25px;
+    color: #64748b;
+    font-size: 15px;
+    text-align: center;
+}
+
+.gains-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.gains-button {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: #2563eb;
+    color: white;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.gains-button:hover {
+    background-color: #1d4ed8;
+    color: white;
+}
+
+.gains-back-button {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: #e2e8f0;
+    color: #1e293b;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.gains-back-button:hover {
+    background-color: #cbd5e1;
+    color: #1e293b;
+}
