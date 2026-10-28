@@ -42,7 +42,7 @@ if (!empty($holdings)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Portfolio Gains | Currency Trading</title>
+    <title>Portfolio Gains | Forex Armitage</title>
 
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/gains.css">
@@ -54,7 +54,7 @@ if (!empty($holdings)) {
         <div class="main-nav-container">
 
             <a href="home.php" class="main-logo">
-                Currency Trading
+                Forex Armitage
             </a>
 
             <div class="main-nav-links">

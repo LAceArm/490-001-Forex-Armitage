@@ -77,7 +77,7 @@ if (!$loaded || !$positions) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>My Portfolio | Currency Trading</title>
+    <title>My Portfolio | Forex Armitage</title>
 
     <!-- Shared site styles, then styles for this page -->
     <link rel="stylesheet" href="assets/style.css">
@@ -89,7 +89,14 @@ if (!$loaded || !$positions) {
     <!-- Navigation bar (same links as the other pages) -->
     <nav class="main-navbar">
         <div class="main-nav-container">
+<<<<<<< HEAD
             <a href="home.php" class="main-logo">Currency Trading</a>
+=======
+
+            <a href="home.php" class="main-logo">
+                Forex Armitage
+            </a>
+>>>>>>> 582041c (Fixing Header Name)
 
             <div class="main-nav-links">
                 <a href="dashboard.php">Dashboard</a>

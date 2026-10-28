@@ -108,7 +108,7 @@ foreach ($portfolio['positions'] ?? [] as $p) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Marketplace | Currency Trading</title>
+    <title>Marketplace | Forex Armitage</title>
 
     <!-- Shared site styles, then styles for this page -->
     <link rel="stylesheet" href="assets/style.css">
@@ -120,7 +120,11 @@ foreach ($portfolio['positions'] ?? [] as $p) {
     <!-- Navigation bar (same links as the other pages) -->
     <nav class="main-navbar">
         <div class="main-nav-container">
+<<<<<<< HEAD
             <a href="home.php" class="main-logo">Currency Trading</a>
+=======
+            <a href="home.php" class="main-logo">Forex Armitage</a>
+>>>>>>> 582041c (Fixing Header Name)
 
             <div class="main-nav-links">
                 <a href="dashboard.php">Dashboard</a>
