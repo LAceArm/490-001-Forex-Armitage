@@ -7,13 +7,19 @@
 	function Notification($emails=array()){ 
 		global $key;
 		$resend=Resend::client($key);
-
-		$resend->emails->send([
-  			'from' => 'Acme <onboarding@resend.dev>',
-  			'to' => ['delivered@resend.dev'],
-  			'subject' => 'hello world',
-  			'html' => '<strong>it works!</strong>',
+		try{
+			$response=$resend->emails->send([
+  				'from' => 'Acme <onboarding@resend.dev>',
+  				'to' => ['delivered@resend.dev'],
+  				'subject' => 'hello world',
+  				'html' => '<strong>it works!</strong>',
 			]);
+
+			echo "Email sent successfully\n";
+		}
+		catch(Exception $e){
+			echo "There was an error sending the email:".$e->getMessage()."\n";
+		}
 		
 	}
 ?>
