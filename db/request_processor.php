@@ -2,6 +2,7 @@
 
 require_once "authentication.php";
 require_once "trading.php";
+require_once "watchlists.php";
 
 function getRates()
 {
@@ -171,6 +172,29 @@ function requestProcessor($request)
                         return ["success" => false, "error" => "Not logged in"];
                 }
                 return getTrades($s["user_id"]);
+
+        case "get_watchlists":
+        case "create_watchlist":
+        case "delete_watchlist":
+        case "add_watchlist_item":
+        case "remove_watchlist_item":
+                // All five need a logged-in user; find them from the session key.
+                $s = validateSession($request["session_key"] ?? "");
+                if (empty($s["success"])) {
+                        return ["success" => false, "error" => "Not logged in"];
+                }
+                $uid  = $s["user_id"];
+                $wid  = (int)($request["watchlist_id"] ?? 0);
+                $code = $request["code"] ?? "";
+
+                switch ($request["type"]) {
+                        case "get_watchlists":        return getWatchlists($uid);
+                        case "create_watchlist":      return createWatchlist($uid, $request["name"] ?? "");
+                        case "delete_watchlist":      return deleteWatchlist($uid, $wid);
+                        case "add_watchlist_item":    return addWatchlistItem($uid, $wid, $code);
+                        case "remove_watchlist_item": return removeWatchlistItem($uid, $wid, $code);
+                }
+                break;
 
         default:
             return [
