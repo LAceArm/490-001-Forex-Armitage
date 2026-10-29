@@ -9,9 +9,9 @@
 		}
 		else if (!is_array($request["emails"])){
 			echo "Request is not in a compatible type".PHP_EOL;
-			return ["success"=>false,"message"=>"Incompatible type for request";	
+			return ["success"=>false,"message"=>"Incompatible type for request"];	
 		}
 
-		return Notification($request["emails"];
+		return Notification($request["emails"]);
 	}
 ?>
