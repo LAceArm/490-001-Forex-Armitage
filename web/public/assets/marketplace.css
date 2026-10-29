@@ -26,6 +26,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 25px;
+    margin-bottom: 25px;
 }
 
 .marketplace-card {
@@ -33,6 +34,8 @@
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
 }
 
 .marketplace-card h2 {
@@ -46,6 +49,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    flex: 1;
 }
 
 .marketplace-card label {
@@ -73,11 +77,13 @@
 
 .marketplace-card input[readonly] {
     background-color: #f1f5f9;
+    margin-bottom: 15px;
 }
 
-.marketplace-button {
+.marketplace-button,
+.confirm-button {
     width: 100%;
-    margin-top: 15px;
+    margin-top: auto;
     padding: 12px;
     background-color: #2563eb;
     color: white;
@@ -105,6 +111,7 @@
     border-bottom: 1px solid #e2e8f0;
     color: #475569;
     font-size: 15px;
+    align-items: baseline;
 }
 
 .summary-row strong {
@@ -123,19 +130,11 @@
     color: #64748b;
     font-size: 14px;
     line-height: 1.6;
+    margin-bottom: 15px;
 }
 
 .confirm-button {
-    width: 100%;
-    margin-top: 15px;
-    padding: 12px;
     background-color: #16a34a;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
 }
 
 .confirm-button:hover {

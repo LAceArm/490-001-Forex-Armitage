@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/../broker/session_check.php';
 
 $username = $_SESSION['username'] ?? '';
@@ -13,7 +14,7 @@ $email = $_SESSION['email'] ?? '';
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Profile | Currency Trading</title>
+    <title>Profile | Forex Armitage</title>
 
     <link rel="stylesheet" href="assets/style.css?v=5">
     <link rel="stylesheet" href="assets/profile.css?v=7">
@@ -26,7 +27,7 @@ $email = $_SESSION['email'] ?? '';
         <div class="main-nav-container">
 
             <a href="home.php" class="main-logo">
-                Currency Trading
+                Forex Armitage
             </a>
 
             <div class="main-nav-links">

@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/../broker/session_check.php';
 $username = $currentUser['username'];
 ?>
@@ -10,7 +11,7 @@ $username = $currentUser['username'];
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Home | Currency Trading</title>
+    <title>Home |Forex Armitage</title>
 
     <link rel="stylesheet" href="assets/style.css?v=4">
 </head>
@@ -22,7 +23,7 @@ $username = $currentUser['username'];
         <div class="main-nav-container">
 
             <a href="home.php" class="main-logo">
-                Currency Trading
+                Forex Armitage
             </a>
 
             <div class="main-nav-links">

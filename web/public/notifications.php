@@ -2,6 +2,7 @@
 <?php
 session_start();
 
+
 if (empty($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
@@ -30,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Notifications | Currency Trading</title>
+    <title>Notifications | Forex Armitage</title>
 
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/notifications.css">
@@ -42,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="main-nav-container">
 
             <a href="home.php" class="main-logo">
-                Currency Trading
+                Forex Armitage
             </a>
 
             <div class="main-nav-links">

@@ -1,22 +1,24 @@
 
 .watchlist-container {
     max-width: 1200px;
-    margin: 40px auto;
+    margin: 45px auto 70px;
     padding: 0 25px;
 }
 
 .watchlist-header {
-    margin-bottom: 35px;
+    margin-bottom: 30px;
 }
 
 .watchlist-header h1 {
-    margin-top: 0;
-    margin-bottom: 10px;
+    margin: 0 0 10px;
     color: #1e293b;
-    font-size: 30px;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.7px;
 }
 
 .watchlist-header p {
+    margin: 0;
     color: #64748b;
     font-size: 16px;
     line-height: 1.6;
@@ -25,80 +27,149 @@
 .watchlist-card {
     padding: 30px;
     margin-bottom: 25px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+    transition: box-shadow 0.2s ease;
+}
+
+.watchlist-card:hover {
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
 }
 
 .watchlist-card h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
+    margin: 0 0 24px;
     color: #1e293b;
-    font-size: 22px;
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+.watchlist-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.watchlist-section-header h2 {
+    margin: 0;
+    overflow-wrap: anywhere;
+    min-width: 0;
 }
 
 .watchlist-form {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 25px;
 }
 
+.watchlist-form input,
 .watchlist-form select {
     flex: 1;
     min-width: 200px;
-    padding: 12px;
+    min-height: 46px;
+    padding: 12px 15px;
     border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    background-color: white;
-    color: #222;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #1e293b;
+    font-family: inherit;
     font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.watchlist-form input::placeholder {
+    color: #94a3b8;
+}
+
+.watchlist-form input:focus,
 .watchlist-form select:focus {
     outline: none;
     border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+#create-watchlist-form input {
+    flex: 4;
+    min-width: 350px;
+}
+
+#create-watchlist-form button {
+    flex: 1;
 }
 
 .watchlist-button {
-    display: inline-block;
-    padding: 12px 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 12px 22px;
     background-color: #2563eb;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 15px;
-    font-weight: bold;
+    color: #ffffff;
+    border: 1px solid #2563eb;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
     text-decoration: none;
     text-align: center;
+    white-space: nowrap;
     cursor: pointer;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .watchlist-button:hover {
     background-color: #1d4ed8;
-    color: white;
+    border-color: #1d4ed8;
+    color: #ffffff;
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.18);
+}
+
+.watchlist-button:focus-visible,
+.remove-button:focus-visible,
+.delete-watchlist-button:focus-visible,
+.back-home-button:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.4);
+    outline-offset: 3px;
 }
 
 .watchlist-table-wrapper {
     width: 100%;
     overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
 }
 
 .watchlist-table {
     width: 100%;
     border-collapse: collapse;
+    background: #ffffff;
 }
 
 .watchlist-table th,
 .watchlist-table td {
-    padding: 15px;
+    padding: 16px 18px;
     border-bottom: 1px solid #e2e8f0;
     text-align: left;
+    vertical-align: middle;
 }
 
 .watchlist-table th {
     background-color: #f8fafc;
-    color: #334155;
-    font-size: 14px;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .watchlist-table td {
@@ -106,62 +177,177 @@
     font-size: 14px;
 }
 
-.watchlist-table tr:hover {
+.watchlist-table td:first-child {
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.watchlist-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.watchlist-table tbody tr:hover {
     background-color: #f8fafc;
+}
+
+.watchlist-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .remove-button {
     padding: 9px 15px;
-    background-color: #dc2626;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
 .remove-button:hover {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.delete-watchlist-button {
+    margin-left: auto;
+    flex-shrink: 0;
+    padding: 12px 20px;
+    background-color: #dc2626;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.delete-watchlist-button:hover {
     background-color: #b91c1c;
+    color: #ffffff;
 }
 
 .watchlist-message {
-    margin-top: 25px;
+    margin: 22px 0;
+    padding: 25px 20px;
+    background-color: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
     color: #64748b;
-    font-size: 15px;
+    font-size: 14px;
+    line-height: 1.6;
     text-align: center;
-}
-
-.watchlist-error {
-    margin-top: 20px;
-    color: #dc2626;
-    font-size: 14px;
-}
-
-.watchlist-success {
-    margin-top: 20px;
-    color: #16a34a;
-    font-size: 14px;
 }
 
 .watchlist-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    align-items: center;
+    gap: 12px;
     margin-top: 30px;
 }
 
 .watchlist-actions .back-home-button {
-    display: inline-block;
-    padding: 12px 20px;
-    background-color: #e2e8f0;
-    color: #1e293b;
-    border-radius: 6px;
-    font-size: 15px;
-    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 12px 22px;
+    background-color: #ffffff;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
     text-decoration: none;
+    text-align: center;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease;
 }
 
 .watchlist-actions .back-home-button:hover {
-    background-color: #cbd5e1;
+    background-color: #f1f5f9;
     color: #1e293b;
+}
+
+@media (max-width: 600px) {
+    .watchlist-container {
+        margin: 25px auto 45px;
+        padding: 0 15px;
+    }
+
+    .watchlist-header h1 {
+        font-size: 27px;
+    }
+
+    .watchlist-header p {
+        font-size: 14px;
+    }
+
+    .watchlist-card {
+        padding: 20px;
+        margin-bottom: 18px;
+    }
+
+    .watchlist-card h2 {
+        font-size: 19px;
+    }
+
+    .watchlist-form {
+        flex-direction: column;
+    }
+
+    .watchlist-form input,
+    .watchlist-form select {
+        width: 100%;
+        min-width: 0;
+        flex: none;
+    }
+
+    #create-watchlist-form input {
+        width: 100%;
+        min-width: 0;
+        flex: none;
+    }
+
+    #create-watchlist-form button {
+        width: 100%;
+        flex: none;
+    }
+
+    .watchlist-form .watchlist-button {
+        width: 100%;
+    }
+
+    .watchlist-section-header {
+        align-items: center;
+    }
+
+    .delete-watchlist-button {
+        margin-left: auto;
+        padding: 10px 14px;
+        font-size: 12px;
+    }
+
+    .watchlist-table th,
+    .watchlist-table td {
+        padding: 13px 14px;
+    }
+
+    .watchlist-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .watchlist-actions .watchlist-button,
+    .watchlist-actions .back-home-button {
+        width: 100%;
+    }
 }
