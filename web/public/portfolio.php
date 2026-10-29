@@ -1,3 +1,4 @@
+
 <?php
 // ---------------------------------------------------------------------------
 // portfolio.php: what the user holds, what it's worth in USD, and the total.
@@ -91,11 +92,6 @@ if (!$loaded || !$positions) {
         <div class="main-nav-container">
 
             <a href="home.php" class="main-logo">Forex Armitage</a>
-
-
-            <a href="home.php" class="main-logo">
-                Forex Armitage
-            </a>
 
             <div class="main-nav-links">
                 <a href="dashboard.php">Dashboard</a>
