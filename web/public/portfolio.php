@@ -90,7 +90,7 @@ if (!$loaded || !$positions) {
     <nav class="main-navbar">
         <div class="main-nav-container">
 
-            <a href="home.php" class="main-logo">Currency Trading</a>
+            <a href="home.php" class="main-logo">Forex Armitage</a>
 
 
             <a href="home.php" class="main-logo">
