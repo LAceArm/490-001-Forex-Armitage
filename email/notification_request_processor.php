@@ -1,4 +1,4 @@
-#!/usr/php
+#!/usr/bin/php
 
 <?php
 	require_once("SendEmail.php");
