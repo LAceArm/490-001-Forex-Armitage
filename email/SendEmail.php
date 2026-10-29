@@ -16,9 +16,11 @@
 			]);
 
 			echo "Email sent successfully\n";
+			return ["success"=>true,"message"=>"Email sent successfully"];
 		}
 		catch(Exception $e){
 			echo "There was an error sending the email:".$e->getMessage()."\n";
+			return ["success"=>false,"message"=>"Email could not be sent because of an error"];
 		}
 		
 	}
