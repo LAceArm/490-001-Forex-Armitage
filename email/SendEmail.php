@@ -10,7 +10,7 @@
 		try{
 			$response=$resend->emails->send([
   				'from' => 'Acme <onboarding@resend.dev>',
-  				'to' => ['delivered@resend.dev'],
+  				'to' => $emails,
   				'subject' => 'hello world',
   				'html' => '<strong>it works!</strong>',
 			]);
