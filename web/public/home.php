@@ -11,7 +11,7 @@ $username = $currentUser['username'];
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Home |Forex Armitage</title>
+    <title>Home | Forex Armitage</title>
 
     <link rel="stylesheet" href="assets/style.css?v=4">
 </head>
