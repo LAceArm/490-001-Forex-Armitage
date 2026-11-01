@@ -76,11 +76,33 @@ foreach ($positions as $p) {
 }
 
 // Card figures. Everything starts from the starting cash, so the gain here
-// also includes profit already locked in by selling.
-$initialValue   = $loaded ? (float)$portfolio['starting_cash'] : null;
-$currentValue   = $loaded ? $total : null;
-$totalGain      = $loaded ? $total - $initialValue : null;
-$gainPercentage = ($loaded && $initialValue > 0) ? $totalGain / $initialValue * 100 : null;
+// also includes profit already locked in by selli
+$cash = 0.0;
+$holdingsValue = 0.0;
+
+foreach ($positions as $p) {
+    if ($p['currency'] === 'USD') {
+        $cash += (float)$p['amount'];
+    } else {
+        $holdingsValue += (float)($p['usd_value'] ?? 0);
+    }
+}
+
+$initialValue = $loaded
+    ? (float)$portfolio['starting_cash']
+    : null;
+
+$currentValue = $loaded
+    ? $cash + $holdingsValue
+    : null;
+
+$totalGain = $loaded
+    ? $currentValue - $initialValue
+    : null;
+
+$gainPercentage = ($loaded && $initialValue > 0)
+    ? ($totalGain / $initialValue) * 100
+    : null;
 
 $cards = [
     'Initial Holdings Value' => [$initialValue === null ? 'Not available' : $usd($initialValue), ''],
