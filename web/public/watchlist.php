@@ -84,12 +84,15 @@ $names = [
 
 $available = [];
 $ratesReply = send_to_broker(['type' => 'get_rates']);
-foreach ($ratesReply['rates'] ?? [] as $row) {
-    if ($row['base_currency'] === 'USD') {
-        $available[] = $row['quote_currency'];
-    }
+
+if(!empty($ratesReply)){ 
+	foreach ($ratesReply['rates'] ?? [] as $row) {
+    	if ($row['base_currency'] === 'USD') {
+        	$available[] = $row['quote_currency'];
+    	}
+	}
 }
-sort($available);
+sort($available); //Makes the list accessible
 ?>
 
 <!DOCTYPE html>
