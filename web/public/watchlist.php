@@ -1,8 +1,6 @@
 <?php
 // ---------------------------------------------------------------------------
-// watchlist.php: the user's named watchlists and the currencies in them.
-// Every action (create, delete, add, remove) is a form that posts to this page,
-// calls the broker, then redirects so a refresh can't repeat it.
+// watchlist.php: User watchlists page 
 // ---------------------------------------------------------------------------
 
 // Only logged-in users get past this line. It checks the session key with the DB.
@@ -16,9 +14,13 @@ $price = fn($p) => $p === null ? 'Not available' : number_format($p, $p < 0.01 ?
 
 // Handle a submitted form. Each action maps to one broker request; the user is
 // found from the session key, so no user id is sent.
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
 
+    //There'll be a set of four actions. Rather than creating them all at runtime, A two dimensional array is declared and the appropiate 
+    //sub-array is sent to the broker.
+    //Because Watchlist IDs are integers and the backend uses ===, they must be cast to int before sending them to the broker
     $requests = [
         'create' => ['type' => 'create_watchlist',      'name' => trim($_POST['name'])],
         'delete' => ['type' => 'delete_watchlist',      'watchlist_id' => (int)($_POST['watchlist_id'])],
@@ -28,27 +30,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($requests[$action])) {
         $r = send_to_broker($requests[$action] + ['session_key' => $key]);
-        // One-time message for the next page load, only if something went wrong.
-        if (empty($r['success'])) {
-            $_SESSION['flash'] = $r['error'] ?? 'That did not work. Please try again.';
+        // Check for errors. If broker does not return an error, a custom message is used.
+	if (empty($r['success'])) {
+		if(isset($r['success'])){
+		       $_SESSION['flash']=$r['error'];	
+		}
+		else{
+		       $_SESSION['flash']="That did not work, Please try again";	
+		}
         }
     }
 
-    // Redirect so refreshing the page can't repeat the action.
+    // Averts duplicates by reloading the page
     header('Location: watchlist.php');
-    exit;
+    die(); //A matter of personal taste.
 }
 
-// Show the last error once, then clear it.
+// Show the flash error
 $flash = $_SESSION['flash'];
 unset($_SESSION['flash']);
 
 // The user's watchlists, with each currency's latest USD price and daily change.
-$reply      = send_to_broker(['type' => 'get_watchlists', 'session_key' => $key]);
-$watchlists = $reply['watchlists'] ?? [];
+$reply = send_to_broker(['type' => 'get_watchlists', 'session_key' => $key]);
 
-// Readable names. The DB currently stores each code as its own name, so this
-// map supplies them; anything not listed falls back to showing its code.
+if(isset($reply['watchlists'])){
+       $watchlists=$reply['watchlists'];	
+}
+else{ 
+	$watchlists=[];
+}
+
 $names = [
     'AED' => 'United Arab Emirates Dirham',
     'CAD' => 'Canadian Dollar',
@@ -60,7 +71,7 @@ $names = [
     'USD' => 'US Dollar',
 ];
 
-// Currencies that can be added: the ones that have a rate, in alphabetical order.
+// 
 $available = [];
 $ratesReply = send_to_broker(['type' => 'get_rates']);
 foreach ($ratesReply['rates'] ?? [] as $row) {
