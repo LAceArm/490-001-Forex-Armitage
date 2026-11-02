@@ -8,10 +8,6 @@ require_once __DIR__ . '/../broker/session_check.php';
 
 $key = $_SESSION['session_key'];
 
-// Escape text for HTML, and format a USD price (more decimals for tiny prices like JPY).
-$e     = fn($v) => htmlspecialchars((string)$v);
-$price = fn($p) => $p === null ? 'Not available' : number_format($p, $p < 0.01 ? 6 : 4);
-
 // Handle a submitted form. Each action maps to one broker request; the user is
 // found from the session key, so no user id is sent.
 
