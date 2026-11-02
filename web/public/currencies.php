@@ -1,7 +1,7 @@
 
 <?php
 require_once __DIR__ . '/../broker/session_check.php';
-
+//currency names
 $names = [
     'AED' => 'United Arab Emirates Dirham',
     'CAD' => 'Canadian Dollar',
@@ -14,9 +14,9 @@ $names = [
 ];
 
 $currencies = [];
-
+//gettinf exchange rates from rabbitmq
 $reply = send_to_broker(['type' => 'get_rates']);
-
+//processing the raes
 foreach ($reply['rates'] ?? [] as $row) {
     if ($row['base_currency'] == 'USD' && $row['rate'] > 0) {
         $code = $row['quote_currency'];
@@ -87,7 +87,8 @@ ksort($currencies);
 
                 <tbody>
                     <?php foreach ($currencies as $code => $currency): ?>
-                        <tr>
+                        //displaying the content
+                         <tr>
                             <td><?= htmlspecialchars($code) ?></td>
                             <td><?= htmlspecialchars($currency['name']) ?></td>
                             <td><?= htmlspecialchars($currency['rate']) ?></td>
@@ -138,7 +139,7 @@ ksort($currencies);
     </div>
 
 </main>
-
+//searching for currencies
 <script>
 function searchCurrencies() {
     let search = document.getElementById("currency-search").value.toLowerCase();
@@ -162,7 +163,7 @@ function searchCurrencies() {
         message.hidden = found;
     }
 }
-
+//view details button
 function showDetails(button) {
     let row = button.parentElement.parentElement;
     let cells = row.getElementsByTagName("td");
