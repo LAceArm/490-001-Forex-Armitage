@@ -17,13 +17,13 @@ $price = fn($p) => $p === null ? 'Not available' : number_format($p, $p < 0.01 ?
 // Handle a submitted form. Each action maps to one broker request; the user is
 // found from the session key, so no user id is sent.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
+    $action = $_POST['action'];
 
     $requests = [
-        'create' => ['type' => 'create_watchlist',      'name' => trim($_POST['name'] ?? '')],
-        'delete' => ['type' => 'delete_watchlist',      'watchlist_id' => (int)($_POST['watchlist_id'] ?? 0)],
-        'add'    => ['type' => 'add_watchlist_item',    'watchlist_id' => (int)($_POST['watchlist_id'] ?? 0), 'code' => $_POST['code'] ?? ''],
-        'remove' => ['type' => 'remove_watchlist_item', 'watchlist_id' => (int)($_POST['watchlist_id'] ?? 0), 'code' => $_POST['code'] ?? ''],
+        'create' => ['type' => 'create_watchlist',      'name' => trim($_POST['name'])],
+        'delete' => ['type' => 'delete_watchlist',      'watchlist_id' => (int)($_POST['watchlist_id'])],
+        'add'    => ['type' => 'add_watchlist_item',    'watchlist_id' => (int)($_POST['watchlist_id']), 'code' => $_POST['code']],
+        'remove' => ['type' => 'remove_watchlist_item', 'watchlist_id' => (int)($_POST['watchlist_id']), 'code' => $_POST['code']],
     ];
 
     if (isset($requests[$action])) {
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Show the last error once, then clear it.
-$flash = $_SESSION['flash'] ?? '';
+$flash = $_SESSION['flash'];
 unset($_SESSION['flash']);
 
 // The user's watchlists, with each currency's latest USD price and daily change.
