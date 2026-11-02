@@ -29,8 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
 
     if (isset($requests[$action])) {
-        $r = send_to_broker($requests[$action] + ['session_key' => $key]);
-        // Check for errors. If broker does not return an error, a custom message is used.
+	   // $r = send_to_broker($requests[$action] + ['session_key' => $key]);
+	
+
+        // Check for errors. If broker does not return an error, a default message is used.
 	if (empty($r['success'])) {
 		if(isset($r['success'])){
 		       $_SESSION['flash']=$r['error'];	
