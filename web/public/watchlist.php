@@ -18,19 +18,27 @@ $price = fn($p) => $p === null ? 'Not available' : number_format($p, $p < 0.01 ?
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
 
-    //There'll be a set of four actions. Rather than creating them all at runtime, A two dimensional array is declared and the appropiate 
-    //sub-array is sent to the broker.
-    //Because Watchlist IDs are integers and the backend uses ===, they must be cast to int before sending them to the broker
-    $requests = [
-        'create' => ['type' => 'create_watchlist',      'name' => trim($_POST['name'])],
-        'delete' => ['type' => 'delete_watchlist',      'watchlist_id' => (int)($_POST['watchlist_id'])],
-        'add'    => ['type' => 'add_watchlist_item',    'watchlist_id' => (int)($_POST['watchlist_id']), 'code' => $_POST['code']],
-        'remove' => ['type' => 'remove_watchlist_item', 'watchlist_id' => (int)($_POST['watchlist_id']), 'code' => $_POST['code']],
-    ];
-
     if (isset($requests[$action])) {
-	   // $r = send_to_broker($requests[$action] + ['session_key' => $key]);
+	    //Behavior will be different depending on action
 	
+	    switch($requests[$action]){  //Create watchlist
+	    	case 'create':
+			$send=array('type'=>'create_watchlist','name'=>trim($_POST['name'],'session_key'=>$key));
+			$r=send_to_broker($send);
+			break;
+		case 'delete': //Delete a whole watchlist
+			$send=array('type'=>'delete_watchlist','watchlist_id'=>(int)($_POST['watchlist_id']),'code'=>$_POST['code'],'key'=>$key);
+			$r=send_to_broker($send);
+			break;
+		case 'add': //Add currency to watchlist
+			$send=array('type'=>'add_watchlist_item','watchlist_id'=>(int)($_POST['watchlist_id']),'code'=>$_POST['code'],'key'=>$key);
+			$r=send_to_broker($send);
+			break;
+		case 'remove': //Remove currency from watchlist
+			$send=array('type'=>'remove_watchlist_item','watchlist_id'=>(int)($_POST['watchlist_id']),'code'=>$_POST['code'],'key'=>$key);
+			$r=send_to_broker($send);
+			break;
+	}	//Backend expects an int.     
 
         // Check for errors. If broker does not return an error, a default message is used.
 	if (empty($r['success'])) {
@@ -45,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Averts duplicates by reloading the page
     header('Location: watchlist.php');
-    die(); //A matter of personal taste.
+    die(); //A matter of personal taste. (previous code used exit()).
 }
 
 // Show the flash error
@@ -73,7 +81,7 @@ $names = [
     'USD' => 'US Dollar',
 ];
 
-// 
+
 $available = [];
 $ratesReply = send_to_broker(['type' => 'get_rates']);
 foreach ($ratesReply['rates'] ?? [] as $row) {
