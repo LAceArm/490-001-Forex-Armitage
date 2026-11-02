@@ -1,164 +1,68 @@
 <?php
 
-require_once "database.php";
-
-function tradeError($message)
-{
-        return ["success" => false, "error" => $message];
-}
-
-function currencyId($code)
-{
-        global $conn;
-
-        $stmt = $conn->prepare("SELECT currency_id FROM currencies WHERE currency_code = ?");
-        $stmt->bind_param("s", $code);
-        $stmt->execute();
-        $row = $stmt->get_result()->fetch_assoc();
-
-        return $row ? (int)$row["currency_id"] : null;
-}
-
-// Units of $code per 1 USD from the ratrse table. USD itself is 1
-function usdRate($code)
-{
-        global $conn;
-
-        if ($code === "USD") {
-                return 1.0;
-        }
-
-        $stmt = $conn->prepare(
-                "SELECT r.rate
-                FROM rates r
-                JOIN currencies b on b.currency_id = r.base_currency_id
-                JOIN currencies q ON q.currency_id = r.quote_currency_id
-                WHERE b.currency_code = 'USD' AND q.currency_code = ?"
-        );
-        $stmt->bind_param("s", $code);
-        $stmt->execute();
-        $row = $stmt->get_result()->fetch_assoc();
-
-        return $row ? (float)$row["rate"] : null;
-}
+require_once __DIR__ . "/database.php";
+require_once __DIR__ . "/trading/trading_rates.php";
+require_once __DIR__ . "/trading/trading_sales.php";
+require_once __DIR__ . "/trading/trading_purchase.php";
+require_once __DIR__ . "/trading/trading_history.php";
 
 function executeTrade($userId, $fromCode, $toCode, $amount)
 {
-        global $conn;
+ global $conn;
 
-        $fromCode = strtoupper(trim($fromCode));
-        $toCode   = strtoupper(trim($toCode));
-        $amount   = (float)$amount;
+ $fromCode = strtoupper(trim($fromCode));
+ $toCode = strtoupper(trim($toCode));
+ $amount = (float)$amount;
 
-        if ($amount <= 0) {
-                return tradeError("Amount must be greater than zero");
-        }
+ if ($amount <= 0)
+  return ["success"=>false, "error"=>"Invalid amount"];
 
-        if ($fromCode === $toCode) {
-                return tradeError("Choose two different currencies");
-        }
+ if ($fromCode == $toCode)
+  return ["success"=>false, "error"=>"Choose different currencies"];
 
-        $fromId = currencyId($fromCode);
-        $toId   = currencyId($toCode);
-        if (!$fromId || !$toId) {
-                return tradeError("Unknown currency");
-        }
+ $from = currencyInfo($fromCode);
+ $to = currencyInfo($toCode);
 
-        $fromRate = usdRate($fromCode);
-        $toRate   = usdRate($toCode);
-        if (!$fromRate || !$toRate) {
-                return tradeError("No rate available for that pair");
-        }
+ if (!$from || !$to)
+  return ["success"=>false, "error"=>"Currency not found"];
 
-        // Convert through USD: from -> USD -> to
-        $toAmount = round($amount / $fromRate * $toRate, 8);
-        $rate     = $toAmount / $amount;
+ $toAmount = $amount / $from["rate"] * $to["rate"];
+ $rate = $toAmount / $amount;
 
-        try {
-                $conn->begin_transaction();
+ try {
 
-                // Lock the row we're spending from, then check the balance
-                $stmt = $conn->prepare(
-                        "SELECT amount FROM positions
-                        WHERE user_id = ? AND currency_id = ? FOR UPDATE"
-                );
+  $conn->begin_transaction();
 
-                $stmt->bind_param("ii", $userId, $fromId);
-                $stmt->execute();
-                $row = $stmt->get_result()->fetch_assoc();
+  if (!sellCurrency($userId, $from["id"], $amount)) {
+   $conn->rollback();
+   return ["success"=>false, "error"=>"Insufficient balance"];
+  }
 
-                if (!$row || (float)$row["amount"] < $amount) {
-                        $conn->rollback();
-                        return tradeError("Insufficient balance");
-                }
+  buyCurrency($userId, $to["id"], $toAmount);
 
-                $stmt = $conn->prepare(
-                        "UPDATE positions SET amount = amount - ?
-                        WHERE user_id = ? AND currency_id = ?"
-                );
+  saveTrade(
+   $userId,
+   $from["id"],
+   $to["id"],
+   $amount,
+   $toAmount,
+   $rate
+  );
 
-                $stmt->bind_param("dii", $amount, $userId, $fromId);
-                $stmt->execute();
+  $conn->commit();
 
-                $stmt = $conn->prepare(
-                        "INSERT into positions (user_id, currency_id, amount)
-                        VALUES (?, ?, ?)
-                        ON DUPLICATE KEY UPDATE amount = amount + VALUES(amount)"
-                );
+ } catch (Exception $e) {
+  $conn->rollback();
+  return ["success"=>false, "error"=>"Trade failed"];
+ }
 
-                $stmt->bind_param("iid", $userId, $toId, $toAmount);
-                $stmt->execute();
-
-                $stmt = $conn->prepare(
-                        "INSERT INTO trades
-                        (user_id, from_currency_id, to_currency_id, from_amount, to_amount, rate)
-                        VALUES (?, ?, ?, ?, ?, ?)"
-                );
-
-                $stmt->bind_param("iiiddd", $userId, $fromId, $toId, $amount, $toAmount, $rate);
-                $stmt->execute();
-
-                $conn->commit();
-        } catch (mysqli_sql_exception $e) {
-                $conn->rollback();
-                return tradeError("Trade failed");
-        }
-
-        return [
-                "success"     => true,
-                "from"        => $fromCode,
-                "to"          => $toCode,
-                "from_amount" => $amount,
-                "to_amount"   => $toAmount,
-                "rate"        => $rate
-        ];
-}
-
-
-// A user's trades, newest first, with currency codes instead of ids.
-function getTrades($userId)
-{
-        global $conn;
-
-        $stmt = $conn->prepare(
-                "SELECT t.trade_id, f.currency_code AS from_code, k.currency_code AS to_code,
-                        t.from_amount, t.to_amount, t.rate, t.created_at
-                FROM trades t
-                JOIN currencies f ON f.currency_id = t.from_currency_id
-                JOIN currencies k ON k.currency_id = t.to_currency_id
-                WHERE t.user_id = ?
-                ORDER BY t.trade_id DESC
-                LIMIT 1000"
-        );
-        $stmt->bind_param("i", $userId);
-        $stmt->execute();
-
-        $trades = [];
-        $result = $stmt->get_result();
-        while ($row = $result->fetch_assoc()) {
-                $trades[] = $row;
-        }
-
-        return ["success" => true, "trades" => $trades];
+ return [
+  "success"=>true,
+  "from"=>$fromCode,
+  "to"=>$toCode,
+  "from_amount"=>$amount,
+  "to_amount"=>$toAmount,
+  "rate"=>$rate
+ ];
 }
 ?>

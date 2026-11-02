@@ -1,221 +1,192 @@
-
 <?php
-session_start();
 
-if (empty($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit;
+require_once __DIR__ . '/../broker/session_check.php';
+
+$key = $_SESSION['session_key'];
+
+$money = fn($v) => number_format((float)$v, 2);
+$usd = fn($v) => ($v < 0 ? '-$' : '$') . number_format(abs($v), 2);
+$cls = fn($v) => $v >= 0 ? 'positive' : 'negative';
+
+$portfolio = send_to_broker([
+    'type' => 'get_portfolio',
+    'session_key' => $key
+]);
+
+$loaded = !empty($portfolio['success']);
+$positions = $loaded ? ($portfolio['positions'] ?? []) : [];
+
+$cash = 0;
+$holdingsValue = 0;
+
+foreach ($positions as $p) {
+
+ if ($p['currency'] === 'USD') {
+    $cash += (float)$p['amount'];
+ } else {
+    $holdingsValue += (float)($p['usd_value'] ?? 0);
+ }
+
 }
 
-$holdings = [];
+$initialValue = $loaded ? (float)$portfolio['starting_cash'] : null;
 
-$initialValue = null;
-$currentValue = null;
-$totalGain = null;
-$gainPercentage = null;
+$currentValue = $loaded ? $cash + $holdingsValue : null;
 
-if (!empty($holdings)) {
-    $initialValue = 0;
-    $currentValue = 0;
+$totalGain = $loaded ? $currentValue - $initialValue : null;
 
-    foreach ($holdings as $holding) {
-        $amount = (float)($holding['amount'] ?? 0);
-        $purchaseRate = (float)($holding['purchase_rate'] ?? 0);
-        $currentRate = (float)($holding['current_rate'] ?? 0);
+$gainPercentage = ($loaded && $initialValue > 0)
+    ? ($totalGain / $initialValue) * 100
+    : null;
 
-        $initialValue += $amount * $purchaseRate;
-        $currentValue += $amount * $currentRate;
-    }
-
-    $totalGain = $currentValue - $initialValue;
-
-    if ($initialValue > 0) {
-        $gainPercentage = ($totalGain / $initialValue) * 100;
-    }
-}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Portfolio Gains | Currency Trading</title>
+<title>Portfolio Gains | Forex Armitage</title>
 
-    <link rel="stylesheet" href="assets/style.css">
-    <link rel="stylesheet" href="assets/gains.css">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/gains.css">
 </head>
 
 <body class="home-page">
 
-    <nav class="main-navbar">
-        <div class="main-nav-container">
+<nav class="main-navbar">
+<div class="main-nav-container">
 
-            <a href="home.php" class="main-logo">
-                Currency Trading
-            </a>
+<a href="home.php" class="main-logo">Forex Armitage</a>
 
-            <div class="main-nav-links">
-                <a href="dashboard.php">Dashboard</a>
-                <a href="notifications.php">Notifications</a>
-                <a href="profile.php">Profile</a>
-                <a href="logout.php">Logout</a>
-            </div>
+<div class="main-nav-links">
+<a href="dashboard.php">Dashboard</a>
+<a href="notifications.php">Notifications</a>
+<a href="profile.php">Profile</a>
+<a href="logout.php">Logout</a>
+</div>
 
-        </div>
-    </nav>
+</div>
+</nav>
 
-    <main class="gains-container">
+<main class="gains-container">
 
-        <div class="gains-header">
-            <h1>Portfolio Gains</h1>
-            <p>Track the performance of your virtual currency holdings.</p>
-        </div>
+<div class="gains-header">
+<h1>Portfolio Gains</h1>
+<p>Track the performance of your virtual currency holdings.</p>
+</div>
 
-        <div class="gains-summary">
+<div class="gains-summary">
 
-            <div class="gains-card">
-                <h2>Initial Holdings Value</h2>
-                <p>
-                    <?php
-                    echo $initialValue !== null
-                        ? '$' . number_format($initialValue, 2)
-                        : 'Not available';
-                    ?>
-                </p>
-            </div>
+<div class="gains-card">
+<h2>Initial Portfolio Value</h2>
+<p>
+<?= $initialValue !== null ? '$' . $money($initialValue) : 'Not available' ?>
+</p>
+</div>
 
-            <div class="gains-card">
-                <h2>Current Holdings Value</h2>
-                <p>
-                    <?php
-                    echo $currentValue !== null
-                        ? '$' . number_format($currentValue, 2)
-                        : 'Not available';
-                    ?>
-                </p>
-            </div>
+<div class="gains-card">
+<h2>Current Portfolio Value</h2>
+<p>
+<?= $currentValue !== null ? '$' . $money($currentValue) : 'Not available' ?>
+</p>
+</div>
 
-            <div class="gains-card">
-                <h2>Total Gain / Loss</h2>
+<div class="gains-card">
+<h2>Total Gain / Loss</h2>
+<p class="<?= $totalGain !== null ? $cls($totalGain) : '' ?>">
+<?= $totalGain !== null ? $usd($totalGain) : 'Not available' ?>
+</p>
+</div>
 
-                <p class="<?php
-                    echo $totalGain === null
-                        ? ''
-                        : ($totalGain >= 0 ? 'positive' : 'negative');
-                ?>">
-                    <?php
-                    echo $totalGain !== null
-                        ? '$' . number_format($totalGain, 2)
-                        : 'Not available';
-                    ?>
-                </p>
-            </div>
+<div class="gains-card">
+<h2>Performance</h2>
+<p class="<?= $gainPercentage !== null ? $cls($gainPercentage) : '' ?>">
+<?= $gainPercentage !== null ? number_format($gainPercentage, 2) . '%' : 'Not available' ?>
+</p>
+</div>
 
-            <div class="gains-card">
-                <h2>Performance</h2>
+</div>
 
-                <p class="<?php
-                    echo $gainPercentage === null
-                        ? ''
-                        : ($gainPercentage >= 0 ? 'positive' : 'negative');
-                ?>">
-                    <?php
-                    echo $gainPercentage !== null
-                        ? number_format($gainPercentage, 2) . '%'
-                        : 'Not available';
-                    ?>
-                </p>
-            </div>
+<section class="gains-holdings">
 
-        </div>
+<h2>Current Holdings</h2>
 
-        <section class="gains-holdings">
+<div class="gains-table-wrapper">
 
-            <h2>Currency Performance</h2>
+<table class="gains-table">
 
-            <div class="gains-table-wrapper">
+<thead>
+<tr>
+<th>Currency</th>
+<th>Amount Owned</th>
+<th>Current Value (USD)</th>
+</tr>
+</thead>
 
-                <table class="gains-table">
+<tbody>
 
-                    <thead>
-                        <tr>
-                            <th>Currency</th>
-                            <th>Amount Owned</th>
-                            <th>Purchase Rate</th>
-                            <th>Current Rate</th>
-                            <th>Gain / Loss</th>
-                        </tr>
-                    </thead>
+<?php foreach ($positions as $p): ?>
 
-                    <tbody>
+<tr>
 
-                        <?php foreach ($holdings as $holding): ?>
+<td>
+<?= htmlspecialchars($p['currency']) ?>
+</td>
 
-                            <?php
-                            $amount = (float)($holding['amount'] ?? 0);
-                            $purchaseRate = (float)($holding['purchase_rate'] ?? 0);
-                            $currentRate = (float)($holding['current_rate'] ?? 0);
-                            $gain = $amount * ($currentRate - $purchaseRate);
-                            ?>
+<td>
+<?= number_format((float)$p['amount'], 2) ?>
+</td>
 
-                            <tr>
+<td>
 
-                                <td>
-                                    <?php echo htmlspecialchars($holding['code'] ?? ''); ?>
-                                </td>
+<?php if ($p['currency'] === 'USD'): ?>
 
-                                <td>
-                                    <?php echo number_format($amount, 2); ?>
-                                </td>
+$<?= $money($p['amount']) ?>
 
-                                <td>
-                                    <?php echo number_format($purchaseRate, 4); ?>
-                                </td>
+<?php else: ?>
 
-                                <td>
-                                    <?php echo number_format($currentRate, 4); ?>
-                                </td>
+$<?= $money($p['usd_value'] ?? 0) ?>
 
-                                <td class="<?php echo $gain >= 0 ? 'positive' : 'negative'; ?>">
-                                    <?php echo '$' . number_format($gain, 2); ?>
-                                </td>
+<?php endif; ?>
 
-                            </tr>
+</td>
 
-                        <?php endforeach; ?>
+</tr>
 
-                    </tbody>
+<?php endforeach; ?>
 
-                </table>
+</tbody>
 
-            </div>
+</table>
 
-            <?php if (empty($holdings)): ?>
+</div>
 
-                <p class="gains-message">
-                    Portfolio performance information is not available yet.
-                </p>
+<?php if (!$loaded): ?>
 
-            <?php endif; ?>
+<p class="gains-message">
+Portfolio performance information is not available.
+</p>
 
-        </section>
+<?php endif; ?>
 
-        <div class="gains-actions">
+</section>
 
-            <a href="portfolio.php" class="gains-button">
-                View Portfolio
-            </a>
+<div class="gains-actions">
 
-            <a href="home.php" class="gains-back-button">
-                Back to Home
-            </a>
+<a href="portfolio.php" class="gains-button">
+View Portfolio
+</a>
 
-        </div>
+<a href="home.php" class="gains-back-button">
+Back to Home
+</a>
 
-    </main>
+</div>
+
+</main>
 
 </body>
 </html>
