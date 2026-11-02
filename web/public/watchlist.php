@@ -82,7 +82,7 @@ $available = [];
 $ratesReply = send_to_broker(['type' => 'get_rates']);
 
 if(!empty($ratesReply)){ 
-	foreach ($ratesReply['rates'] ?? [] as $row) {
+	foreach ($ratesReply['rates'] as $row) {
     	if ($row['base_currency'] === 'USD') {
         	$available[] = $row['quote_currency'];
     	}
