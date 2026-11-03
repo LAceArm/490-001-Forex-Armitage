@@ -8,7 +8,7 @@ $error = '';
 
 // Runs when form is submitted (not when page is opened)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-	// 
+	// Bothers DB to check username and password
 	$r = send_to_broker([
 		'type'     => 'login',
 		'username' => $_POST['username'] ?? '',
