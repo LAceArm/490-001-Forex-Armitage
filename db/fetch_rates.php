@@ -8,32 +8,26 @@ $symbols = [
     "USD/EUR",
     "USD/CNY",
     "USD/CHF",
-    "USD/AED"
+    "USD/AED",
+    "USD/CAD"
 ];
 
 function getCurrencyId($conn, $code)
 {
-    $stmt = $conn->prepare(
-        "INSERT INTO currencies (currency_code, currency_name)
-         VALUES (?, ?)
-         ON DUPLICATE KEY UPDATE currency_code = currency_code"
-    );
+    $stmt = $conn->prepare("SELECT currency_id FROM currencies WHERE currency_code = ?");
+    $stmt->bind_param("s", $code);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
 
+    if ($row) {
+        return $row["currency_id"];
+    }
+
+    $stmt = $conn->prepare("INSERT INTO currencies (currency_code, currency_name) VALUES (?, ?)");
     $stmt->bind_param("ss", $code, $code);
     $stmt->execute();
 
-    $stmt = $conn->prepare(
-        "SELECT currency_id
-         FROM currencies
-         WHERE currency_code = ?"
-    );
-
-    $stmt->bind_param("s", $code);
-    $stmt->execute();
-
-    $result = $stmt->get_result()->fetch_assoc();
-
-    return $result["currency_id"];
+    return $conn->insert_id;
 }
 
 foreach ($symbols as $symbol) {

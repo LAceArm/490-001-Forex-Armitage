@@ -8,7 +8,8 @@ $symbols = [
     "USD/EUR",
     "USD/CNY",
     "USD/CHF",
-    "USD/AED"
+    "USD/AED",
+    "USD/CAD"
 ];
 
 function getCurrencyId($conn, $code)
