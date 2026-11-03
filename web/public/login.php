@@ -6,7 +6,7 @@ require_once __DIR__ . '/../broker/broker_client.php';
 // Error message; empty means no error
 $error = '';
 
-// Runs when login form is submitted (not when page is opened)
+// Runs when form is submitted (not when page is opened)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	// 
 	$r = send_to_broker([
