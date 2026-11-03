@@ -95,7 +95,6 @@ sort($available); //Makes the list accessible
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Watchlists | Forex Armitage</title>
@@ -153,7 +152,7 @@ sort($available); //Makes the list accessible
             <section class="watchlist-card">
 
                 <div class="watchlist-section-header">
-                    <h2><?= $e($list['name']) ?></h2>
+                    <h2><?= echo($list['name']) ?></h2>
 
                     <!-- Delete the whole list (its currencies go with it) -->
                     <form method="POST" action="watchlist.php"
@@ -173,8 +172,8 @@ sort($available); //Makes the list accessible
                         <option value="">Select a currency</option>
                         <?php foreach ($available as $code): ?>
                             <?php if (!in_array($code, $inList, true)): ?>
-                                <option value="<?= $e($code) ?>">
-                                    <?= $e($code . ' - ' . ($names[$code] ?? $code)) ?>
+                                <option value="<?= echo $code?>">
+				   <? echo "$code -". $names[$code]; ?>
                                 </option>
                             <?php endif; ?>
                         <?php endforeach; ?>
@@ -200,13 +199,11 @@ sort($available); //Makes the list accessible
                         <tbody>
                             <?php foreach ($list['currencies'] as $c): ?>
                                 <tr>
-                                    <td><?= $e($c['code']) ?></td>
-                                    <td><?= $e($names[$c['code']] ?? $c['code']) ?></td>
+				    <td><?=$c['code'] ?></td>
+				    <td> <?=$names[$c['code']] ?>
                                     <td><?= $price($c['price']) ?></td>
                                     <td>
-                                        <?= $c['change'] === null
-                                            ? 'Not available'
-                                            : ($c['change'] > 0 ? '+' : '') . number_format($c['change'], 2) . '%' ?>
+					<?= $c['change'].number_format($c['change'],2).'%' ?>
                                     </td>
                                     <td>
                                         <form method="POST" action="watchlist.php">
