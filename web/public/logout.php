@@ -1,9 +1,9 @@
 <?php
-session_start();
+session_start(); // Start session
 
-require_once __DIR__ . '/../broker/broker_client.php';
+require_once __DIR__ . '/../broker/broker_client.php'; // Loads send_to_broker()
 
-// Tell DB to delete session key
+// Bothers DB to delete this session's key
 if (!empty($_SESSION['session_key'])) {
         send_to_broker([
                 'type'        => 'logout',
@@ -11,10 +11,6 @@ if (!empty($_SESSION['session_key'])) {
         ]);
 }
 
-// Clear session, end it
-$_SESSION = [];
-session_destroy();
+session_destroy(); // Stop session
 
-header('Location: login.php');
-exit;
-?>
+header('Location: login.php'); // Redirect to login.php
