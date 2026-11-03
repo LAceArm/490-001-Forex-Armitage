@@ -1,18 +1,15 @@
 <?php
 require_once __DIR__ . '/../broker/session_check.php';
+
 $username = $currentUser['username'];
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Forex Armitage</title>
-
     <link rel="stylesheet" href="assets/dashboard.css?v=7">
     <link rel="stylesheet" href="assets/style.css?v=5">
 </head>
@@ -23,9 +20,7 @@ $username = $currentUser['username'];
     <nav class="main-navbar">
         <div class="main-nav-container">
 
-            <a href="home.php" class="main-logo">
-                Forex Armitage
-            </a>
+            <a href="home.php" class="main-logo">Forex Armitage</a>
 
             <div class="main-nav-links">
                 <a href="dashboard.php">Dashboard</a>
@@ -41,18 +36,9 @@ $username = $currentUser['username'];
     <main class="dashboard-container">
 
         <div class="dashboard-header">
-
             <h1>Portfolio Dashboard</h1>
-
-            <p>
-                Welcome,
-                <?php echo htmlspecialchars($username); ?>!
-            </p>
-
-            <p>
-                View your portfolio overview and recent activity.
-            </p>
-
+            <p>Welcome, <?php echo htmlspecialchars($username); ?>!</p>
+            <p>View your portfolio overview and recent activity.</p>
         </div>
 
         <!-- Portfolio Statistics -->
@@ -109,11 +95,7 @@ $username = $currentUser['username'];
 
         <!-- Back to Home -->
         <div class="dashboard-footer">
-
-            <a href="home.php" class="back-button">
-                Back to Home
-            </a>
-
+            <a href="home.php" class="back-button">Back to Home</a>
         </div>
 
     </main>
