@@ -7,10 +7,11 @@ $key = $_SESSION['session_key'];
 function e($value) {
     return htmlspecialchars((string)$value);
 }
-
+//get the exchange rate
 $currencies = [];
 $rates = send_to_broker(['type' => 'get_rates']);
-
+//processes the currencies 
+// en example of this would be if 1 usd it would calculate 1/0.85
 foreach ($rates['rates'] ?? [] as $row) {
     if ($row['base_currency'] == 'USD' && $row['rate'] > 0) {
         $currencies[$row['quote_currency']] = 1 / $row['rate'];
@@ -18,14 +19,14 @@ foreach ($rates['rates'] ?? [] as $row) {
 }
 
 ksort($currencies);
-
+//reads the users input 
 $type = $_POST['trade_type'] ?? 'buy';
 $currency = $_POST['currency'] ?? '';
 $amount = $_POST['amount'] ?? '';
 $rate = $currencies[$currency] ?? null;
 $total = null;
 $error = '';
-
+// validates the trade that the user did 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($type != 'buy' && $type != 'sell') {
         $error = 'Invalid trade type.';
@@ -34,8 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (!is_numeric($amount) || (float)$amount <= 0) {
         $error = 'Please enter a valid amount.';
     } else {
+        //calculates the trade 
         $total = (float)$amount * $rate;
-
+//this section determins what currency is the user spending and what currency they sell
         if (($_POST['action'] ?? '') == 'confirm') {
             if ($type == 'buy') {
                 $from = 'USD';
@@ -46,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $to = 'USD';
                 $tradeAmount = (float)$amount;
             }
-
+//sends the trade to the broker
             $result = send_to_broker([
                 'type' => 'trade',
                 'session_key' => $key,
@@ -83,7 +85,7 @@ if ($message == '') {
         $message = 'Select a currency and enter an amount to preview a trade.';
     }
 }
-
+//gets the users holdings 
 $holdings = [];
 $portfolio = send_to_broker([
     'type' => 'get_portfolio',
@@ -118,7 +120,7 @@ foreach ($portfolio['positions'] ?? [] as $row) {
         </div>
     </div>
 </nav>
-
+<!--layout of  the page-->
 <main class="marketplace-container">
 
     <div class="marketplace-header">
@@ -130,7 +132,7 @@ foreach ($portfolio['positions'] ?? [] as $row) {
 
         <section class="marketplace-card">
             <h2>Trade Currency</h2>
-
+<!--make a form that sends info to the php side -->
             <form method="POST">
                 <label>Trade Type</label>
                 <select name="trade_type">
@@ -147,7 +149,7 @@ foreach ($portfolio['positions'] ?? [] as $row) {
                         </option>
                     <?php } ?>
                 </select>
-
+<!--lets users decide how much they want to buy or sell-->
                 <label>Amount</label>
                 <input type="number" name="amount" min="0.01" step="any"
                        placeholder="Enter currency amount" value="<?= e($amount) ?>" required>
@@ -194,7 +196,9 @@ foreach ($portfolio['positions'] ?? [] as $row) {
             </div>
 
             <p class="trade-message" aria-live="polite"><?= e($message) ?></p>
-
+<!--this is a hidden input field-->
+<!--it sends the same trade that the user made php side 
+to confirm the trade when the button is clicked-->
             <form method="POST">
                 <input type="hidden" name="trade_type" value="<?= e($type) ?>">
                 <input type="hidden" name="currency" value="<?= e($currency) ?>">
