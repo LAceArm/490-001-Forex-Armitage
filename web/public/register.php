@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($password !== $confirm) {
                 $error = 'Passwords do not match';
 	} else if (!$compliant_password) {
-		$error="Password needs at least one special character and one number";
+                $error="Password needs at least 8 characters, with an uppercase letter, a lowercase letter, a number, and a symbol";
 	} else {
 		// Bothers DB to create account
                 $r = send_to_broker([
