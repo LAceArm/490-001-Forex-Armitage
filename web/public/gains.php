@@ -1,124 +1,150 @@
-<?php
-// ---------------------------------------------------------------------------
-// gains.php: how the portfolio has performed since the account started.
-//
-// Cards: initial value (the starting cash) against current value, with the
-// difference as the gain, so they match the Portfolio page's total.
-// Table: for each holding, the average USD price paid vs. today's price.
-// ---------------------------------------------------------------------------
 
-// Only logged-in users get past this line. It checks the session key with the DB.
+<?php
 require_once __DIR__ . '/../broker/session_check.php';
 
 $key = $_SESSION['session_key'];
 
-// Small helpers: escape text for HTML, format money (with a minus sign
-// in front of the $), format a rate, and pick the CSS class for a gain or loss.
-$e       = fn($v) => htmlspecialchars((string)$v);
-$money   = fn($v) => number_format((float)$v, 2);
-$usd     = fn($v) => (round($v, 2) < 0 ? '-' : '') . '$' . number_format(abs($v), 2);
-$fmtRate = fn($r) => number_format($r, $r < 0.01 ? 6 : 4);
-$cls     = fn($v) => $v === null ? '' : (round($v, 2) >= 0 ? 'positive' : 'negative');
-
-// Today's USD price of one unit of each currency. The DB stores rates as
-// units per 1 USD, so the price is 1 / rate. USD itself is always 1.
-$prices = ['USD' => 1.0];
 $ratesReply = send_to_broker(['type' => 'get_rates']);
-foreach ($ratesReply['rates'] ?? [] as $row) {
-    if ($row['base_currency'] === 'USD' && (float)$row['rate'] > 0) {
-        $prices[$row['quote_currency']] = 1 / (float)$row['rate'];
+
+$prices = ['USD' => 1];
+
+foreach ($ratesReply['rates'] ?? [] as $rate) {
+    if ($rate['base_currency'] == 'USD' && $rate['rate'] > 0) {
+        $prices[$rate['quote_currency']] = 1 / $rate['rate'];
     }
 }
+//get the users portfolio
+$portfolio = send_to_broker([
+    'type' => 'get_portfolio',
+    'session_key' => $key
+]);
 
-// The user's positions and starting cash. $loaded is false if the request
-// failed, so the page says "Not available" instead of showing zeros.
-$portfolio = send_to_broker(['type' => 'get_portfolio', 'session_key' => $key]);
-$loaded    = !empty($portfolio['success']);
-$positions = $loaded ? $portfolio['positions'] : [];
+$loaded = !empty($portfolio['success']);
 
-// Average purchase price per currency, in USD per unit: total USD spent
-// divided by total units bought. Only trades paid for in USD count, which is
-// what the Marketplace page makes.
+$positions = [];
+
+if ($loaded) {
+    if (isset($portfolio['positions'])) {
+        $positions = $portfolio['positions'];
+    }
+}
+//get the users trade history
+$tradesReply = send_to_broker([
+    'type' => 'get_trades',
+    'session_key' => $key
+]);
+
 $spent = [];
 $bought = [];
-$tradesReply = send_to_broker(['type' => 'get_trades', 'session_key' => $key]);
-foreach ($tradesReply['trades'] ?? [] as $t) {
-    if ($t['from_code'] === 'USD' && $t['to_code'] !== 'USD') {
-        $spent[$t['to_code']]  = ($spent[$t['to_code']]  ?? 0) + (float)$t['from_amount'];
-        $bought[$t['to_code']] = ($bought[$t['to_code']] ?? 0) + (float)$t['to_amount'];
-    }
-}
-$purchase = ['USD' => 1.0];
-foreach ($bought as $code => $units) {
-    if ($units > 0) {
-        $purchase[$code] = $spent[$code] / $units;
-    }
-}
 
-// One row per holding, plus the total value of everything held.
+foreach ($tradesReply['trades'] ?? [] as $trade) {
+    if ($trade['from_code'] == 'USD' && $trade['to_code'] != 'USD') {
+        $code = $trade['to_code'];
+
+        if (!isset($spent[$code])) {
+            $spent[$code] = 0;
+            $bought[$code] = 0;
+        }
+
+        $spent[$code] += $trade['from_amount'];
+        $bought[$code] += $trade['to_amount'];
+    }
+}
+//calculate the average purchase price
+//the calculation is purchase price = total usd spent / the total units baught
+$purchase = ['USD' => 1];
+
+foreach ($bought as $code => $amount) {
+    if ($amount > 0) {
+        $purchase[$code] = $spent[$code] / $amount;
+    }
+}
+//calculate each currencys gain or loss
 $holdings = [];
-$total = 0.0;
-foreach ($positions as $p) {
-    $code    = $p['currency'];
-    $amount  = (float)$p['amount'];
-    $current = $prices[$code] ?? null;
-    $paid    = $purchase[$code] ?? null;
+$currentValue = 0;
 
+foreach ($positions as $position) {
+    $code = $position['currency'];
+    $amount = (float)$position['amount'];
+//get the purchase and current rates
+    $currentRate = $prices[$code] ?? null;
+    $purchaseRate = $purchase[$code] ?? null;
+//calculate the gain
+    $gain = null;
+
+    if ($currentRate !== null && $purchaseRate !== null) {
+        $gain = $amount * ($currentRate - $purchaseRate);
+    }
+//store the output of the calculation
     $holdings[] = [
-        'code'          => $code,
-        'amount'        => $amount,
-        'purchase_rate' => $paid,
-        'current_rate'  => $current,
-        // Unrealized gain: units held times the change in price. Unknown if either price is.
-        'gain'          => ($paid !== null && $current !== null) ? $amount * ($current - $paid) : null,
+        'code' => $code,
+        'amount' => $amount,
+        'purchase_rate' => $purchaseRate,
+        'current_rate' => $currentRate,
+        'gain' => $gain
     ];
-    $total += (float)($p['usd_value'] ?? 0);   // null means no rate, so it counts as 0
+
+    $currentValue += (float)($position['usd_value'] ?? 0);
 }
+//calculates the portfolios overall performance
+$initialValue = null;
+$totalGain = null;
+$performance = null;
+//total gain =current value - initial value
+//performance = total gain / initial value * 100
+if ($loaded) {
+    $initialValue = (float)$portfolio['starting_cash'];
+    $totalGain = $currentValue - $initialValue;
 
-// Card figures. Everything starts from the starting cash, so the gain here
-// also includes profit already locked in by selli
-$cash = 0.0;
-$holdingsValue = 0.0;
-
-foreach ($positions as $p) {
-    if ($p['currency'] === 'USD') {
-        $cash += (float)$p['amount'];
-    } else {
-        $holdingsValue += (float)($p['usd_value'] ?? 0);
+    if ($initialValue > 0) {
+        $performance = ($totalGain / $initialValue) * 100;
     }
 }
 
-$initialValue = $loaded
-    ? (float)$portfolio['starting_cash']
-    : null;
-
-$currentValue = $loaded
-    ? $cash + $holdingsValue
-    : null;
-
-$totalGain = $loaded
-    ? $currentValue - $initialValue
-    : null;
-
-$gainPercentage = ($loaded && $initialValue > 0)
-    ? ($totalGain / $initialValue) * 100
-    : null;
-
-$cards = [
-    'Initial Holdings Value' => [$initialValue === null ? 'Not available' : $usd($initialValue), ''],
-    'Current Holdings Value' => [$currentValue === null ? 'Not available' : $usd($currentValue), ''],
-    'Total Gain / Loss'      => [$totalGain === null ? 'Not available' : $usd($totalGain), $cls($totalGain)],
-    'Performance'            => [$gainPercentage === null ? 'Not available'
-                                    : (round($gainPercentage, 2) < 0 ? '-' : '') . number_format(abs($gainPercentage), 2) . '%',
-                                 $cls($gainPercentage)],
-];
-
-// Message under the table, only if there is something to say.
 $message = '';
-if (!$loaded || !$holdings) {
+
+if (!$loaded || empty($holdings)) {
     $message = 'Portfolio performance information is not available yet.';
-} elseif (in_array(null, array_column($holdings, 'purchase_rate'), true)) {
-    $message = 'Purchase rates are only available for currencies bought with USD.';
+} else {
+    foreach ($holdings as $holding) {
+        if ($holding['purchase_rate'] === null) {
+            $message = 'Purchase rates are only available for currencies bought with USD.';
+            break;
+        }
+    }
+}
+//this function displays the numbers as money
+//example 1500 becomes $1,500.00
+function formatMoney($value) {
+    if ($value === null) {
+        return 'Not available';
+    }
+
+    if ($value < 0) {
+        return '-$' . number_format(abs($value), 2);
+    }
+
+    return '$' . number_format($value, 2);
+}
+//changes the color of the text depending if it gained or loss
+function gainClass($value) {
+    if ($value === null) {
+        return '';
+    }
+
+    if (round($value, 2) >= 0) {
+        return 'positive';
+    }
+
+    return 'negative';
+}
+//formats rate if it exists 
+function formatRate($rate) {
+    if ($rate === null) {
+        return 'Not available';
+    }
+
+    return number_format($rate, 6);
 }
 ?>
 
@@ -128,17 +154,14 @@ if (!$loaded || !$holdings) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Portfolio Gains | Forex Armitage</title>
 
-    <!-- Shared site styles, then styles for this page -->
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/gains.css">
 </head>
 
 <body class="home-page">
 
-    <!-- Navigation bar (same links as the other pages) -->
     <nav class="main-navbar">
         <div class="main-nav-container">
             <a href="home.php" class="main-logo">Forex Armitage</a>
@@ -159,17 +182,34 @@ if (!$loaded || !$holdings) {
             <p>Track the performance of your virtual currency holdings.</p>
         </div>
 
-        <!-- Four summary cards; gain and performance turn green or red -->
         <div class="gains-summary">
-            <?php foreach ($cards as $label => [$text, $class]): ?>
-                <div class="gains-card">
-                    <h2><?= $label ?></h2>
-                    <p class="<?= $class ?>"><?= $text ?></p>
-                </div>
-            <?php endforeach; ?>
+
+            <div class="gains-card">
+                <h2>Initial Holdings Value</h2>
+                <p><?= formatMoney($initialValue) ?></p>
+            </div>
+
+            <div class="gains-card">
+                <h2>Current Holdings Value</h2>
+                <p><?= $loaded ? formatMoney($currentValue) : 'Not available' ?></p>
+            </div>
+
+            <div class="gains-card">
+                <h2>Total Gain / Loss</h2>
+                <p class="<?= gainClass($totalGain) ?>">
+                    <?= formatMoney($totalGain) ?>
+                </p>
+            </div>
+
+            <div class="gains-card">
+                <h2>Performance</h2>
+                <p class="<?= gainClass($performance) ?>">
+                    <?= $performance !== null ? number_format($performance, 2) . '%' : 'Not available' ?>
+                </p>
+            </div>
+
         </div>
 
-        <!-- One row per currency held -->
         <section class="gains-holdings">
 
             <h2>Currency Performance</h2>
@@ -186,16 +226,27 @@ if (!$loaded || !$holdings) {
                             <th>Gain / Loss</th>
                         </tr>
                     </thead>
-
+<!--displays each currency
+the foreach loop creates one row for every currency owned-->
                     <tbody>
-                        <?php foreach ($holdings as $h): ?>
+                        <?php foreach ($holdings as $holding): ?>
                             <tr>
-                                <td><?= $e($h['code']) ?></td>
-                                <td><?= $money($h['amount']) ?></td>
-                                <td><?= $h['purchase_rate'] !== null ? $fmtRate($h['purchase_rate']) : 'Not available' ?></td>
-                                <td><?= $h['current_rate'] !== null ? $fmtRate($h['current_rate']) : 'Not available' ?></td>
-                                <td class="<?= $cls($h['gain']) ?>">
-                                    <?= $h['gain'] !== null ? $usd($h['gain']) : 'Not available' ?>
+                                <td><?= htmlspecialchars($holding['code']) ?></td>
+
+                                <td>
+                                    <?= number_format($holding['amount'], 2) ?>
+                                </td>
+
+                                <td>
+                                    <?= formatRate($holding['purchase_rate']) ?>
+                                </td>
+
+                                <td>
+                                    <?= formatRate($holding['current_rate']) ?>
+                                </td>
+
+                                <td class="<?= gainClass($holding['gain']) ?>">
+                                    <?= formatMoney($holding['gain']) ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -204,8 +255,10 @@ if (!$loaded || !$holdings) {
                 </table>
             </div>
 
-            <?php if ($message !== ''): ?>
-                <p class="gains-message"><?= $e($message) ?></p>
+            <?php if ($message != ''): ?>
+                <p class="gains-message">
+                    <?= htmlspecialchars($message) ?>
+                </p>
             <?php endif; ?>
 
         </section>

@@ -1,39 +1,50 @@
 <?php
 session_start();
+
 require_once __DIR__ . '/../broker/broker_client.php';
 
+// Error message; empty means no error
 $error = '';
-$regex="/(?=(.*[0-9]))((?=.*[A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z]))^.{8,}$/";
 
+// 8 characters, 1 number, an uppercase and a lowercase letter, and a symbol
+$regex="/(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,}/";
 
+// Runs when form is submitted (not when page is opened)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $username = trim($_POST['username'] ?? '');
         $email    = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
         $confirm  = $_POST['confirm_password'] ?? '';
+
+	// Returns 1 if password follows regex rule, returns 0 if not
 	$compliant_password=preg_match($regex,$password);
 
+	// Checks the password before bothering DB
         if ($password !== $confirm) {
                 $error = 'Passwords do not match';
-	}
-	else if (!$compliant_password){ 
-		$error="Password needs at least one special character and one number";
-	}
-	else {
+	} else if (!$compliant_password) {
+                $error="Password needs at least 8 characters, with an uppercase letter, a lowercase letter, a number, and a symbol";
+	} else {
+		// Bothers DB to create account
                 $r = send_to_broker([
                         'type'     => 'register',
                         'username' => $username,
                         'email'    => $email,
                         'password' => $password,
                 ]);
-                if (!empty($r['success'])) {
+
+		// Registration worked; go back to login.php
+		if (!empty($r['success'])) {
                         header('Location: login.php');
                         exit;
                 }
-                $error = 'Registration failed (username or email may be taken)';
+
+		// Registration failed; error message loaded
+		$error="Password needs at least 8 characters, with an uppercase letter, a lowercase letter, a number, and a symbol";
         }
 }
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>

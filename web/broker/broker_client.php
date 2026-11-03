@@ -23,11 +23,11 @@ function send_to_broker(array $payload): array
                 chdir($prev); // Revert to original folder
         }
 
-	// Return $reply if array
+	// If database sends back array, pass along to page
 	if (is_array($reply)) {
                 return $reply;
 	}
 
-	// Return failure if array is null
+	// If nothing comes back, pass failure along to page
 	return array('success' => false, 'error' => 'Service unavailable');
 }
