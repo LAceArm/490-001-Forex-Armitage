@@ -1,50 +1,50 @@
 <?php
-// ---------------------------------------------------------------------------
-// watchlist.php: User watchlists page 
-// ---------------------------------------------------------------------------
-
-// Only logged-in users get past this line. It checks the session key with the DB.
 require_once __DIR__ . '/../broker/session_check.php';
 
 $key = $_SESSION['session_key'];
 
 // Handle a submitted form. Each action maps to one broker request; the user is
 // found from the session key, so no user id is sent.
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'];
+    $action = $_POST['action'] ?? '';
+    $r      = null;
 
-    if (isset($requests[$action])) {
-	    //Behavior will be different depending on action
-	
-	    switch($requests[$action]){  //Create watchlist
-	    	case 'create':
-			$send=array('type'=>'create_watchlist','name'=>trim($_POST['name'],'session_key'=>$key));
-			$r=send_to_broker($send);
-			break;
-		case 'delete': //Delete a whole watchlist
-			$send=array('type'=>'delete_watchlist','watchlist_id'=>(int)($_POST['watchlist_id']),'code'=>$_POST['code'],'key'=>$key);
-			$r=send_to_broker($send);
-			break;
-		case 'add': //Add currency to watchlist
-			$send=array('type'=>'add_watchlist_item','watchlist_id'=>(int)($_POST['watchlist_id']),'code'=>$_POST['code'],'key'=>$key);
-			$r=send_to_broker($send);
-			break;
-		case 'remove': //Remove currency from watchlist
-			$send=array('type'=>'remove_watchlist_item','watchlist_id'=>(int)($_POST['watchlist_id']),'code'=>$_POST['code'],'key'=>$key);
-			$r=send_to_broker($send);
-			break;
-	}	//Backend expects an int.     
+    switch($action) {
+    	case 'create': // Create watchlist
+            $r = send_to_broker([
+            'type'        => 'create_watchlist',
+            'name'        => trim($_POST['name'] ?? ''),
+            'session_key' => $key,
+            ]);
+	        break;
+	    case 'delete': // Delete a whole watchlist
+            $r = send_to_broker([
+                'type'         => 'delete_watchlist',
+                'watchlist_id' => (int)($_POST['watchlist_id'] ?? 0),
+                'session_key'  => $key,
+            ]);
+            break;
+	    case 'add': //Add currency to watchlist
+            $r = send_to_broker([
+                'type'         => 'add_watchlist_item',
+                'watchlist_id' => (int)($_POST['watchlist_id'] ?? 0),
+                'code'         => $_POST['code'] ?? '',
+                'session_key'  => $key,
+            ]);
+            break;
+	    case 'remove': //Remove currency from watchlist
+            $r = send_to_broker([
+                'type'         => 'remove_watchlist_item',
+                'watchlist_id' => (int)($_POST['watchlist_id'] ?? 0),
+                'code'         => $_POST['code'] ?? '',
+                'session_key'  => $key,
+            ]);
+	        break;
+    }
 
-        // Check for errors. If broker does not return an error, a default message is used.
-	if (empty($r['success'])) {
-		if(isset($r['success'])){
-		       $_SESSION['flash']=$r['error'];	
-		}
-		else{
-		       $_SESSION['flash']="That did not work, Please try again";	
-		}
-        }
+    // Check for errors. If broker does not return an error, a default message is used.
+	if ($r !== null && empty($r['success'])) {
+        $_SESSION['flash']=  $r['error'] ?? 'That did not work, please try again';
     }
 
     // Averts duplicates by reloading the page
@@ -53,18 +53,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Show the flash error
-$flash = $_SESSION['flash'];
+$flash = $_SESSION['flash'] ?? '';
 unset($_SESSION['flash']);
 
 // The user's watchlists, with each currency's latest USD price and daily change.
 $reply = send_to_broker(['type' => 'get_watchlists', 'session_key' => $key]);
 
-if(isset($reply['watchlists'])){
-       $watchlists=$reply['watchlists'];	
-}
-else{ 
-	$watchlists=[];
-}
+$watchlists = $reply['watchlists'] ?? [];
 
 $names = [
     'AED' => 'United Arab Emirates Dirham',
@@ -77,29 +72,22 @@ $names = [
     'USD' => 'US Dollar',
 ];
 
-
 $available = [];
 $ratesReply = send_to_broker(['type' => 'get_rates']);
-
-if(!empty($ratesReply)){ 
-	foreach ($ratesReply['rates'] as $row) {
-    	if ($row['base_currency'] === 'USD') {
-        	$available[] = $row['quote_currency'];
-    	}
-	}
+foreach ($ratesReply['rates'] ?? [] as $row) {
+    if ($row['base_currency'] === 'USD') {
+	$available[] = $row['quote_currency'];
+    }
 }
-sort($available); //Makes the list accessible
+
+sort($available); // Makes the list accessible
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Watchlists | Forex Armitage</title>
-
-    <!-- Shared site styles, then styles for this page -->
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/watchlist.css">
 </head>
@@ -129,7 +117,7 @@ sort($available); //Makes the list accessible
 
         <!-- An error from the last action, if there was one -->
         <?php if ($flash !== ''): ?>
-            <p class="watchlist-message"><?= $e($flash) ?></p>
+            <p class="watchlist-message"><?= htmlspecialchars($flash) ?></p>
         <?php endif; ?>
 
         <!-- Create a new, empty watchlist -->
@@ -152,7 +140,7 @@ sort($available); //Makes the list accessible
             <section class="watchlist-card">
 
                 <div class="watchlist-section-header">
-                    <h2><?= echo($list['name']) ?></h2>
+                    <h2><?= $list['name'] ?></h2>
 
                     <!-- Delete the whole list (its currencies go with it) -->
                     <form method="POST" action="watchlist.php"
@@ -172,8 +160,8 @@ sort($available); //Makes the list accessible
                         <option value="">Select a currency</option>
                         <?php foreach ($available as $code): ?>
                             <?php if (!in_array($code, $inList, true)): ?>
-                                <option value="<?= echo $code?>">
-				   <? echo "$code -". $names[$code]; ?>
+                                <option value="<?= $code ?>">
+                                   <?= $code ?> - <?= $names[$code] ?>
                                 </option>
                             <?php endif; ?>
                         <?php endforeach; ?>
@@ -201,7 +189,7 @@ sort($available); //Makes the list accessible
                                 <tr>
 				    <td><?=$c['code'] ?></td>
 				    <td> <?=$names[$c['code']] ?>
-                                    <td><?= $price($c['price']) ?></td>
+                                    <td><?= number_format($c['price'], $c['price'] < 0.01 ? 6 : 4) ?></td>
                                     <td>
 					<?= $c['change'].number_format($c['change'],2).'%' ?>
                                     </td>
@@ -209,7 +197,7 @@ sort($available); //Makes the list accessible
                                         <form method="POST" action="watchlist.php">
                                             <input type="hidden" name="action" value="remove">
                                             <input type="hidden" name="watchlist_id" value="<?= (int)$list['id'] ?>">
-                                            <input type="hidden" name="code" value="<?= $e($c['code']) ?>">
+                                            <input type="hidden" name="code" value="<?= $c['code'] ?>">
                                             <button type="submit" class="remove-button">Remove</button>
                                         </form>
                                     </td>
