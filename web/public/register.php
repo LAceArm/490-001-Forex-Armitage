@@ -1,31 +1,25 @@
 <?php
-session_start();
+require_once __DIR__ . '/../broker/broker_client.php'; // Loads send_to_broker()
 
-require_once __DIR__ . '/../broker/broker_client.php';
+$error = ''; // Error message; empty means no error
 
-// Error message; empty means no error
-$error = '';
+// 8+ characters, 1 number, an uppercase and a lowercase letter, and a symbol
+$regex = "/(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,}/";
 
-// 8 characters, 1 number, an uppercase and a lowercase letter, and a symbol
-$regex="/(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,}/";
-
-// Runs when form is submitted (not when page is opened)
+// Runs when form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $username = trim($_POST['username'] ?? '');
         $email    = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
         $confirm  = $_POST['confirm_password'] ?? '';
 
-	// Returns 1 if password follows regex rule, returns 0 if not
-	$compliant_password=preg_match($regex,$password);
-
-	// Checks the password before bothering DB
+        // Run password checks
         if ($password !== $confirm) {
                 $error = 'Passwords do not match';
-	} else if (!$compliant_password) {
-                $error="Password needs at least 8 characters, with an uppercase letter, a lowercase letter, a number, and a symbol";
-	} else {
-		// Bothers DB to create account
+        } else if (!preg_match($regex, $password)) {
+                $error = "Password needs at least 8 characters, 1 number, an uppercase and a lowercase letter, and a symbol";
+        } else {
+                // Bothers DB to create account
                 $r = send_to_broker([
                         'type'     => 'register',
                         'username' => $username,
@@ -33,21 +27,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'password' => $password,
                 ]);
 
-		// Registration worked; go back to login.php
-		if (!empty($r['success'])) {
+                // Registration succeeded; redirect to login.php
+                if (!empty($r['success'])) {
                         header('Location: login.php');
                         exit;
                 }
 
-		// Registration failed; error message loaded
-		$error="Password needs at least 8 characters, with an uppercase letter, a lowercase letter, a number, and a symbol";
+                // Registration failed; error message loaded
+                $error = "Registration failed (username or email may be taken)";
         }
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Register</title>
         <link rel="stylesheet" href="assets/style.css">
 </head>
@@ -99,13 +95,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </form>
                 <div class="register-section">
                         <p>Already have an account?</p>
-                        <button
-                                 class="register-button"
-                                 onclick="window.location.href='login.php'"
-                                 type="button"
-                                >
-                                  Back to Login
-                                </button>
+                        <button 
+                                class="register-button" 
+                                onclick="location.href='./login.php'" 
+                                type="button"
+                        >
+                                Back to Login
+                        </button>
                 </div>
         </div>
 </body>

@@ -1,12 +1,11 @@
 <?php
-session_start();
+session_start(); // Start session
 
-require_once __DIR__ . '/../broker/broker_client.php';
+require_once __DIR__ . '/../broker/broker_client.php'; // Loads send_to_broker()
 
-// Error message; empty means no error
-$error = '';
+$error = ''; // Error message; empty means no error
 
-// Runs when form is submitted (not when page is opened)
+// Runs when form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	// Bothers DB to check username and password
 	$r = send_to_broker([
@@ -15,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		'password' => $_POST['password'] ?? '',
 	]);
 
-	// Login worked; remembers user and moves to home.php
+	// Login succeeded; remembers user and redirect to home.php
 	if (!empty($r['success'])) {
 		$_SESSION['user_id']  = $r['user_id'];
 		$_SESSION['username'] = $r['username'];
@@ -30,15 +29,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Login</title>
         <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
         <div class="login-box">
                 <h1>Login</h1>
-                <p class="welcome">Welcome back! Please sign in to continue.</p>
+                <p class="welcome">Sign in or create an account to continue.</p>
                 <?php if ($error): ?>
                         <div class="error"><?php echo htmlspecialchars($error); ?></div>
                 <?php endif; ?>
