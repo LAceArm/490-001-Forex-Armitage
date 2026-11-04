@@ -23,11 +23,11 @@ foreach ($reply['rates'] ?? [] as $row) {
     $code = $row['quote_currency'];
     $rate = 1 / $row['rate'];
 
-        $currencies[$code] = [
-            'name' => $names[$code] ?? $code,
-            'rate' => number_format($rate, $rate < 0.01 ? 6 : 4)
-        ];
-    }
+    $currencies[$code] = [
+        'name' => $names[$code] ?? $code,
+        'rate' => number_format($rate, $rate < 0.01 ? 6 : 4)
+    ];
+
 }
 
 ksort($currencies);
@@ -90,8 +90,8 @@ ksort($currencies);
                     <?php foreach ($currencies as $code => $currency): ?>
                          <tr>
                             <td><?= $code ?></td>
-                            <td><?= currency['name'] ?></td>
-                            <td><?= currency['rate'] ?></td>
+                            <td><?= $currency['name'] ?></td>
+                            <td><?= $currency['rate'] ?></td>
                             <td>
                                 <button class="view-button" onclick="showDetails(this)">View Details</button>
                             </td>
