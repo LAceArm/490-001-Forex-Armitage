@@ -1,36 +1,23 @@
 <?php
-require_once __DIR__ . '/../broker/session_check.php';
+require_once __DIR__ . '/../broker/session_check.php'; // Loads session check
+require_once __DIR__ . '/../data/currencies.php'; // Defines $currencyNames (e.g., 'USD' => US Dollar)
 
-// Currencies
-$names = [
-    'AED' => 'United Arab Emirates Dirham',
-    'CAD' => 'Canadian Dollar',
-    'CHF' => 'Swiss Franc',
-    'CNY' => 'Chinese Yuan',
-    'EUR' => 'Euro',
-    'GBP' => 'British Pound',
-    'JPY' => 'Japanese Yen',
-    'USD' => 'US Dollar'
-];
+$currencyRows = [];
 
-$currencies = [];
-
-// Bother DB for rates
-$reply = send_to_broker(['type' => 'get_rates']);
+$reply = send_to_broker(['type' => 'get_rates']); // Bother DB for rates
 
 // Processing rates
-foreach ($reply['rates'] ?? [] as $row) {
-    $code = $row['quote_currency'];
+foreach ($reply['rates'] as $row) {
+    $currencyCode = $row['quote_currency'];
     $rate = 1 / $row['rate'];
 
-    $currencies[$code] = [
-        'name' => $names[$code] ?? $code,
-        'rate' => number_format($rate, $rate < 0.01 ? 6 : 4)
+    $currencyRows[$currencyCode] = [
+        'name' => $currencyNames[$currencyCode],
+        'rate' => number_format($rate, 6)
     ];
-
 }
 
-ksort($currencies);
+ksort($currencyRows);
 ?>
 
 <!DOCTYPE html>
@@ -39,16 +26,16 @@ ksort($currencies);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Currency Browser | Forex Armitage</title>
-    <link rel="stylesheet" href="assets/style.css?v=5">
-    <link rel="stylesheet" href="assets/currencies.css?v=1">
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/currencies.css">
 </head>
 
 <body class="home-page">
 
+<!-- Navigation Bar -->
 <nav class="main-navbar">
     <div class="main-nav-container">
         <a href="home.php" class="main-logo">Forex Armitage</a>
-
         <div class="main-nav-links">
             <a href="dashboard.php">Dashboard</a>
             <a href="notifications.php">Notifications</a>
@@ -87,9 +74,9 @@ ksort($currencies);
                 </thead>
 
                 <tbody>
-                    <?php foreach ($currencies as $code => $currency): ?>
+                    <?php foreach ($currencyRows as $currencyCode => $currency): ?>
                          <tr>
-                            <td><?= $code ?></td>
+                            <td><?= $currencyCode ?></td>
                             <td><?= $currency['name'] ?></td>
                             <td><?= $currency['rate'] ?></td>
                             <td>
@@ -102,7 +89,7 @@ ksort($currencies);
         </div>
 
         <p id="currency-message" class="currency-message"
-           <?= count($currencies) > 0 ? 'hidden' : '' ?>>
+           <?= count($currencyRows) > 0 ? 'hidden' : '' ?>>
             Currency information is not available yet.
         </p>
     </section>

@@ -44,7 +44,7 @@ $username = $currentUser['username'];
             <div class="feature-card">
                 <h2>Currency Browser</h2>
                 <p>Search currencies and view current exchange rates.</p>
-                <a href="currencies.php" class="feature-button">Browse Currencies</a>
+                <a href="currency_browser.php" class="feature-button">Browse Currencies</a>
             </div>
 
             <!-- Mock Portfolio -->

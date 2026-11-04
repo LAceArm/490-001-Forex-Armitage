@@ -220,7 +220,7 @@ sort($available); // Makes the list accessible
         <?php endif; ?>
 
         <div class="watchlist-actions">
-            <a href="currencies.php" class="watchlist-button">Browse Currencies</a>
+            <a href="currency_browser.php" class="watchlist-button">Browse Currencies</a>
             <a href="home.php" class="back-home-button">Back to Home</a>
         </div>
 
