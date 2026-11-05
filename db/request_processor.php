@@ -46,7 +46,7 @@ function getPortfolio($userId)
     $stmt = $conn->prepare("SELECT starting_cash FROM portfolios WHERE user_id = ?");
     $stmt->bind_param("i", $userId);
     $stmt->execute();
-    $cash = $stmt->get_result()->fetch_assoc();
+    $portfolio = $stmt->get_result()->fetch_assoc();
 
     $stmt = $conn->prepare(
         "SELECT c.currency_code AS currency,
@@ -63,7 +63,7 @@ function getPortfolio($userId)
 
     return array(
         "success" => true,
-        "starting_cash" => $cash["starting_cash"],
+        "starting_cash" => $portfolio["starting_cash"],
         "positions" => $positions
     );
 }
@@ -78,7 +78,6 @@ function requestProcessor($request)
     }
 
     switch ($request["type"]) {
-
         /* Authentication */
         case "login":
             return loginUser(
@@ -103,13 +102,13 @@ function requestProcessor($request)
 
         /* Forex logic */
         case "trade":
-            $s = validateSession($request["session_key"] ?? "");
-            if (empty($s["success"])) {
+            $session = validateSession($request["session_key"] ?? "");
+            if (empty($session["success"])) {
                 return ["success" => false, "error" => "Not logged in"];
             }
 
             return executeTrade(
-                $s["user_id"],
+                $session["user_id"],
                 $request["from"] ?? "",
                 $request["to"] ?? "",
                 $request["amount"] ?? 0
@@ -119,41 +118,41 @@ function requestProcessor($request)
             return getRates();
 
         case "get_portfolio":
-                $s = validateSession($request["session_key"]);
-                if (empty($s["success"])) {
-                        return array("success" => false, "error" => "Not logged in");
-                }
-                return getPortfolio($s["user_id"]);
+            $session = validateSession($request["session_key"]);
+            if (empty($session["success"])) {
+                    return array("success" => false, "error" => "Not logged in");
+            }
+            return getPortfolio($session["user_id"]);
 
         case "get_trades":
-                $s = validateSession($request["session_key"] ?? "");
-                if (empty($s["success"])) {
-                        return ["success" => false, "error" => "Not logged in"];
-                }
-                return getTrades($s["user_id"]);
+            $session = validateSession($request["session_key"] ?? "");
+            if (empty($session["success"])) {
+                    return ["success" => false, "error" => "Not logged in"];
+            }
+            return getTrades($session["user_id"]);
 
         case "get_watchlists":
         case "create_watchlist":
         case "delete_watchlist":
         case "add_watchlist_item":
         case "remove_watchlist_item":
-                // All five need a logged-in user; find them from the session key.
-                $s = validateSession($request["session_key"] ?? "");
-                if (empty($s["success"])) {
-                        return ["success" => false, "error" => "Not logged in"];
-                }
-                $uid  = $s["user_id"];
-                $wid  = (int)($request["watchlist_id"] ?? 0);
-                $code = $request["code"] ?? "";
+            // All five need a logged-in user; find them from the session key.
+            $session = validateSession($request["session_key"] ?? "");
+            if (empty($session["success"])) {
+                return ["success" => false, "error" => "Not logged in"];
+            }
+            $userId       = $session["user_id"];
+            $watchlistId  = (int)($request["watchlist_id"] ?? 0);
+            $currencyCode = $request["code"] ?? "";
 
-                switch ($request["type"]) {
-                        case "get_watchlists":        return getWatchlists($uid);
-                        case "create_watchlist":      return createWatchlist($uid, $request["name"] ?? "");
-                        case "delete_watchlist":      return deleteWatchlist($uid, $wid);
-                        case "add_watchlist_item":    return addWatchlistItem($uid, $wid, $code);
-                        case "remove_watchlist_item": return removeWatchlistItem($uid, $wid, $code);
-                }
-                break;
+            switch ($request["type"]) {
+                case "get_watchlists":        return getWatchlists($userId);
+                case "create_watchlist":      return createWatchlist($userId, $request["name"] ?? "");
+                case "delete_watchlist":      return deleteWatchlist($userId, $watchlistId);
+                case "add_watchlist_item":    return addWatchlistItem($userId, $watchlistId, $currencyCode);
+                case "remove_watchlist_item": return removeWatchlistItem($userId, $watchlistId, $currencyCode);
+            }
+            break;
 
         default:
             return [

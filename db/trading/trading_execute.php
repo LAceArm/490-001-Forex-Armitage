@@ -1,62 +1,64 @@
 <?php
-
-function executeTrade($userId, $fromCode, $toCode, $amount)
+function executeTrade($userId, $fromCode, $toCode, $fromAmount)
 {
- global $conn;
+    global $conn;
 
- $fromCode = strtoupper(trim($fromCode));
- $toCode = strtoupper(trim($toCode));
- $amount = (float)$amount;
+    $fromCode   = strtoupper(trim($fromCode));
+    $toCode     = strtoupper(trim($toCode));
+    $fromAmount = (float)$fromAmount;
 
- if ($amount <= 0)
-  return ["success"=>false, "error"=>"Invalid amount"];
+    //makes sure number isn't negative or zero
+    if ($fromAmount <= 0)
+    return ["success" => false, "error" => "Invalid amount"];
 
- if ($fromCode == $toCode)
-  return ["success"=>false, "error"=>"Choose different currencies"];
+    //makes sure it doesn't make s useless trade like trading USD to USD
+    if ($fromCode == $toCode)
+    return ["success"=>false, "error"=>"Choose different currencies"];
 
- $from = currencyInfo($fromCode);
- $to = currencyInfo($toCode);
+    $fromCurrency = getCurrencyInfo($fromCode);
+    $toCurrency   = getCurrencyInfo($toCode);
 
- if (!$from || !$to)
-  return ["success"=>false, "error"=>"Currency not found"];
+    // stops the trade if currency doesn't exist or has no rate
+    if (!$fromCurrency || !$toCurrency)
+    return ["success"=>false, "error"=>"Currency not found"];
 
- $toAmount = $amount / $from["rate"] * $to["rate"];
- $rate = $toAmount / $amount;
+    $toAmount = $fromAmount / $fromCurrency["units_per_usd"] * $toCurrency["units_per_usd"];
+    $tradeRate = $toAmount / $fromAmount;
 
- try {
+    try {
 
-  $conn->begin_transaction();
+        $conn->begin_transaction();
 
-  if (!sellCurrency($userId, $from["id"], $amount)) {
-   $conn->rollback();
-   return ["success"=>false, "error"=>"Insufficient balance"];
-  }
+        if (!sellCurrency($userId, $fromCurrency["currency_id"], $fromAmount)) {
+            $conn->rollback();
+            return ["success" => false, "error" => "Insufficient balance"];
+        }
 
-  buyCurrency($userId, $to["id"], $toAmount);
+        buyCurrency($userId, $toCurrency["currency_id"], $toAmount);
 
-  saveTrade(
-   $userId,
-   $from["id"],
-   $to["id"],
-   $amount,
-   $toAmount,
-   $rate
-  );
+        saveTrade(
+            $userId,
+            $fromCurrency["currency_id"],
+            $toCurrency["currency_id"],
+            $fromAmount,
+            $toAmount,
+            $tradeRate
+        );
 
-  $conn->commit();
+        $conn->commit();
 
- } catch (Exception $e) {
-  $conn->rollback();
-  return ["success"=>false, "error"=>"Trade failed"];
- }
+    } catch (Exception $e) {
+        $conn->rollback();
+        return ["success" => false, "error" => "Trade failed"];
+    }
 
- return [
-  "success"=>true,
-  "from"=>$fromCode,
-  "to"=>$toCode,
-  "from_amount"=>$amount,
-  "to_amount"=>$toAmount,
-  "rate"=>$rate
- ];
+    return [
+        "success"     => true,
+        "from"        => $fromCode,
+        "to"          => $toCode,
+        "from_amount" => $fromAmount,
+        "to_amount"   => $toAmount,
+        "rate"        => $tradeRate
+    ];
 }
 ?>
