@@ -1,47 +1,6 @@
 <?php
-require_once "database.php";
-
-// Latest rate per currency id (units per 1 USD)
-function getLatestRates()
-{
-    global $conn;
-
-    $rates = [];
-    $res = $conn->query(
-        "SELECT r.quote_currency_id AS id, r.rate
-        FROM rates r
-        JOIN currencies b ON b.currency_id = r.base_currency_id
-        WHERE b.currency_code = 'USD'"
-    );
-
-    while ($row = $res->fetch_assoc()) {
-        $rates[$row["watchlist_id"]] = (float)$row["rate"];
-    }
-
-    return $rates;
-}
-
-// Rate per currency id from the day before the newest day in rate_history
-function getPreviousRates()
-{
-    global $conn;
-
-    $rates = [];
-    $res = $conn->query(
-        "SELECT quote_currency_id AS id, rate
-        FROM rate_history
-        WHERE base_currency_code = 'USD'
-        AND rate_date = (
-        SELECT MAX(rate_date) FROM rate_history
-        WHERE rate_date < (SELECT MAX(rate_date) FROM rate_history))"
-    );
-
-    while ($row = $res->fetch_assoc()) {
-        $rates[$row["watchlist_id"]] = (float)$row["rate"];
-    }
-
-    return $rates;
-}
+require_once __DIR__ . "/database.php";
+require_once __DIR__ . "/rates.php";
 
 function getWatchlists($userId)
 {
@@ -50,8 +9,8 @@ function getWatchlists($userId)
     $stmt = $conn->prepare(
         "SELECT w.watchlist_id, w.name, c.currency_id, c.currency_code
         FROM watchlists w
-        LEFT JOIN watchlist_items i ON i.watchlist_id = w.watchlist_id
-        LEFT JOIN currencies c ON c.currency_id = i.currency_id
+        LEFT JOIN watchlist_items wi ON wi.watchlist_id = w.watchlist_id
+        LEFT JOIN currencies c ON c.currency_id = wi.currency_id
         WHERE w.user_id = ?
         ORDER BY w.watchlist_id, c.currency_code"
     );
@@ -86,6 +45,7 @@ function getWatchlists($userId)
             "change_percent" => ($latestRate && $previousRate) ? ($previousRate / $latestRate - 1) * 100 : null
         ];
     }
+
     return ["success" => true, "watchlists" => array_values($lists)];
 }
 
@@ -95,6 +55,7 @@ function createWatchlist($userId, $name)
     global $conn;
 
     $name = trim($name);
+
     if ($name === "" || strlen($name) > 50) {
         return ["success" => false, "error" => "Enter a name up to 50 characters"];
     }
@@ -147,9 +108,9 @@ function removeWatchlistItem($userId, $watchlistId, $currencyCode)
     $currencyCode = strtoupper(trim($currencyCode));
 
     $stmt = $conn->prepare(
-        "DELETE i FROM watchlist_items i
-        JOIN watchlists w ON w.watchlist_id = i.watchlist_id
-        JOIN currencies c ON c.currency_id = i.currency_id
+        "DELETE wi FROM watchlist_items wi
+        JOIN watchlists w ON w.watchlist_id = wi.watchlist_id
+        JOIN currencies c ON c.currency_id = wi.currency_id
         WHERE w.watchlist_id = ? AND w.user_id = ? AND c.currency_code = ?"
     );
     $stmt->bind_param("iis", $watchlistId, $userId, $currencyCode);
@@ -157,4 +118,3 @@ function removeWatchlistItem($userId, $watchlistId, $currencyCode)
 
     return ["success" => true];
 }
-

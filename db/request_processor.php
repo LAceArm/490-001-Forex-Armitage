@@ -1,30 +1,7 @@
 <?php
-require_once "authentication.php";
-require_once "trading.php";
-require_once "watchlists.php";
-
-function getRates()
-{
-    global $conn;
-
-    $stmt = $conn->prepare(
-        "SELECT q.currency_code,
-                r.updated_at,
-                r.rate AS units_per_usd
-        FROM rates r
-        JOIN currencies b ON r.base_currency_id = b.currency_id
-        JOIN currencies q ON r.quote_currency_id = q.currency_id
-        WHERE b.currency_code = 'USD'
-        ORDER BY q.currency_code"
-    );
-    $stmt->execute();
-    $rates = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-
-    return [
-        "success" => true,
-        "rates" => $rates
-    ];
-}
+require_once __DIR__ . "/authentication.php";
+require_once __DIR__ . "/trading.php";
+require_once __DIR__ . "/rates.php";
 
 function getPortfolio($userId)
 {

@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . "/database.php";
-require_once __DIR__ . "/trading/trading_rates.php";
 require_once __DIR__ . "/trading/trading_sales.php";
 require_once __DIR__ . "/trading/trading_purchase.php";
 require_once __DIR__ . "/trading/trading_history.php";
