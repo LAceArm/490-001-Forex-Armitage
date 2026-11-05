@@ -6,7 +6,13 @@
 	//Load Configurations for PHPMailer
 	use PHPMailer\PHPMailer\PHPMailer;
 	use PHPMailer\PHPMailer\SMTP;
+	use Dotenv/Dotenv;
 	require_once 'vendor/autoload.php';
+	
+	//Load .env details
+	$env=parse_ini_file('.env');
+	$username=$env["USERNAME"];
+	$password=$env["PASSWORD"];
 
 	//Create instance
 	$mailman=new PHPMailer();
@@ -20,12 +26,13 @@
 	$mailman->SMTPAuth = true; //Use SMTP authentication
 
 	//Configure username and password
-	$mailman->Username='';
-	$mailman->Password='';
+	$mailman->Username=$username;
+	$mailman->Password=$password;
 
 	//Configure Email
-	$mailman->setFrom(); //Same as Username
-	$mailman->addAddress(); //Loop? 
+	$mailman->setFrom($username,'Luis Acevedo'); //Same as Username
+	$mailman->addAddress('briantheduck259@gmail.com','Brian the Duck'); //Loop? 
+	$mailman->Subject="PHPMailer GMail Test";
 	//Can use HTML emails
 	$mailman->msgHTML();
 
