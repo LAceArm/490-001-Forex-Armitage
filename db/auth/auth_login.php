@@ -38,7 +38,6 @@ function loginUser($username, $password)
 		"success" => true,
 		"user_id" => $user["user_id"],	
 		"username" => $user["username"],
-		"role" => $user["role"],
 		"session_key" => createSession($user["user_id"])
 	];
 }

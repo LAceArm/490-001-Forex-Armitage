@@ -10,7 +10,7 @@ function saveTrade($userId, $fromCurrencyId, $toCurrencyId, $fromAmount, $toAmou
         (user_id, from_currency_id, to_currency_id, from_amount, to_amount, rate)
         VALUES (?, ?, ?, ?, ?, ?)"
     );
-    $stmt->bind_param("iiiddd", $userId, $fromId, $toId, $amount, $toAmount, $rate);
+    $stmt->bind_param("iiiddd", $userId, $fromCurrencyId, $toCurrencyId, $fromAmount, $toAmount, $tradeRate);
     $stmt->execute();
 
     return true;

@@ -13,14 +13,14 @@ function executeTrade($userId, $fromCode, $toCode, $fromAmount)
 
     //makes sure it doesn't make s useless trade like trading USD to USD
     if ($fromCode == $toCode)
-    return ["success"=>false, "error"=>"Choose different currencies"];
+    return ["success" => false, "error" => "Choose different currencies"];
 
     $fromCurrency = getCurrencyInfo($fromCode);
     $toCurrency   = getCurrencyInfo($toCode);
 
     // stops the trade if currency doesn't exist or has no rate
     if (!$fromCurrency || !$toCurrency)
-    return ["success"=>false, "error"=>"Currency not found"];
+    return ["success" => false, "error" => "Currency not found"];
 
     $toAmount = $fromAmount / $fromCurrency["units_per_usd"] * $toCurrency["units_per_usd"];
     $tradeRate = $toAmount / $fromAmount;
