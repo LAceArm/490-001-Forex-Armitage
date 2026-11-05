@@ -1,98 +1,77 @@
 
 <?php
-require_once __DIR__ . '/../broker/session_check.php';
+require_once __DIR__ . '/../broker/session_check.php'; // Loads session check
 
 $key = $_SESSION['session_key'];
 
-function e($value) {
-    return htmlspecialchars((string)$value);
-}
-//get the exchange rate
 $currencies = [];
-$rates = send_to_broker(['type' => 'get_rates']);
-//processes the currencies 
-// en example of this would be if 1 usd it would calculate 1/0.85
-foreach ($rates['rates'] ?? [] as $row) {
-    if ($row['base_currency'] == 'USD' && $row['rate'] > 0) {
-        $currencies[$row['quote_currency']] = 1 / $row['rate'];
-    }
+
+$rates = send_to_broker(['type' => 'get_rates']); // Bother DB for rates
+
+foreach ($rates['rates'] as $row) {
+    $currencies[$row['quote_currency']] = 1 / $row['rate'];
 }
 
 ksort($currencies);
-//reads the users input 
-$type = $_POST['trade_type'] ?? 'buy';
+
+// Set variables
+$type = ($_POST['trade_type'] ?? '') == 'sell' ? 'sell' : 'buy';
 $currency = $_POST['currency'] ?? '';
 $amount = $_POST['amount'] ?? '';
 $rate = $currencies[$currency] ?? null;
 $total = null;
-$error = '';
-// validates the trade that the user did 
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if ($type != 'buy' && $type != 'sell') {
-        $error = 'Invalid trade type.';
-    } elseif ($rate === null) {
-        $error = 'Please select a currency.';
-    } elseif (!is_numeric($amount) || (float)$amount <= 0) {
-        $error = 'Please enter a valid amount.';
-    } else {
-        //calculates the trade 
-        $total = (float)$amount * $rate;
-//this section determins what currency is the user spending and what currency they sell
-        if (($_POST['action'] ?? '') == 'confirm') {
-            if ($type == 'buy') {
-                $from = 'USD';
-                $to = $currency;
-                $tradeAmount = $total;
-            } else {
-                $from = $currency;
-                $to = 'USD';
-                $tradeAmount = (float)$amount;
-            }
-//sends the trade to the broker
-            $result = send_to_broker([
-                'type' => 'trade',
-                'session_key' => $key,
-                'from' => $from,
-                'to' => $to,
-                'amount' => $tradeAmount
-            ]);
-
-            if (!empty($result['success'])) {
-                $_SESSION['flash'] = 'Traded ' .
-                    number_format($result['from_amount'], 2) . ' ' .
-                    $result['from'] . ' for ' .
-                    number_format($result['to_amount'], 2) . ' ' .
-                    $result['to'];
-            } else {
-                $_SESSION['flash'] = $result['error'] ?? 'Trade failed.';
-            }
-
-            header('Location: marketplace.php');
-            exit;
+    $total = (float) $amount * $rate; // Calculates USD value of currency
+    if ($_POST['action'] == 'confirm') {
+        if ($type == 'buy') { // Buy: USD --> Other
+            $from        = 'USD';
+            $to          = $currency;
+            $tradeAmount = $total;
+        } else { // Sell: Other --> USD
+            $from        = $currency;
+            $to          = 'USD';
+            $tradeAmount = (float) $amount;
         }
+
+        $result = send_to_broker([
+            'type'        => 'trade',
+            'session_key' => $key,
+            'from'        => $from,
+            'to'          => $to,
+            'amount'      => $tradeAmount
+        ]);
+
+        // Displays confirmation or error message
+        if (!empty($result['success'])) {
+            // e.g., "Traded [amount][code] for [amount][code]"
+            $_SESSION['flash'] = sprintf(
+                'Traded %.2f %s for %.2f %s',
+                $result['from_amount'], $result['from'],
+                $result['to_amount'], $result['to']
+            );
+        } else {
+            $_SESSION['flash'] = $result['error'];
+        }
+
+        header('Location: marketplace.php'); // Redirect to marketplace.php
+        exit;
     }
 }
 
-$message = $_SESSION['flash'] ?? '';
-unset($_SESSION['flash']);
-
-if ($message == '') {
-    if ($error != '') {
-        $message = $error;
-    } elseif ($total !== null) {
-        $message = 'This is an estimated trade preview.';
-    } else {
-        $message = 'Select a currency and enter an amount to preview a trade.';
-    }
+if ($total === null) {
+    $message = 'Select a currency and enter an amount to preview a trade.';
+} else {
+    $message = 'This is an estimated trade preview.';
 }
-//gets the users holdings 
+
+$message = $_SESSION['flash'] ?? $message; // Load message to page
+unset($_SESSION['flash']); 
+
+// User's holdings
 $holdings = [];
-$portfolio = send_to_broker([
-    'type' => 'get_portfolio',
-    'session_key' => $key
-]);
-
-foreach ($portfolio['positions'] ?? [] as $row) {
+$portfolio = send_to_broker(['type' => 'get_portfolio', 'session_key' => $key]);
+foreach ($portfolio['positions'] as $row) {
     $holdings[$row['currency']] = $row['amount'];
 }
 ?>
@@ -109,6 +88,7 @@ foreach ($portfolio['positions'] ?? [] as $row) {
 
 <body class="home-page">
 
+<!-- Navigation Bar -->
 <nav class="main-navbar">
     <div class="main-nav-container">
         <a href="home.php" class="main-logo">Forex Armitage</a>
@@ -144,15 +124,15 @@ foreach ($portfolio['positions'] ?? [] as $row) {
                 <select name="currency" required>
                     <option value="">Select a currency</option>
                     <?php foreach ($currencies as $code => $price) { ?>
-                        <option value="<?= e($code) ?>" <?= $currency == $code ? 'selected' : '' ?>>
-                            <?= e($code) ?>
+                        <option value="<?= $code ?>" <?= $currency == $code ? 'selected' : '' ?>>
+                            <?= $code ?>
                         </option>
                     <?php } ?>
                 </select>
 <!--lets users decide how much they want to buy or sell-->
                 <label>Amount</label>
                 <input type="number" name="amount" min="0.01" step="any"
-                       placeholder="Enter currency amount" value="<?= e($amount) ?>" required>
+                       placeholder="Enter currency amount" value="<?= $amount ?>" required>
 
                 <label>Exchange Rate (USD)</label>
                 <input type="text" readonly value="<?php
@@ -179,7 +159,7 @@ foreach ($portfolio['positions'] ?? [] as $row) {
                 </div>
                 <div class="summary-row">
                     <span>Currency</span>
-                    <strong><?= $total !== null ? e($currency) : 'Not selected' ?></strong>
+                    <strong><?= $total !== null ? $currency : 'Not selected' ?></strong>
                 </div>
                 <div class="summary-row">
                     <span>Amount</span>
@@ -195,14 +175,14 @@ foreach ($portfolio['positions'] ?? [] as $row) {
                 </div>
             </div>
 
-            <p class="trade-message" aria-live="polite"><?= e($message) ?></p>
+            <p class="trade-message"><?= $message ?></p>
 <!--this is a hidden input field-->
 <!--it sends the same trade that the user made php side 
 to confirm the trade when the button is clicked-->
             <form method="POST">
-                <input type="hidden" name="trade_type" value="<?= e($type) ?>">
-                <input type="hidden" name="currency" value="<?= e($currency) ?>">
-                <input type="hidden" name="amount" value="<?= e($amount) ?>">
+                <input type="hidden" name="trade_type" value="<?= $type ?>">
+                <input type="hidden" name="currency" value="<?= $currency ?>">
+                <input type="hidden" name="amount" value="<?= $amount ?>">
 
                 <button type="submit" name="action" value="confirm"
                         class="confirm-button" <?= $total === null ? 'disabled' : '' ?>>
@@ -218,7 +198,7 @@ to confirm the trade when the button is clicked-->
         <div class="trade-summary">
             <?php foreach ($holdings as $code => $value) { ?>
                 <div class="summary-row">
-                    <span><?= e($code) ?></span>
+                    <span><?= $code ?></span>
                     <strong><?= number_format((float)$value, 2) ?></strong>
                 </div>
             <?php } ?>
