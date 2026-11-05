@@ -8,17 +8,14 @@ function getRates()
     global $conn;
 
     $sql = "
-        SELECT
-            b.currency_code AS base_currency,
-            q.currency_code AS quote_currency,
-            r.rate,
+        SELECT q.currency_code AS currency_code,
+            r.rate AS units_per_usd, 
             r.updated_at
         FROM rates r
-        JOIN currencies b
-            ON r.base_currency_id = b.currency_id
-        JOIN currencies q
-            ON r.quote_currency_id = q.currency_id
-        ORDER BY b.currency_code, q.currency_code
+        JOIN currencies b ON r.base_currency_id = b.currency_id
+        JOIN currencies q ON r.quote_currency_id = q.currency_id
+        WHERE b.currency_code = 'USD'
+        ORDER BY q.currency_code
     ";
 
     $result = $conn->query($sql);
@@ -82,6 +79,13 @@ function requestProcessor($request)
 
     switch ($request["type"]) {
 
+        /* Authentication */
+        case "login":
+            return loginUser(
+                $request["username"],
+                $request["password"]
+	        );
+
         case "register":
             return registerUser(
                 $request["username"],
@@ -91,33 +95,28 @@ function requestProcessor($request)
                 $request["last_name"] ?? null
             );
 
-        case "login":
-            return loginUser(
-                $request["username"],
-                $request["password"]
-	    );
+        case "validate_session":
+            return validateSession($request["session_key"] ?? "");
 
-	case "validate_session":
-		return validateSession($request["session_key"] ?? "");
+        case "logout":
+            return destroySession($request["session_key"] ?? "");
 
-	case "logout":
-		return destroySession($request["session_key"] ?? "");
+        /* Forex logic */
+        case "trade":
+            $s = validateSession($request["session_key"] ?? "");
+            if (empty($s["success"])) {
+                return ["success" => false, "error" => "Not logged in"];
+            }
 
-	case "trade":
-		$s = validateSession($request["session_key"] ?? "");
-		if (empty($s["success"])) {
-			return ["success" => false, "error" => "Not logged in"];
-		}
+            return executeTrade(
+                $s["user_id"],
+                $request["from"] ?? "",
+                $request["to"] ?? "",
+                $request["amount"] ?? 0
+            );
 
-		return executeTrade(
-			$s["user_id"],
-			$request["from"] ?? "",
-			$request["to"] ?? "",
-			$request["amount"] ?? 0
-		);
-
-	case "get_rates":
-		return getRates();
+        case "get_rates":
+            return getRates();
 
         case "get_portfolio":
                 $s = validateSession($request["session_key"]);
