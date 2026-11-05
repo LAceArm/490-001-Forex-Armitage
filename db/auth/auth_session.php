@@ -6,20 +6,20 @@ function createSession($userId)
 {
 	global $conn;
 
-	$key = bin2hex(random_bytes(32)); // Create hash
+	$sessionKey = bin2hex(random_bytes(32)); // Create hash
 
-	// Create session; establish with $key and $userid
+	// Create session; establish with $sessionKey and $userId
 	$stmt = $conn->prepare(
 		"INSERT INTO sessions (session_key, user_id, created_at, expires_at)
 		VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 1 HOUR))"
 	);
-	$stmt->bind_param("si", $key, $userId);
+	$stmt->bind_param("si", $sessionKey, $userId);
 	$stmt->execute();
 
-	return $key;
+	return $sessionKey;
 }
 
-function validateSession($key)
+function validateSession($sessionKey)
 {
 	global $conn;
 
@@ -31,7 +31,7 @@ function validateSession($key)
 		WHERE s.session_key = ?
 		AND s.expires_at > NOW()"
 	);
-	$stmt->bind_param("s", $key);
+	$stmt->bind_param("s", $sessionKey);
 	$stmt->execute();
 
 	// Retrieve user_id and username associated with key
@@ -50,7 +50,7 @@ function validateSession($key)
 	];
 }
 
-function destroySession($key)
+function destroySession($sessionKey)
 {
 	global $conn;
 
@@ -58,7 +58,7 @@ function destroySession($key)
 	$stmt = $conn->prepare(
 		"DELETE FROM sessions WHERE session_key = ?"
 	);
-	$stmt->bind_param("s", $key);
+	$stmt->bind_param("s", $sessionKey);
 	$stmt->execute();
 
 	return ["success" => true];

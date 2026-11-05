@@ -27,33 +27,33 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
 
 	// Basic error catching (i.e., duplicate username or email); prevents listener crash
 	try {
-		$ok = $stmt->execute();
+		$registered = $stmt->execute();
 	} catch (Exception $e) {
-		$ok = false;
+		$registered = false;
 	}
 
 	// Runs if no issues above
-	if ($ok) {
+	if ($registered) {
 		$newUserId = $conn->insert_id; // ID of new user
 
 		// Creates initial portfolio ($100,000.00 starting cash)
-		$pstmt = $conn->prepare(
+		$portfolioStmt = $conn->prepare(
 			"INSERT INTO portfolios (user_id)
 			VALUES (?)"
 		);
-		$pstmt->bind_param("i", $newUserId);
-		$pstmt->execute();
+		$portfolioStmt->bind_param("i", $newUserId);
+		$portfolioStmt->execute();
 
 		// Copies initial portfolio cash into USD holdings
-                $ustmt = $conn->prepare(
-                        "INSERT INTO positions (user_id, currency_id, amount)
-                        SELECT p.user_id, c.currency_id, p.starting_cash
-                        FROM portfolios p
-                        JOIN currencies c ON c.currency_code = 'USD'
-                        WHERE p.user_id = ?"
-                );
-		$ustmt->bind_param("i", $newUserId);
-		$ustmt->execute();
+		$positionStmt = $conn->prepare(
+			"INSERT INTO positions (user_id, currency_id, amount)
+			SELECT p.user_id, c.currency_id, p.starting_cash
+			FROM portfolios p
+			JOIN currencies c ON c.currency_code = 'USD'
+			WHERE p.user_id = ?"
+		);
+		$positionStmt->bind_param("i", $newUserId);
+		$positionStmt->execute();
 
 		// User successfully registered
 		error_log(date("Y/m/d H:i:s").": REGISTRATION WAS SUCCESSFUL".PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
