@@ -16,4 +16,18 @@
 	$mailman->SMTPDebug=SMTP::DEBUG_SERVER;
 	$mailman->Host = "smtp.gmail.com"; //This is what will allow PHPMailer to send emails over gmail.
 	$mailman->Port=465; //465 is a secure port since it sends information over TLS.
+	$mailman->SMTPSecure=PHPMailer::ENCRYPTION_SMTPS; //Sets encryption algorithm
+	$mailman->SMTPAuth = true; //Use SMTP authentication
+
+	//Configure username and password
+	$mailman->Username='';
+	$mailman->Password='';
+
+	//Configure Email
+	$mailman->setFrom(); //Same as Username
+	$mailman->addAddress(); //Loop? 
+	//Can use HTML emails
+	$mailman->msgHTML();
+
+	$success= $mailman->send();
 ?>
