@@ -54,11 +54,11 @@ function executeTrade($userId, $fromCode, $toCode, $fromAmount)
 
     return [
         "success"     => true,
-        "from"        => $fromCode,
-        "to"          => $toCode,
+        "from_code"   => $fromCode,
+        "to_code"     => $toCode,
         "from_amount" => $fromAmount,
         "to_amount"   => $toAmount,
-        "rate"        => $tradeRate
+        "trade_rate"  => $tradeRate
     ];
 }
 ?>

@@ -7,31 +7,18 @@ function getRates()
 {
     global $conn;
 
-    $sql = "
-        SELECT q.currency_code AS currency_code,
-            r.rate AS units_per_usd, 
-            r.updated_at
+    $stmt = $conn->prepare(
+        "SELECT q.currency_code,
+                r.updated_at,
+                r.rate AS units_per_usd
         FROM rates r
         JOIN currencies b ON r.base_currency_id = b.currency_id
         JOIN currencies q ON r.quote_currency_id = q.currency_id
         WHERE b.currency_code = 'USD'
-        ORDER BY q.currency_code
-    ";
-
-    $result = $conn->query($sql);
-
-    if (!$result) {
-        return [
-            "success" => false,
-            "error" => $conn->error
-        ];
-    }
-
-    $rates = [];
-
-    while ($row = $result->fetch_assoc()) {
-        $rates[] = $row;
-    }
+        ORDER BY q.currency_code"
+    );
+    $stmt->execute();
+    $rates = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
     return [
         "success" => true,
@@ -49,23 +36,23 @@ function getPortfolio($userId)
     $portfolio = $stmt->get_result()->fetch_assoc();
 
     $stmt = $conn->prepare(
-        "SELECT c.currency_code AS currency,
-                p.amount,
-                IF(c.currency_code = 'USD', p.amount, p.amount / r.rate) AS usd_value
-         FROM positions p
-         JOIN currencies c ON c.currency_id = p.currency_id
-         LEFT JOIN rates r ON r.quote_currency_id = p.currency_id
-         WHERE p.user_id = ?"
+        "SELECT c.currency_code,
+            p.amount,
+            IF(c.currency_code = 'USD', p.amount, p.amount / r.rate) AS usd_value
+        FROM positions p
+        JOIN currencies c ON c.currency_id = p.currency_id
+        LEFT JOIN rates r ON r.quote_currency_id = p.currency_id
+        WHERE p.user_id = ?"
     );
     $stmt->bind_param("i", $userId);
     $stmt->execute();
-    $positions = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $holdings = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-    return array(
+    return [
         "success" => true,
         "starting_cash" => $portfolio["starting_cash"],
-        "positions" => $positions
-    );
+        "holdings" => $holdings
+    ];
 }
 
 function requestProcessor($request)
@@ -109,27 +96,27 @@ function requestProcessor($request)
 
             return executeTrade(
                 $session["user_id"],
-                $request["from"] ?? "",
-                $request["to"] ?? "",
-                $request["amount"] ?? 0
+                $request["from_code"] ?? "",
+                $request["to_code"] ?? "",
+                $request["from_amount"] ?? 0
             );
+
+        case "get_trades":
+            $session = validateSession($request["session_key"] ?? "");
+            if (empty($session["success"])) {
+                return ["success" => false, "error" => "Not logged in"];
+            }
+            return getTrades($session["user_id"]);
 
         case "get_rates":
             return getRates();
 
         case "get_portfolio":
-            $session = validateSession($request["session_key"]);
-            if (empty($session["success"])) {
-                    return array("success" => false, "error" => "Not logged in");
-            }
-            return getPortfolio($session["user_id"]);
-
-        case "get_trades":
             $session = validateSession($request["session_key"] ?? "");
             if (empty($session["success"])) {
-                    return ["success" => false, "error" => "Not logged in"];
+                return ["success" => false, "error" => "Not logged in"];
             }
-            return getTrades($session["user_id"]);
+            return getPortfolio($session["user_id"]);
 
         case "get_watchlists":
         case "create_watchlist":
@@ -143,7 +130,7 @@ function requestProcessor($request)
             }
             $userId       = $session["user_id"];
             $watchlistId  = (int)($request["watchlist_id"] ?? 0);
-            $currencyCode = $request["code"] ?? "";
+            $currencyCode = $request["currency_code"] ?? "";
 
             switch ($request["type"]) {
                 case "get_watchlists":        return getWatchlists($userId);
