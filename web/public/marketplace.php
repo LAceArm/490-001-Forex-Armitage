@@ -9,7 +9,7 @@ $currencies = [];
 $rates = send_to_broker(['type' => 'get_rates']); // Bother DB for rates
 
 foreach ($rates['rates'] as $row) {
-    $currencies[$row['quote_currency']] = 1 / $row['rate'];
+    $currencies[$row['currency_code']] = 1 / $row['units_per_usd'];
 }
 
 ksort($currencies);

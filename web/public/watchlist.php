@@ -75,9 +75,7 @@ $names = [
 $available = [];
 $ratesReply = send_to_broker(['type' => 'get_rates']);
 foreach ($ratesReply['rates'] ?? [] as $row) {
-    if ($row['base_currency'] === 'USD') {
-	$available[] = $row['quote_currency'];
-    }
+	$available[] = $row['currency_code'];
 }
 
 sort($available); // Makes the list accessible

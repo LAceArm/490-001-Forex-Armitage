@@ -8,8 +8,8 @@ $reply = send_to_broker(['type' => 'get_rates']); // Bother DB for rates
 
 // Processing rates
 foreach ($reply['rates'] as $row) {
-    $currencyCode = $row['quote_currency'];
-    $rate = 1 / $row['rate'];
+    $currencyCode = $row['currency_code'];
+    $rate = 1 / $row['units_per_usd'];
 
     $currencyRows[$currencyCode] = [
         'name' => $currencyNames[$currencyCode],

@@ -1,4 +1,3 @@
-
 <?php
 require_once __DIR__ . '/../broker/session_check.php';
 
@@ -9,8 +8,8 @@ $ratesReply = send_to_broker(['type' => 'get_rates']);
 $prices = ['USD' => 1];
 
 foreach ($ratesReply['rates'] ?? [] as $rate) {
-    if ($rate['base_currency'] == 'USD' && $rate['rate'] > 0) {
-        $prices[$rate['quote_currency']] = 1 / $rate['rate'];
+    if ($rate['units_per_usd'] > 0) {
+        $prices[$rate['currency_code']] = 1 / $rate['units_per_usd'];
     }
 }
 //get the users portfolio
