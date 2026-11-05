@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . "/../database.php";
-require_once "auth_session.php";
+require_once __DIR__ . "/auth_session.php";
 
 function loginUser($username, $password)
 {

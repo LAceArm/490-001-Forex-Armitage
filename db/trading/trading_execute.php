@@ -15,8 +15,8 @@ function executeTrade($userId, $fromCode, $toCode, $fromAmount)
     if ($fromCode == $toCode)
     return ["success" => false, "error" => "Choose different currencies"];
 
-    $fromCurrency = getCurrencyInfo($fromCode);
-    $toCurrency   = getCurrencyInfo($toCode);
+    $fromCurrency = getCurrencyIdAndRate($fromCode);
+    $toCurrency   = getCurrencyIdAndRate($toCode);
 
     // stops the trade if currency doesn't exist or has no rate
     if (!$fromCurrency || !$toCurrency)

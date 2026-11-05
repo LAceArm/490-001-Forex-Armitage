@@ -41,7 +41,6 @@ function getCurrencyIdAndRate($currencyCode)
 
     return ["currency_id" => $currencyId, "units_per_usd" => (float)$row["rate"]];
 }
-?>
 
 function getRates()
 {
@@ -111,3 +110,4 @@ function getPreviousRates()
 
     return $rates;
 }
+?>

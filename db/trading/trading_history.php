@@ -1,5 +1,4 @@
 <?php
-
 // Saves one finished trade
 function saveTrade($userId, $fromCurrencyId, $toCurrencyId, $fromAmount, $toAmount, $tradeRate) 
 {
