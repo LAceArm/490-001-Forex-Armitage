@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../data/currencies.php';
 require_once __DIR__ . '/../broker/session_check.php';
 
 $key = $_SESSION['session_key'];
@@ -12,9 +13,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     switch($action) {
     	case 'create': // Create watchlist
             $r = send_to_broker([
-            'type'        => 'create_watchlist',
-            'name'        => trim($_POST['name'] ?? ''),
-            'session_key' => $key,
+                'type'        => 'create_watchlist',
+                'name'        => trim($_POST['name'] ?? ''),
+                'session_key' => $key,
             ]);
 	        break;
 	    case 'delete': // Delete a whole watchlist
@@ -26,18 +27,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 	    case 'add': //Add currency to watchlist
             $r = send_to_broker([
-                'type'         => 'add_watchlist_item',
-                'watchlist_id' => (int)($_POST['watchlist_id'] ?? 0),
-                'code'         => $_POST['code'] ?? '',
-                'session_key'  => $key,
+                'type'          => 'add_watchlist_item',
+                'watchlist_id'  => (int)($_POST['watchlist_id'] ?? 0),
+                'currency_code' => $_POST['currency_code'] ?? '',
+                'session_key'   => $key,
             ]);
             break;
 	    case 'remove': //Remove currency from watchlist
             $r = send_to_broker([
-                'type'         => 'remove_watchlist_item',
-                'watchlist_id' => (int)($_POST['watchlist_id'] ?? 0),
-                'code'         => $_POST['code'] ?? '',
-                'session_key'  => $key,
+                'type'          => 'remove_watchlist_item',
+                'watchlist_id'  => (int)($_POST['watchlist_id'] ?? 0),
+                'currency_code' => $_POST['currency_code'] ?? '',
+                'session_key'   => $key,
             ]);
 	        break;
     }
@@ -60,17 +61,6 @@ unset($_SESSION['flash']);
 $reply = send_to_broker(['type' => 'get_watchlists', 'session_key' => $key]);
 
 $watchlists = $reply['watchlists'] ?? [];
-
-$names = [
-    'AED' => 'United Arab Emirates Dirham',
-    'CAD' => 'Canadian Dollar',
-    'CHF' => 'Swiss Franc',
-    'CNY' => 'Chinese Yuan',
-    'EUR' => 'Euro',
-    'GBP' => 'British Pound',
-    'JPY' => 'Japanese Yen',
-    'USD' => 'US Dollar',
-];
 
 $available = [];
 $ratesReply = send_to_broker(['type' => 'get_rates']);
@@ -138,13 +128,13 @@ sort($available); // Makes the list accessible
             <section class="watchlist-card">
 
                 <div class="watchlist-section-header">
-                    <h2><?= $list['name'] ?></h2>
+                    <h2><?= htmlspecialchars($list['name']) ?></h2>
 
                     <!-- Delete the whole list (its currencies go with it) -->
                     <form method="POST" action="watchlist.php"
                           onsubmit="return confirm('Delete this watchlist?');">
                         <input type="hidden" name="action" value="delete">
-                        <input type="hidden" name="watchlist_id" value="<?= (int)$list['id'] ?>">
+                        <input type="hidden" name="watchlist_id" value="<?= (int)$list['watchlist_id'] ?>">
                         <button type="submit" class="delete-watchlist-button">Delete Watchlist</button>
                     </form>
                 </div>
@@ -152,14 +142,14 @@ sort($available); // Makes the list accessible
                 <!-- Add a currency to this list -->
                 <form method="POST" action="watchlist.php" class="watchlist-form">
                     <input type="hidden" name="action" value="add">
-                    <input type="hidden" name="watchlist_id" value="<?= (int)$list['id'] ?>">
+                    <input type="hidden" name="watchlist_id" value="<?= (int)$list['watchlist_id'] ?>">
 
-                    <select name="code" required>
+                    <select name="currency_code" required>
                         <option value="">Select a currency</option>
                         <?php foreach ($available as $code): ?>
                             <?php if (!in_array($code, $inList, true)): ?>
                                 <option value="<?= $code ?>">
-                                   <?= $code ?> - <?= $names[$code] ?>
+                                   <?= $code ?> - <?= $currencyNames[$code] ?>
                                 </option>
                             <?php endif; ?>
                         <?php endforeach; ?>
@@ -185,17 +175,17 @@ sort($available); // Makes the list accessible
                         <tbody>
                             <?php foreach ($list['currencies'] as $c): ?>
                                 <tr>
-				    <td><?=$c['code'] ?></td>
-				    <td> <?=$names[$c['code']] ?>
-                                    <td><?= number_format($c['price'], $c['price'] < 0.01 ? 6 : 4) ?></td>
+				    <td><?=$c['currency_code'] ?></td>
+				    <td> <?=$currencyNames[$c['currency_code']] ?></td>
+                                    <td><?= number_format($c['usd_per_unit'], $c['usd_per_unit'] < 0.01 ? 6 : 4) ?></td>
                                     <td>
-					<?= $c['change'].number_format($c['change'],2).'%' ?>
+					<?= number_format($c['change_percent'],2).'%' ?>
                                     </td>
                                     <td>
                                         <form method="POST" action="watchlist.php">
                                             <input type="hidden" name="action" value="remove">
-                                            <input type="hidden" name="watchlist_id" value="<?= (int)$list['id'] ?>">
-                                            <input type="hidden" name="code" value="<?= $c['code'] ?>">
+                                            <input type="hidden" name="watchlist_id" value="<?= (int)$list['watchlist_id'] ?>">
+                                            <input type="hidden" name="currency_code" value="<?= $c['currency_code'] ?>">
                                             <button type="submit" class="remove-button">Remove</button>
                                         </form>
                                     </td>

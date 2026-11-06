@@ -4,21 +4,21 @@ require_once __DIR__ . '/../broker/session_check.php'; // Loads session check
 
 $key = $_SESSION['session_key'];
 
-$currencies = [];
+$currencyRows = [];
 
 $rates = send_to_broker(['type' => 'get_rates']); // Bother DB for rates
 
 foreach ($rates['rates'] as $row) {
-    $currencies[$row['currency_code']] = 1 / $row['units_per_usd'];
+    $currencyRows[$row['currency_code']] = 1 / $row['units_per_usd'];
 }
 
-ksort($currencies);
+ksort($currencyRows);
 
 // Set variables
 $type = ($_POST['trade_type'] ?? '') == 'sell' ? 'sell' : 'buy';
 $currency = $_POST['currency'] ?? '';
 $amount = $_POST['amount'] ?? '';
-$rate = $currencies[$currency] ?? null;
+$rate = $currencyRows[$currency] ?? null;
 $total = null;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -123,7 +123,7 @@ foreach ($portfolio['positions'] as $row) {
                 <label>Select Currency</label>
                 <select name="currency" required>
                     <option value="">Select a currency</option>
-                    <?php foreach ($currencies as $code => $price) { ?>
+                    <?php foreach ($currencyRows as $code => $price) { ?>
                         <option value="<?= $code ?>" <?= $currency == $code ? 'selected' : '' ?>>
                             <?= $code ?>
                         </option>
