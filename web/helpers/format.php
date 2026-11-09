@@ -15,4 +15,14 @@ function formatRate($rate) {
 
     return number_format($rate, $rate < 0.01 ? 6 : 4);
 }
+
+// Green text for a gain, red for a loss
+function gainClass($value) {
+    if ($value === null) {
+        return '';
+    }
+
+    return $value >= 0 ? 'positive' : 'negative';
+}
+?>
 ?>

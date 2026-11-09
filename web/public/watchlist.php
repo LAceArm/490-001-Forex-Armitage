@@ -1,11 +1,11 @@
 <?php
-require_once __DIR__ . '/../data/currencies.php';
 require_once __DIR__ . '/../broker/session_check.php';
+require_once __DIR__ . '/../data/currencies.php';
+require_once __DIR__ . '/../helpers/format.php';
 
 $key = $_SESSION['session_key'];
 
-// Handle a submitted form. Each action maps to one broker request; the user is
-// found from the session key, so no user id is sent.
+// Handle a submitted form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     $r      = null;
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'session_key'  => $key,
             ]);
             break;
-	    case 'add': //Add currency to watchlist
+	    case 'add': // Add currency to watchlist
             $r = send_to_broker([
                 'type'          => 'add_watchlist_item',
                 'watchlist_id'  => (int)($_POST['watchlist_id'] ?? 0),
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'session_key'   => $key,
             ]);
             break;
-	    case 'remove': //Remove currency from watchlist
+	    case 'remove': // Remove currency from watchlist
             $r = send_to_broker([
                 'type'          => 'remove_watchlist_item',
                 'watchlist_id'  => (int)($_POST['watchlist_id'] ?? 0),
@@ -123,7 +123,7 @@ sort($available); // Makes the list accessible
         <?php foreach ($watchlists as $list): ?>
             <?php
             // Currencies already in this list, so the dropdown only offers new ones.
-            $inList = array_column($list['currencies'], 'code');
+            $inList = array_column($list['currencies'], 'currency_code');
             ?>
             <section class="watchlist-card">
 
@@ -175,9 +175,9 @@ sort($available); // Makes the list accessible
                         <tbody>
                             <?php foreach ($list['currencies'] as $c): ?>
                                 <tr>
-				    <td><?=$c['currency_code'] ?></td>
-				    <td> <?=$currencyNames[$c['currency_code']] ?></td>
-                                    <td><?= number_format($c['usd_per_unit'], $c['usd_per_unit'] < 0.01 ? 6 : 4) ?></td>
+				                    <td><?=$c['currency_code'] ?></td>
+				                    <td> <?=$currencyNames[$c['currency_code']] ?></td>
+                                    <td><?= formatRate($c['usd_per_unit']) ?></td>
                                     <td>
 					<?= number_format($c['change_percent'],2).'%' ?>
                                     </td>

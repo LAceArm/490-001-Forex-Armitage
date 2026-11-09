@@ -2,96 +2,71 @@
 require_once __DIR__ . '/../broker/session_check.php'; // Checks if session key is valid
 require_once __DIR__ . '/../helpers/format.php';
 
-$key = $_SESSION['session_key'];
-
 // Asks DB side for user's holdings
-$portfolio = send_to_broker([
+$portfolioReply = send_to_broker([
     'type' => 'get_portfolio',
-    'session_key' => $key
+    'session_key' => $_SESSION['session_key']
 ]);
 
 // Asks DB side for user's trade history
 $tradesReply = send_to_broker([
     'type' => 'get_trades',
-    'session_key' => $key
+    'session_key' => $_SESSION['session_key']
 ]);
 
 // Per currency: total USD spent and total units bought (only trades paid for with USD)
-$spent = [];
-$bought = [];
+$usdSpent = [];
+$unitsBought = [];
 
 foreach ($tradesReply['trades'] as $trade) {
-    if ($trade['from_code'] == 'USD' && $trade['to_code'] != 'USD') {
-        $currencyCode = $trade['to_code'];
-
-        if (!isset($spent[$currencyCode])) {
-            $spent[$currencyCode] = 0;
-            $bought[$currencyCode] = 0;
-        }
-
-        $spent[$currencyCode] += $trade['from_amount'];
-        $bought[$currencyCode] += $trade['to_amount'];
+    if ($trade['from_code'] == 'USD') {
+        $toCode = $trade['to_code'];
+        $usdSpent[$toCode] = ($usdSpent[$toCode] ?? 0) + $trade['from_amount'];
+        $unitsBought[$toCode] = ($unitsBought[$toCode] ?? 0) + $trade['to_amount'];
     }
 }
 
 $gainRows = []; // One row per currency owned
-$currentValue = 0;
-$message = '';
+$portfolioValue = 0;
 
-foreach ($portfolio['holdings'] as $holding) {
+foreach ($portfolioReply['holdings'] as $holding) {
+    $portfolioValue += $holding['usd_value'];
+
     // Sold-out currencies have nothing to measure
     if ($holding['amount'] == 0) {
         continue;
     }
 
-    $currencyCode = $holding['currency_code'];
-    $amount = $holding['amount'];
-    $currentRate = $holding['usd_value'] / $amount; // USD value of 1 unit
+    $toCode = $holding['currency_code'];
+    $usdPerUnit = $holding['usd_value'] / $holding['amount']; // USD value of 1 unit
 
     // Average USD paid per unit (USD itself is always 1)
-    $purchaseRate = null;
-    if ($currencyCode == 'USD') {
-        $purchaseRate = 1;
-    } elseif (isset($bought[$currencyCode])) {
-        $purchaseRate = $spent[$currencyCode] / $bought[$currencyCode];
+    $purchaseUsdPerUnit = null;
+    if ($toCode == 'USD') {
+        $purchaseUsdPerUnit = 1;
+    } elseif (isset($unitsBought[$toCode])) {
+        $purchaseUsdPerUnit = $usdSpent[$toCode] / $unitsBought[$toCode];
     }
 
     // Gain or loss = amount owned * (current rate - purchase rate)
     $gain = null;
-    if ($purchaseRate !== null) {
-        $gain = $amount * ($currentRate - $purchaseRate);
-    } else {
-        $message = 'Purchase rates are only available for currencies bought with USD.';
+    if ($purchaseUsdPerUnit !== null) {
+        $gain = $holding['amount'] * ($usdPerUnit = $purchaseUsdPerUnit);
     }
 
     $gainRows[] = [
-        'currency_code' => $currencyCode,
-        'amount' => $amount,
-        'purchase_rate' => $purchaseRate,
-        'current_rate' => $currentRate,
+        'currency_code' => $toCode,
+        'amount' => $holding['amount'],
+        'purchase_rate' => $purchaseUsdPerUnit,
+        'current_rate' => $usdPerUnit,
         'gain' => $gain
     ];
-
-    $currentValue += $holding['usd_value'];
-}
-
-if (empty($gainRows)) {
-    $message = 'Portfolio performance information is not available yet.';
 }
 
 // Overall performance
-$initialValue = $portfolio['starting_cash'];
-$totalGain = $currentValue - $initialValue;
-$performance = $totalGain / $initialValue * 100;
-
-// Green text for a gain, red for a loss
-function gainClass($value) {
-    if ($value === null) {
-        return '';
-    }
-
-    return $value >= 0 ? 'positive' : 'negative';
-}
+$startingCash = $portfolioReply['starting_cash'];
+$totalGain = $portfolioValue - $startingCash;
+$performancePercent = $totalGain / $startingCash * 100;
 ?>
 
 <!DOCTYPE html>
@@ -129,13 +104,13 @@ function gainClass($value) {
         <div class="gains-summary">
 
             <div class="gains-card">
-                <h2>Initial Holdings Value</h2>
-                <p><?= formatMoney($initialValue) ?></p>
+                <h2>Initial Portfolio Value</h2>
+                <p><?= formatMoney($startingCash) ?></p>
             </div>
 
             <div class="gains-card">
-                <h2>Current Holdings Value</h2>
-                <p><?= formatMoney($currentValue) ?></p>
+                <h2>Current Portfolio Value</h2>
+                <p><?= formatMoney($portfolioValue) ?></p>
             </div>
 
             <div class="gains-card">
@@ -147,8 +122,8 @@ function gainClass($value) {
 
             <div class="gains-card">
                 <h2>Performance</h2>
-                <p class="<?= gainClass($performance) ?>">
-                    <?= number_format($performance, 2) . '%' ?>
+                <p class="<?= gainClass($performancePercent) ?>">
+                    <?= number_format($performancePercent, 2) . '%' ?>
                 </p>
             </div>
 
@@ -175,8 +150,8 @@ function gainClass($value) {
                             <tr>
                                 <td><?= $gainRow['currency_code'] ?></td>
                                 <td><?= number_format($gainRow['amount'], 2) ?></td>
-                                <td><?= formatRate($gainRow['purchase_rate']) ?></td>
-                                <td><?= formatRate($gainRow['current_rate']) ?></td>
+                                <td><?= formatRate($gainRow['purchase_usd_per_unit']) ?></td>
+                                <td><?= formatRate($gainRow['usd_per_unit']) ?></td>
                                 <td class="<?= gainClass($gainRow['gain']) ?>">
                                     <?= formatMoney($gainRow['gain']) ?></td>
                             </tr>
