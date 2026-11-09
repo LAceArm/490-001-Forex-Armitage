@@ -6,13 +6,12 @@
 	//Load Configurations for PHPMailer
 	use PHPMailer\PHPMailer\PHPMailer;
 	use PHPMailer\PHPMailer\SMTP;
-	use Dotenv/Dotenv;
 	require_once 'vendor/autoload.php';
 	
 	//Load .env details
 	$env=parse_ini_file('.env');
-	$username=$env["USERNAME"];
 	$password=$env["PASSWORD"];
+	$email=$env["EMAIL"];
 
 	//Create instance
 	$mailman=new PHPMailer();
@@ -20,21 +19,19 @@
 	//Configure new instance
 	$mailman->isSMTP();
 	$mailman->SMTPDebug=SMTP::DEBUG_SERVER;
-	$mailman->Host = "smtp.gmail.com"; //This is what will allow PHPMailer to send emails over gmail.
-	$mailman->Port=465; //465 is a secure port since it sends information over TLS.
-	$mailman->SMTPSecure=PHPMailer::ENCRYPTION_SMTPS; //Sets encryption algorithm
-	$mailman->SMTPAuth = true; //Use SMTP authentication
-
-	//Configure username and password
-	$mailman->Username=$username;
+	$mailman->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+	$mailman->Host = "smtp.gmail.com"; 
+	$mailman->Username=$email;
 	$mailman->Password=$password;
+	$mailman->Port=465;
 
-	//Configure Email
-	$mailman->setFrom($username,'Luis Acevedo'); //Same as Username
-	$mailman->addAddress('briantheduck259@gmail.com','Brian the Duck'); //Loop? 
-	$mailman->Subject="PHPMailer GMail Test";
-	//Can use HTML emails
-	$mailman->msgHTML();
+	$mailman->setFrom($email,"NotifBot");
 
-	$success= $mailman->send();
+	$mailman->addAddress('briantheduck259@gmail.com', 'Luis l');
+
+	$mailman->isHTML(false);
+	$mailman->Subject='Test email';
+	$mailman->Body="This is a test email";
+
+	$mailman->send();
 ?>
