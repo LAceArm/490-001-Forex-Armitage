@@ -26,103 +26,143 @@ ksort($currencyRows);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Currency Browser | Forex Armitage</title>
-    <link rel="stylesheet" href="assets/style.css">
-    <link rel="stylesheet" href="assets/currencies.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body class="home-page">
+<body class="bg-light">
 
-<!-- Navigation Bar -->
-<nav class="main-navbar">
-    <div class="main-nav-container">
-        <a href="home.php" class="main-logo">Forex Armitage</a>
-        <div class="main-nav-links">
-            <a href="dashboard.php">Dashboard</a>
-            <a href="notifications.php">Notifications</a>
-            <a href="profile.php">Profile</a>
-            <a href="logout.php">Logout</a>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm py-3">
+        <div class="container">
+
+            <a href="home.php" class="navbar-brand fw-bold fs-4 text-primary">
+                Forex Armitage
+            </a>
+
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <a href="dashboard.php" class="text-decoration-none text-dark fw-semibold">Dashboard</a>
+                <a href="notifications.php" class="text-decoration-none text-dark fw-semibold">Notifications</a>
+                <a href="profile.php" class="text-decoration-none text-dark fw-semibold">Profile</a>
+                <a href="logout.php" class="btn btn-outline-danger btn-sm fw-semibold">Logout</a>
+            </div>
+
         </div>
-    </div>
-</nav>
+    </nav>
 
-<main class="currencies-container">
+    <main class="container py-5">
 
-    <div class="currencies-header">
-        <h1>Currency Browser</h1>
-        <p>Browse currencies, search by name or code, and view exchange rate information.</p>
-    </div>
-
-    <div class="currency-search-section">
-        <label for="currency-search">Search Currencies</label>
-        <input type="text" id="currency-search"
-               placeholder="Search by currency name or code..."
-               onkeyup="searchCurrencies()">
-    </div>
-
-    <section class="currency-table-section">
-        <h2>Available Currencies</h2>
-
-        <div class="currency-table-wrapper">
-            <table class="currency-table" id="currency-table">
-                <thead>
-                    <tr>
-                        <th>Currency Code</th>
-                        <th>Currency Name</th>
-                        <th>Exchange Rate (USD)</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <?php foreach ($currencyRows as $currencyCode => $currency): ?>
-                         <tr>
-                            <td><?= $currencyCode ?></td>
-                            <td><?= $currency['name'] ?></td>
-                            <td><?= $currency['rate'] ?></td>
-                            <td>
-                                <button class="view-button" onclick="showDetails(this)">View Details</button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+        <div class="text-center mb-4">
+            <h1 class="fw-bold fs-2 mb-3">Currency Browser</h1>
+            <p class="text-secondary fs-6">
+                Browse currencies, search by name or code, and view exchange rate information.
+            </p>
         </div>
 
-        <p id="currency-message" class="currency-message"
-           <?= count($currencyRows) > 0 ? 'hidden' : '' ?>>
-            Currency information is not available yet.
-        </p>
-    </section>
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-body p-4">
 
-    <section id="currency-details" class="currency-details" hidden>
-        <h2>Currency Details</h2>
+                <label for="currency-search" class="form-label fw-semibold mb-2">
+                    Search Currencies
+                </label>
 
-        <div class="detail-row">
-            <span>Currency Code</span>
-            <span id="detail-code"></span>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="currency-search"
+                    placeholder="Search by currency name or code..."
+                    onkeyup="searchCurrencies()"
+                >
+
+            </div>
         </div>
 
-        <div class="detail-row">
-            <span>Currency Name</span>
-            <span id="detail-name"></span>
+        <section class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-body p-4">
+
+                <h2 class="fs-5 fw-bold mb-3">Available Currencies</h2>
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle mb-0" id="currency-table">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>Currency Code</th>
+                                <th>Currency Name</th>
+                                <th>Exchange Rate (USD)</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <?php foreach ($currencyRows as $currencyCode => $currency): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($currencyCode); ?></td>
+                                    <td><?php echo htmlspecialchars($currency['name']); ?></td>
+                                    <td><?php echo htmlspecialchars($currency['rate']); ?></td>
+                                    <td>
+                                        <button
+                                            class="btn btn-primary btn-sm fw-semibold"
+                                            onclick="showDetails(this)"
+                                        >
+                                            View Details
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <p
+                    id="currency-message"
+                    class="text-secondary text-center mt-3 mb-0"
+                    <?php echo count($currencyRows) > 0 ? 'hidden' : ''; ?>
+                >
+                    Currency information is not available yet.
+                </p>
+
+            </div>
+        </section>
+
+        <section id="currency-details" class="card shadow-sm border-0 rounded-4 mb-4" hidden>
+            <div class="card-body p-4">
+
+                <h2 class="fs-5 fw-bold mb-4">Currency Details</h2>
+
+                <div class="d-flex justify-content-between border-bottom py-3 gap-3">
+                    <span class="fw-semibold">Currency Code</span>
+                    <span id="detail-code"></span>
+                </div>
+
+                <div class="d-flex justify-content-between border-bottom py-3 gap-3">
+                    <span class="fw-semibold">Currency Name</span>
+                    <span id="detail-name"></span>
+                </div>
+
+                <div class="d-flex justify-content-between border-bottom py-3 gap-3">
+                    <span class="fw-semibold">Exchange Rate (USD)</span>
+                    <span id="detail-rate"></span>
+                </div>
+
+                <button
+                    class="btn btn-outline-secondary fw-semibold mt-4"
+                    onclick="closeDetails()"
+                >
+                    Close Details
+                </button>
+
+            </div>
+        </section>
+
+        <div class="text-center mt-4">
+            <a href="home.php" class="btn btn-outline-primary fw-semibold px-4 py-2">
+                Back to Home
+            </a>
         </div>
 
-        <div class="detail-row">
-            <span>Exchange Rate (USD)</span>
-            <span id="detail-rate"></span>
-        </div>
+    </main>
 
-        <button class="close-details-button"
-                onclick="closeDetails()">
-            Close Details
-        </button>
-    </section>
-
-    <div class="currencies-footer">
-        <a href="home.php" class="back-home-button">Back to Home</a>
-    </div>
-
-</main>
 <script>
 function searchCurrencies() {
     let search = document.getElementById("currency-search").value.toLowerCase();

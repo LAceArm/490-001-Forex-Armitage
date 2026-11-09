@@ -1,3 +1,4 @@
+
 <?php
 require_once __DIR__ . '/../broker/session_check.php'; // Checks if session key is valid
 require_once __DIR__ . '/../helpers/format.php';
@@ -8,12 +9,14 @@ $portfolio = send_to_broker(array(
     'session_key' => $_SESSION['session_key']
 ));
 
+$positions = $portfolio['holdings'] ?? [];
+
 // 'Available Cash' and 'Holdings Value', respectively
 $cash = 0;
 $holdingsValue = 0;
 
 // Go through each holding
-foreach ($portfolio['holdings'] as $holding) {
+foreach ($positions as $holding) {
     if ($holding['currency_code'] == 'USD') {
         $cash += $holding['amount']; // Add to cash
     } else {
@@ -31,84 +34,120 @@ $total = $cash + $holdingsValue;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Portfolio | Currency Trading</title>
-    <link rel="stylesheet" href="assets/style.css">
-    <link rel="stylesheet" href="assets/portfolio.css">
+    <title>My Portfolio | Forex Armitage</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body class="home-page">
+<body class="bg-light">
 
-    <nav class="main-navbar">
-        <div class="main-nav-container">
-            <a href="home.php" class="main-logo">Currency Trading</a>
-            <div class="main-nav-links">
-                <a href="dashboard.php">Dashboard</a>
-                <a href="notifications.php">Notifications</a>
-                <a href="profile.php">Profile</a>
-                <a href="logout.php">Logout</a>
+    <nav class="navbar navbar-dark bg-dark py-3">
+        <div class="container-fluid px-4">
+
+            <a href="home.php" class="navbar-brand fw-bold">
+                Forex Armitage
+            </a>
+
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <a href="dashboard.php" class="text-white text-decoration-none">Dashboard</a>
+                <a href="notifications.php" class="text-white text-decoration-none">Notifications</a>
+                <a href="profile.php" class="text-white text-decoration-none">Profile</a>
+                <a href="logout.php" class="btn btn-danger">Logout</a>
             </div>
+
         </div>
     </nav>
 
-    <main class="portfolio-container">
+    <main class="container py-5">
 
-        <div class="portfolio-header">
-            <h1>My Portfolio</h1>
+        <div class="mb-4">
+            <h1 class="fw-bold">My Portfolio</h1>
         </div>
 
-        <div class="portfolio-summary">
-            <div class="portfolio-card">
-                <h2>Available Cash</h2>
-                <p><?= formatMoney($cash) ?></p>
+        <div class="row g-4 mb-4">
+
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h2 class="h5">Available Cash</h2>
+                        <p class="fs-3 fw-bold mb-0">
+                            $<?php echo number_format($cash, 2); ?>
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div class="portfolio-card">
-                <h2>Holdings Value</h2>
-                <p><?= formatMoney($holdingsValue) ?></p>
-	    </div>
-            <div class="portfolio-card">
-                <h2>Total Portfolio Value</h2>
-		        <p><?= formatMoney($total) ?></p>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h2 class="h5">Holdings Value</h2>
+                        <p class="fs-3 fw-bold mb-0">
+                            $<?php echo number_format($holdingsValue, 2); ?>
+                        </p>
+                    </div>
+                </div>
             </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h2 class="h5">Total Portfolio Value</h2>
+                        <p class="fs-3 fw-bold mb-0">
+                            $<?php echo number_format($total, 2); ?>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <section class="portfolio-holdings">
-            <h2>My Currency Holdings</h2>
+        <section class="card shadow-sm mb-4">
+            <div class="card-body p-4">
 
-            <div class="portfolio-table-wrapper">
-                <table class="portfolio-table">
-                    <thead>
-                        <tr>
-			    <th>Currency</th>
-                            <th>Amount Owned</th>
-                            <th>Exchange Rate (USD)</th>
-                            <th>Current Value (USD)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($portfolio['holdings'] as $holding): ?>
-                            <?php
-                            $usdPerUnit = 0;
+                <h2 class="h4 fw-bold mb-4">My Currency Holdings</h2>
 
-			                // Calculates rate (USD value / amount)
-			                if ($holding['amount'] > 0) { // If holding is an amount above 0
-                                $usdPerUnit = $holding['usd_value'] / $holding['amount']; // Calculate exchange rate
-                            }
-                            ?>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle">
+                        <thead class="table-dark">
                             <tr>
-                                <td><?= $holding['currency_code'] ?></td>
-                                <td><?= number_format($holding['amount'], 2) ?></td>
-                                <td><?= formatRate($usdPerUnit) ?></td>
-                                <td><?= formatMoney($holding['usd_value']) ?></td>
+                                <th>Currency</th>
+                                <th>Amount Owned</th>
+                                <th>Exchange Rate (USD)</th>
+                                <th>Current Value (USD)</th>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($positions as $p): ?>
+                                <?php
+                                $rate = 0;
+
+                                // Calculates rate (USD value / amount)
+                                if ($p['amount'] > 0) { // If holding is an amount above 0
+                                    $rate = $p['usd_value'] / $p['amount']; // Calculate exchange rate
+                                }
+                                ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($p['currency_code']); ?></td>
+                                    <td><?php echo number_format($p['amount'], 2); ?></td>
+                                    <td><?php echo number_format($rate, 6); ?></td>
+                                    <td>$<?php echo number_format($p['usd_value'], 2); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </section>
 
-        <div class="portfolio-actions">
-            <a href="marketplace.php" class="portfolio-button">Go to Marketplace</a>
-            <a href="home.php" class="back-home-button">Back to Home</a>
+        <div class="d-flex flex-wrap gap-3">
+            <a href="marketplace.php" class="btn btn-primary">
+                Go to Marketplace
+            </a>
+
+            <a href="home.php" class="btn btn-outline-secondary">
+                Back to Home
+            </a>
         </div>
 
     </main>
