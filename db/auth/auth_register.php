@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . "/../database.php";
 
-function registerUser($username, $email, $password, $firstName = null, $lastName = null)
+function registerUser($username, $email, $password)
 {
 	global $conn;
 

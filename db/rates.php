@@ -37,7 +37,7 @@ function getCurrencyIdAndRate($currencyCode)
         return null;
     }
 
-    return ["currency_id" => $currencyId, "units_per_usd" => (float)$row["rate"]];
+    return ["currency_id" => $currencyId, "units_per_usd" => (float)$row["units_per_usd"]];
 }
 
 function getRates()
@@ -45,18 +45,15 @@ function getRates()
     global $conn;
 
     $stmt = $conn->prepare(
-        "SELECT qc.currency_code, r.units_per_usd
+        "SELECT c.currency_code, r.units_per_usd
         FROM rates r
         JOIN currencies c ON c.currency_id = r.currency_id
-        ORDER BY qc.currency_code"
+        ORDER BY c.currency_code"
     );
     $stmt->execute();
     $rates = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-    return [
-        "success" => true,
-        "rates" => $rates
-    ];
+    return ["success" => true, "rates" => $rates];
 }
 
 // Latest rate per currency id (units per 1 USD)
@@ -89,8 +86,8 @@ function getPreviousRates()
         "SELECT currency_id, units_per_usd
         FROM rate_history
         WHERE rate_date = (
-            SELECT MAX(rate_date) FROM rate_history
-            WHERE rate_date < (SELECT MAX(rate_date) FROM rate_history))"
+            SELECT DISTINCT rate_date FROM rate_history
+            ORDER BY rate_date DESC)"
     );
     $stmt->execute();
     $result = $stmt->get_result();

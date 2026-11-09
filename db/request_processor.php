@@ -54,9 +54,7 @@ function requestProcessor($request)
             return registerUser(
                 $request["username"],
                 $request["email"],
-                $request["password"],
-                $request["first_name"] ?? null,
-                $request["last_name"] ?? null
+                $request["password"]
             );
 
         case "validate_session":

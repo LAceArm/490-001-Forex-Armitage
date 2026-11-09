@@ -6,7 +6,7 @@ function saveTrade($userId, $fromCurrencyId, $toCurrencyId, $fromAmount, $toAmou
 
     $stmt = $conn->prepare(
         "INSERT INTO trades
-        (user_id, from_currency_id, to_currency_id, from_amount, to_amount, rate)
+        (user_id, from_currency_id, to_currency_id, from_amount, to_amount, trade_rate)
         VALUES (?, ?, ?, ?, ?, ?)"
     );
     $stmt->bind_param("iiiddd", $userId, $fromCurrencyId, $toCurrencyId, $fromAmount, $toAmount, $tradeRate);

@@ -50,7 +50,6 @@ foreach ($symbols as $symbol) {
 
     $data = json_decode($response, true);
 
-    $baseId = getCurrencyId($conn, $baseCode);
     $quoteId = getCurrencyId($conn, $quoteCode);
 
     foreach ($data as $row) {
