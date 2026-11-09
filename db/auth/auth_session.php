@@ -10,8 +10,8 @@ function createSession($userId)
 
 	// Create session; establish with $sessionKey and $userId
 	$stmt = $conn->prepare(
-		"INSERT INTO sessions (session_key, user_id, created_at, expires_at)
-		VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 1 HOUR))"
+		"INSERT INTO sessions (session_key, user_id, expires_at)
+		VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 1 HOUR))"
 	);
 	$stmt->bind_param("si", $sessionKey, $userId);
 	$stmt->execute();
