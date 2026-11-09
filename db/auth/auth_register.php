@@ -13,17 +13,10 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
 	// Add new user to users table
 	$stmt = $conn->prepare(
 		"INSERT INTO users
-		(username, email, password_hash, first_name, last_name)
-		VALUES (?, ?, ?, ?, ?)"
+		(username, email, password_hash)
+		VALUES (?, ?, ?)"
 	);
-	$stmt->bind_param(
-		"sssss",
-		$username,
-		$email,
-		$passwordHash,
-		$firstName,
-		$lastName
-	);
+	$stmt->bind_param("sss", $username, $email, $passwordHash);
 
 	// Basic error catching (i.e., duplicate username or email); prevents listener crash
 	try {
@@ -36,21 +29,13 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
 	if ($registered) {
 		$newUserId = $conn->insert_id; // ID of new user
 
-		// Creates initial portfolio ($100,000.00 starting cash)
-		$portfolioStmt = $conn->prepare(
-			"INSERT INTO portfolios (user_id)
-			VALUES (?)"
-		);
-		$portfolioStmt->bind_param("i", $newUserId);
-		$portfolioStmt->execute();
-
-		// Copies initial portfolio cash into USD holdings
+		// Copies starting cash into USD holdings
 		$positionStmt = $conn->prepare(
 			"INSERT INTO positions (user_id, currency_id, amount)
-			SELECT p.user_id, c.currency_id, p.starting_cash
-			FROM portfolios p
+			SELECT u.user_id, c.currency_id, u.starting_cash
+			FROM users u
 			JOIN currencies c ON c.currency_code = 'USD'
-			WHERE p.user_id = ?"
+			WHERE u.user_id = ?"
 		);
 		$positionStmt->bind_param("i", $newUserId);
 		$positionStmt->execute();

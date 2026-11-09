@@ -2,12 +2,13 @@
 require_once __DIR__ . "/authentication.php";
 require_once __DIR__ . "/trading.php";
 require_once __DIR__ . "/rates.php";
+require_once __DIR__ . "/watchlists.php";
 
 function getPortfolio($userId)
 {
     global $conn;
 
-    $stmt = $conn->prepare("SELECT starting_cash FROM portfolios WHERE user_id = ?");
+    $stmt = $conn->prepare("SELECT starting_cash FROM users WHERE user_id = ?");
     $stmt->bind_param("i", $userId);
     $stmt->execute();
     $portfolio = $stmt->get_result()->fetch_assoc();
@@ -15,10 +16,10 @@ function getPortfolio($userId)
     $stmt = $conn->prepare(
         "SELECT c.currency_code,
             p.amount,
-            IF(c.currency_code = 'USD', p.amount, p.amount / r.rate) AS usd_value
+            IF(c.currency_code = 'USD', p.amount, p.amount / r.units_per_usd) AS usd_value
         FROM positions p
         JOIN currencies c ON c.currency_id = p.currency_id
-        LEFT JOIN rates r ON r.quote_currency_id = p.currency_id
+        LEFT JOIN rates r ON r.currency_id = p.currency_id
         WHERE p.user_id = ?"
     );
     $stmt->bind_param("i", $userId);
