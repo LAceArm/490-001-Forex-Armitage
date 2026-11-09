@@ -24,8 +24,9 @@ function getTrades($userId)
         "SELECT t.trade_id, 
                 fc.currency_code AS from_code, 
                 tc.currency_code AS to_code,
-                t.rate AS trade_rate,
-                t.from_amount, t.to_amount, t.created_at
+                t.from_amount, 
+                t.to_amount, 
+                t.trade_rate
         FROM trades t
         JOIN currencies fc ON fc.currency_id = t.from_currency_id
         JOIN currencies tc ON tc.currency_id = t.to_currency_id
