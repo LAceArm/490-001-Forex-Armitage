@@ -72,7 +72,7 @@ unset($_SESSION['flash']);
 $holdings = [];
 $portfolio = send_to_broker(['type' => 'get_portfolio', 'session_key' => $key]);
 foreach ($portfolio['holdings'] as $row) {
-    $holdings[$row['currency_code']] = $row['from_amount'];
+    $holdings[$row['currency_code']] = $row['amount'];
 }
 ?>
 
