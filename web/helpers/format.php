@@ -25,4 +25,3 @@ function gainClass($value) {
     return $value >= 0 ? 'positive' : 'negative';
 }
 ?>
-?>
