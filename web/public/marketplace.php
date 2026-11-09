@@ -1,6 +1,6 @@
-
 <?php
 require_once __DIR__ . '/../broker/session_check.php'; // Loads session check
+require_once __DIR__ . '/../helpers/format.php';
 
 $key = $_SESSION['session_key'];
 
@@ -17,7 +17,7 @@ ksort($currencyRows);
 // Set variables
 $type = ($_POST['trade_type'] ?? '') == 'sell' ? 'sell' : 'buy';
 $currency = $_POST['currency'] ?? '';
-$amount = $_POST['amount'] ?? '';
+$amount = $_POST['from_amount'] ?? '';
 $rate = $currencyRows[$currency] ?? null;
 $total = null;
 
@@ -37,9 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $result = send_to_broker([
             'type'        => 'trade',
             'session_key' => $key,
-            'from'        => $from,
-            'to'          => $to,
-            'amount'      => $tradeAmount
+            'from_code'   => $from,
+            'to_code'     => $to,
+            'from_amount' => $tradeAmount
         ]);
 
         // Displays confirmation or error message
@@ -47,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // e.g., "Traded [amount][code] for [amount][code]"
             $_SESSION['flash'] = sprintf(
                 'Traded %.2f %s for %.2f %s',
-                $result['from_amount'], $result['from'],
-                $result['to_amount'], $result['to']
+                $result['from_amount'], $result['from_code'],
+                $result['to_amount'], $result['to_code']
             );
         } else {
             $_SESSION['flash'] = $result['error'];
@@ -71,8 +71,8 @@ unset($_SESSION['flash']);
 // User's holdings
 $holdings = [];
 $portfolio = send_to_broker(['type' => 'get_portfolio', 'session_key' => $key]);
-foreach ($portfolio['positions'] as $row) {
-    $holdings[$row['currency']] = $row['amount'];
+foreach ($portfolio['holdings'] as $row) {
+    $holdings[$row['currency_code']] = $row['from_amount'];
 }
 ?>
 
@@ -131,13 +131,13 @@ foreach ($portfolio['positions'] as $row) {
                 </select>
 <!--lets users decide how much they want to buy or sell-->
                 <label>Amount</label>
-                <input type="number" name="amount" min="0.01" step="any"
-                       placeholder="Enter currency amount" value="<?= $amount ?>" required>
+                <input type="number" name="from_amount" min="0.01" step="any"
+                       placeholder="Enter currency amount" value="<?= htmlspecialchars($amount) ?>" required>
 
                 <label>Exchange Rate (USD)</label>
                 <input type="text" readonly value="<?php
                     if ($rate !== null) {
-                        echo number_format($rate, $rate < 0.01 ? 6 : 4);
+                        echo formatRate($rate);
                     } else {
                         echo '—';
                     }
@@ -167,22 +167,22 @@ foreach ($portfolio['positions'] as $row) {
                 </div>
                 <div class="summary-row">
                     <span>Exchange Rate</span>
-                    <strong><?= $total !== null ? number_format($rate, $rate < 0.01 ? 6 : 4) : '—' ?></strong>
+                    <strong><?= $total !== null ? formatRate($rate) : '—' ?></strong>
                 </div>
                 <div class="summary-row total-row">
                     <span>Estimated Total (USD)</span>
-                    <strong><?= $total !== null ? '$' . number_format($total, 2) : '—' ?></strong>
+                    <strong><?= $total !== null ? formatMoney($total) : '—' ?></strong>
                 </div>
             </div>
 
             <p class="trade-message"><?= $message ?></p>
-<!--this is a hidden input field-->
-<!--it sends the same trade that the user made php side 
-to confirm the trade when the button is clicked-->
+            <!-- this is a hidden input field -->
+            <!-- it sends the same trade that the user made php side to
+            confirm the trade when the button is clicked -->
             <form method="POST">
                 <input type="hidden" name="trade_type" value="<?= $type ?>">
                 <input type="hidden" name="currency" value="<?= $currency ?>">
-                <input type="hidden" name="amount" value="<?= $amount ?>">
+                <input type="hidden" name="from_amount" value="<?= htmlspecialchars($amount) ?>">
 
                 <button type="submit" name="action" value="confirm"
                         class="confirm-button" <?= $total === null ? 'disabled' : '' ?>>
