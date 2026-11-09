@@ -1,22 +1,19 @@
-
 <?php
 require_once __DIR__ . '/../broker/session_check.php'; // Checks if session key is valid
 require_once __DIR__ . '/../helpers/format.php';
 
 // Asks DB side for user's holdings
-$portfolio = send_to_broker(array(
+$portfolioReply = send_to_broker([
     'type' => 'get_portfolio',
     'session_key' => $_SESSION['session_key']
-));
-
-$positions = $portfolio['holdings'] ?? [];
+]);
 
 // 'Available Cash' and 'Holdings Value', respectively
 $cash = 0;
 $holdingsValue = 0;
 
 // Go through each holding
-foreach ($positions as $holding) {
+foreach ($portfolioReply['holdings'] as $holding) {
     if ($holding['currency_code'] == 'USD') {
         $cash += $holding['amount']; // Add to cash
     } else {
@@ -25,7 +22,7 @@ foreach ($positions as $holding) {
 }
 
 // 'Total Portfolio Value'
-$total = $cash + $holdingsValue;
+$portfolioValue = $cash + $holdingsValue;
 ?>
 
 <!DOCTYPE html>
@@ -71,7 +68,7 @@ $total = $cash + $holdingsValue;
                     <div class="card-body p-4">
                         <h2 class="h5">Available Cash</h2>
                         <p class="fs-3 fw-bold mb-0">
-                            $<?php echo number_format($cash, 2); ?>
+                            <?= formatMoney($cash) ?>
                         </p>
                     </div>
                 </div>
@@ -82,7 +79,7 @@ $total = $cash + $holdingsValue;
                     <div class="card-body p-4">
                         <h2 class="h5">Holdings Value</h2>
                         <p class="fs-3 fw-bold mb-0">
-                            $<?php echo number_format($holdingsValue, 2); ?>
+                            <?= formatMoney($holdingsValue) ?>
                         </p>
                     </div>
                 </div>
@@ -93,7 +90,7 @@ $total = $cash + $holdingsValue;
                     <div class="card-body p-4">
                         <h2 class="h5">Total Portfolio Value</h2>
                         <p class="fs-3 fw-bold mb-0">
-                            $<?php echo number_format($total, 2); ?>
+                            <?= formatMoney($portfolioValue) ?>
                         </p>
                     </div>
                 </div>
@@ -117,20 +114,20 @@ $total = $cash + $holdingsValue;
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($positions as $p): ?>
+                            <?php foreach ($portfolioReply['holdings'] as $holding): ?>
                                 <?php
-                                $rate = 0;
+                                $usdPerUnit = 0;
 
-                                // Calculates rate (USD value / amount)
-                                if ($p['amount'] > 0) { // If holding is an amount above 0
-                                    $rate = $p['usd_value'] / $p['amount']; // Calculate exchange rate
+                                // Rate = USD value / amount
+                                if ($holding['amount'] > 0) {
+                                    $usdPerUnit = $holding['usd_value'] / $holding['amount'];
                                 }
                                 ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($p['currency_code']); ?></td>
-                                    <td><?php echo number_format($p['amount'], 2); ?></td>
-                                    <td><?php echo number_format($rate, 6); ?></td>
-                                    <td>$<?php echo number_format($p['usd_value'], 2); ?></td>
+                                    <td><?= $holding['currency_code'] ?></td>
+                                    <td><?= number_format($holding['amount'], 2) ?></td>
+                                    <td><?= formatRate($usdPerUnit) ?></td>
+                                    <td><?= formatMoney($holding['usd_value']) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -146,8 +143,7 @@ $total = $cash + $holdingsValue;
             </a>
 
             <a href="home.php" class="btn btn-outline-secondary">
-                Back to Home
-            </a>
+                Back to Home</a>
         </div>
 
     </main>
