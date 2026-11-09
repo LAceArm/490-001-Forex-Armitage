@@ -4,25 +4,25 @@ require_once __DIR__ . '/../helpers/format.php';
 
 // Asks DB side for user's holdings
 $portfolioReply = send_to_broker([
-    'type' => 'get_portfolio',
+    'type'        => 'get_portfolio',
     'session_key' => $_SESSION['session_key']
 ]);
 
 // Asks DB side for user's trade history
 $tradesReply = send_to_broker([
-    'type' => 'get_trades',
+    'type'        => 'get_trades',
     'session_key' => $_SESSION['session_key']
 ]);
 
-// Per currency: total USD spent and total units bought (only trades paid for with USD)
-$usdSpent = [];
-$unitsBought = [];
+// USD starts at 1 spent per 1 bought, so its purchase rate is always 1
+$usdSpent    = ['USD' => 1];
+$unitsBought = ['USD' => 1];
 
 foreach ($tradesReply['trades'] as $trade) {
     if ($trade['from_code'] == 'USD') {
-        $toCode = $trade['to_code'];
-        $usdSpent[$toCode] = ($usdSpent[$toCode] ?? 0) + $trade['from_amount'];
-        $unitsBought[$toCode] = ($unitsBought[$toCode] ?? 0) + $trade['to_amount'];
+        $currencyCode = $trade['to_code'];
+        $usdSpent[$currencyCode] = ($usdSpent[$currencyCode] ?? 0) + $trade['from_amount'];
+        $unitsBought[$currencyCode] = ($unitsBought[$currencyCode] ?? 0) + $trade['to_amount'];
     }
 }
 
@@ -33,33 +33,35 @@ foreach ($portfolioReply['holdings'] as $holding) {
     $portfolioValue += $holding['usd_value'];
 
     // Sold-out currencies have nothing to measure
-    if ($holding['amount'] == 0) {
+    if ($holding['currency_code'] == 'USD' || $holding['amount'] == 0) {
         continue;
     }
 
-    $toCode = $holding['currency_code'];
+    $usdSpent = 0;
+    $unitsBought = 0;
+    foreach ($tradesReply['trades'] as $trade) {
+        if ($trade['from_code'] == 'USD' && $trade['to_code'] == $holding['currency_code']) {
+            $usdSpent += $trade['from_amount'];
+            $unitsBought += $trade['to_amount'];
+        }
+    }
+
     $usdPerUnit = $holding['usd_value'] / $holding['amount']; // USD value of 1 unit
 
     // Average USD paid per unit (USD itself is always 1)
     $purchaseUsdPerUnit = null;
-    if ($toCode == 'USD') {
-        $purchaseUsdPerUnit = 1;
-    } elseif (isset($unitsBought[$toCode])) {
-        $purchaseUsdPerUnit = $usdSpent[$toCode] / $unitsBought[$toCode];
-    }
-
-    // Gain or loss = amount owned * (current rate - purchase rate)
     $gain = null;
-    if ($purchaseUsdPerUnit !== null) {
-        $gain = $holding['amount'] * ($usdPerUnit = $purchaseUsdPerUnit);
+    if ($unitsBought > 0) {
+        $purchaseUsdPerUnit = $usdSpent / $unitsBought;
+        $gain = $holding['amount'] * ($usdPerUnit - $purchaseUsdPerUnit);
     }
 
     $gainRows[] = [
-        'currency_code' => $toCode,
-        'amount' => $holding['amount'],
-        'purchase_rate' => $purchaseUsdPerUnit,
-        'current_rate' => $usdPerUnit,
-        'gain' => $gain
+        'currency_code'         => $holding['currency_code'],
+        'amount'                => $holding['amount'],
+        'purchase_usd_per_unit' => $purchaseUsdPerUnit,
+        'usd_per_unit'          => $usdPerUnit,
+        'gain'                  => $gain
     ];
 }
 
@@ -160,12 +162,6 @@ $performancePercent = $totalGain / $startingCash * 100;
 
                 </table>
             </div>
-
-            <?php if ($message != ''): ?>
-                <p class="gains-message">
-                    <?= $message ?>
-                </p>
-            <?php endif; ?>
 
         </section>
 
