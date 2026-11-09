@@ -23,8 +23,8 @@ function getCurrencyId($conn, $code)
         return $row["currency_id"];
     }
 
-    $stmt = $conn->prepare("INSERT INTO currencies (currency_code, currency_name) VALUES (?, ?)");
-    $stmt->bind_param("ss", $code, $code);
+    $stmt = $conn->prepare("INSERT INTO currencies (currency_code) VALUES (?)");
+    $stmt->bind_param("s", $code);
     $stmt->execute();
 
     return $conn->insert_id;
@@ -55,24 +55,15 @@ foreach ($symbols as $symbol) {
 
     $rate = $data["rate"];
 
-    $baseId = getCurrencyId($conn, $baseCode);
     $quoteId = getCurrencyId($conn, $quoteCode);
 
     $stmt = $conn->prepare(
-        "INSERT INTO rates
-        (base_currency_id, quote_currency_id, rate)
-        VALUES (?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-            rate = VALUES(rate),
-            updated_at = CURRENT_TIMESTAMP"
+        "INSERT INTO rates (currency_id, units_per_usd)
+        VALUES (?, ?)
+        ON DUPLICATE KEY UPDATE units_per_usd = VALUES(units_per_usd)"
     );
 
-    $stmt->bind_param(
-        "iid",
-        $baseId,
-        $quoteId,
-        $rate
-    );
+    $stmt->bind_param("iid", $quoteId, $rate);
 
     if ($stmt->execute()) {
         echo "$symbol = $rate saved successfully" . PHP_EOL;

@@ -63,25 +63,11 @@ foreach ($symbols as $symbol) {
         $rate = $row["rate"];
 
         $stmt = $conn->prepare(
-            "INSERT INTO rate_history
-            (base_currency_id, quote_currency_id, base_currency_code, quote_currency_code, rate, rate_date)
-            VALUES (?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE
-		rate = VALUES(rate),
-		base_currency_code = VALUES(base_currency_code),
-    		quote_currency_code = VALUES(quote_currency_code)"
+            "INSERT INTO rate_history (currency_id, rate_date, units_per_usd)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE units_per_usd = VALUES(units_per_usd)"
         );
-
-        $stmt->bind_param(
-    	"iissds",
-    	$baseId,
-    	$quoteId,
-    	$baseCode,
-    	$quoteCode,
-    	$rate,
-    	$rateDate
-	);
-
+        $stmt->bind_param("isd", $quoteId, $rateDate, $rate);
         $stmt->execute();
     }
 
