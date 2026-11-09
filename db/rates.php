@@ -25,13 +25,11 @@ function getCurrencyIdAndRate($currencyCode)
     }
 
     $stmt = $conn->prepare(
-        "SELECT r.rate
-        FROM rates r
-        JOIN currencies b ON b.currency_id = r.base_currency_id
-        JOIN currencies q ON q.currency_id = r.quote_currency_id
-        WHERE b.currency_code = 'USD' AND q.currency_code = ?"
+        "SELECT units_per_usd
+        FROM rates
+        WHERE currency_id = ?"
     );
-    $stmt->bind_param("s", $currencyCode);
+    $stmt->bind_param("i", $currencyId);
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
 
@@ -47,13 +45,9 @@ function getRates()
     global $conn;
 
     $stmt = $conn->prepare(
-        "SELECT qc.currency_code,
-                r.rate AS units_per_usd,
-                r.updated_at
+        "SELECT qc.currency_code, r.units_per_usd
         FROM rates r
-        JOIN currencies bc ON bc.currency_id = r.base_currency_id
-        JOIN currencies qc ON qc.currency_id = r.quote_currency_id
-        WHERE bc.currency_code = 'USD'
+        JOIN currencies c ON c.currency_id = r.currency_id
         ORDER BY qc.currency_code"
     );
     $stmt->execute();
@@ -71,17 +65,15 @@ function getLatestRates()
     global $conn;
 
     $stmt = $conn->prepare(
-        "SELECT r.quote_currency_id AS currency_id, r.rate
-        FROM rates r
-        JOIN currencies bc ON bc.currency_id = r.base_currency_id
-        WHERE bc.currency_code = 'USD'"
+        "SELECT currency_id, units_per_usd
+        FROM rates"
     );
     $stmt->execute();
     $result = $stmt->get_result();
 
     $rates = [];
     while ($row = $result->fetch_assoc()) {
-        $rates[$row["currency_id"]] = (float)$row["rate"];
+        $rates[$row["currency_id"]] = (float)$row["units_per_usd"];
     }
 
     return $rates;
@@ -92,20 +84,20 @@ function getPreviousRates()
 {
     global $conn;
 
+    // Retrieve all but current day's rate
     $stmt = $conn->prepare(
-        "SELECT quote_currency_id AS currency_id, rate
+        "SELECT currency_id, units_per_usd
         FROM rate_history
-        WHERE base_currency_code = 'USD'
-        AND rate_date = (
-        SELECT MAX(rate_date) FROM rate_history
-        WHERE rate_date < (SELECT MAX(rate_date) FROM rate_history))"
+        WHERE rate_date = (
+            SELECT MAX(rate_date) FROM rate_history
+            WHERE rate_date < (SELECT MAX(rate_date) FROM rate_history))"
     );
     $stmt->execute();
     $result = $stmt->get_result();
 
     $rates = [];
     while ($row = $result->fetch_assoc()) {
-        $rates[$row["currency_id"]] = (float)$row["rate"];
+        $rates[$row["currency_id"]] = (float)$row["units_per_usd"];
     }
 
     return $rates;
