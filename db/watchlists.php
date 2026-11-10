@@ -26,7 +26,11 @@ function getWatchlists($userId)
         );
         $stmt->bind_param("i", $userId);
         $stmt->execute();
-        $result = $stmt->get_result();
+	$result = $stmt->get_result();
+	if(!$result){
+		error_log(date("Y/m/d H:i:s").": COULD NOT GET WATCHLIST: ".$stmt->error.PHP_EOL,3,"/home/seif490/Watchlist.log");
+		return null;
+	} 
 
         // Latest rate per currency (units per 1 USD), from the rates table.
         $latest = [];
