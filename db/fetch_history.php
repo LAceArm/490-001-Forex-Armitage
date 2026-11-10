@@ -32,6 +32,9 @@ function getCurrencyId($conn, $code)
     return $result["currency_id"];
 }
 
+//laa55 11/10/26:
+//I will add logging to this stuff once it's in the DMZ VM. Anything where there is an insertion is fair game though
+
 $endDate = date("Y-m-d");
 $startDate = date("Y-m-d", strtotime("-1 year"));
 
