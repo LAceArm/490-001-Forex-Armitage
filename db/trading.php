@@ -19,10 +19,12 @@ function currencyId($code)
 
 	//if !row return $row[currency_id" else return null
 	
-	if($row){
+	if($row){	
+               error_log(date("Y/m/d H:i:s").": FOUND CURRENCY ID".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log"); 
 	       return (int)$row["currency_id"];	
 	}
 	else{ 
+        	error_log(date("Y/m/d H:i:s").": COULD NOT GET CURRENCY ID".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log"); 
 		return null;
 	}
 
