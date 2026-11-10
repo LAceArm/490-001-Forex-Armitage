@@ -12,7 +12,8 @@ $symbols = [
 ];
 
 function getCurrencyId($conn, $code)
-{
+{	
+    error_log(date("Y/m/d H:i:s").": GETTING CURRENCY ID".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
     $stmt = $conn->prepare(
         "SELECT currency_id
          FROM currencies
@@ -23,7 +24,11 @@ function getCurrencyId($conn, $code)
     $stmt->execute();
 
     $result = $stmt->get_result()->fetch_assoc();
-
+    if(!$result){
+	    error_log(date("Y/m/d H:i:s").": COULD NOT RESOLVE QUERY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log");
+	   return ["Message"=> "Query could not be executed"]; 
+    }
+    error_log(date("Y/m/d H:i:s").": QUERY RESOLVED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
     return $result["currency_id"];
 }
 
