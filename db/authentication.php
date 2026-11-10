@@ -31,7 +31,7 @@ function createSession($userId)
 function validateSession($key)
 {
     global $conn;
- 
+    error_log(date("Y/m/d H:i:s").": VALIDATING SESSION".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log"); //Note: File does not exist
     $stmt = $conn->prepare(
         "SELECT u.user_id, u.username, u.role
          FROM sessions s
@@ -42,10 +42,11 @@ function validateSession($key)
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
 
-    if (!$row) {
+    if (!$row) {	    
+        error_log(date("Y/m/d H:i:s").": INVALID SESSION".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log"); 
         return ["success" => false];
     }
-
+    error_log(date("Y/m/d H:i:s").": VALID SESSION".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log"); 
     return [
         "success" => true,
         "user_id" => $row["user_id"],
@@ -57,7 +58,6 @@ function validateSession($key)
 function destroySession($key)
 {
     global $conn;
-
     $stmt = $conn->prepare("DELETE FROM sessions WHERE session_key = ?");
     $stmt->bind_param("s", $key);
     $stmt->execute();
