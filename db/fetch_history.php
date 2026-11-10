@@ -34,6 +34,8 @@ function getCurrencyId($conn, $code)
 
 //laa55 11/10/26:
 //I will add logging to this stuff once it's in the DMZ VM. Anything where there is an insertion is fair game though
+//
+//Update, same day: Screw it adding it now. It can be copied later anyways
 
 $endDate = date("Y-m-d");
 $startDate = date("Y-m-d", strtotime("-1 year"));
@@ -68,8 +70,10 @@ foreach ($symbols as $symbol) {
 
         $rateDate = $row["date"];
         $rate = $row["rate"];
-
-        $stmt = $conn->prepare(
+	
+        error_log(date("Y/m/d H:i:s").": INSERTING CURRENCY INFORMATION INTO DATABASE".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
+	
+	$stmt = $conn->prepare(
             "INSERT INTO rate_history
             (base_currency_id, quote_currency_id, base_currency_code, quote_currency_code, rate, rate_date)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -89,7 +93,13 @@ foreach ($symbols as $symbol) {
     	$rateDate
 	);
 
-        $stmt->execute();
+	$result=$stmt->execute();
+	if($result){
+            error_log(date("Y/m/d H:i:s").": QUERY EXECUTED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
+	}
+	else{ 
+        	error_log(date("Y/m/d H:i:s").": COULD NOT INSERT CURRENCY INFORMATION".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log"); 
+	}
     }
 
     echo "$symbol history saved" . PHP_EOL;
