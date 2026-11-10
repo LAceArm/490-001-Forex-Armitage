@@ -7,8 +7,8 @@
 			error_log(date("Y/m/d H:i:s").": EVENT NOT LOGGED: EVENT TYPE NOT SET".PHP_EOL,3,"/home/chris490/WebSiteLogs/logger.log");
 			return;
 		}
+		$msg=$decode["message"];
 		switch($decode["type"]){
-			$msg=$decode["message"];
 			case "login":
 				error_log($msg,3,"/home/chris490/WebSiteLogs/DatabaseLogs/Login.log");
 				break;
