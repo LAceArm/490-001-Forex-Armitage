@@ -70,8 +70,12 @@ function getPortfolio($userId)
          ORDER BY c.currency_code"
     );
     $stmt->bind_param("i", $userId);
-    $stmt->execute();
     $result = $stmt->get_result();
+
+    if(!$result){ 
+	    error_log(date("Y/m/d H:i:s").": COULD NOT GET PORTFOLIO: ".$stmt->error.PHP_EOL,3,"/home/seif490/WebsiteLogs/Portfolio.log");
+	    return ["success"=>false];
+    }
 
     $positions = [];
     $totalValue = 0.0;
