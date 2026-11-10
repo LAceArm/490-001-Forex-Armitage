@@ -25,6 +25,7 @@ function getRates()
     $result = $conn->query($sql);
 
     if (!$result) {
+	error_log(date("Y/m/d H:i:s").": COULD NOT EXECUTE QUERY: ".$conn->error,3,"/home/seif490/WebisteLogs/Rates.log");
         return [
             "success" => false,
             "error" => $conn->error
