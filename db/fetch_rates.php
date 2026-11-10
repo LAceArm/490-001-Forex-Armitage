@@ -95,9 +95,11 @@ foreach ($symbols as $symbol) {
     );
 
     if ($stmt->execute()) {
-        echo "$symbol = $rate saved successfully" . PHP_EOL;
+	    echo "$symbol = $rate saved successfully" . PHP_EOL;
+        error_log(date("Y/m/d H:i:s").": $rate SAVED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
     } else {
-        echo "Failed to save $symbol: " . $stmt->error . PHP_EOL;
+	    echo "Failed to save $symbol: " . $stmt->error . PHP_EOL;   
+        error_log(date("Y/m/d H:i:s").": FAILED TO SAVE $symbol: ". $stmt->error .PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
     }
 }
 
