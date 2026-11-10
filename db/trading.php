@@ -50,7 +50,14 @@ function usdRate($code)
         $stmt->execute();
         $row = $stmt->get_result()->fetch_assoc();
 
-        return $row ? (float)$row["rate"] : null;
+	//if row return float row rate else return null
+
+	if($row){
+		return (float)$row["rate"];
+	} 
+	else{
+	       return null;	
+	}
 }
 
 function executeTrade($userId, $fromCode, $toCode, $amount)
