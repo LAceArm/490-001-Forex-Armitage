@@ -2,21 +2,30 @@
 
 require_once "database.php";
 
+//Function returns an error and does nothing else.
 function tradeError($message)
 {
-        return ["success" => false, "error" => $message];
+        return ["success" => false, "error" => $message]; //?????????
 }
 
 function currencyId($code)
 {
         global $conn;
-
+	
         $stmt = $conn->prepare("SELECT currency_id FROM currencies WHERE currency_code = ?");
         $stmt->bind_param("s", $code);
         $stmt->execute();
         $row = $stmt->get_result()->fetch_assoc();
 
-        return $row ? (int)$row["currency_id"] : null;
+	//if !row return $row[currency_id" else return null
+	
+	if($row){
+	       return (int)$row["currency_id"];	
+	}
+	else{ 
+		return null;
+	}
+
 }
 
 // Units of $code per 1 USD from the ratrse table. USD itself is 1
