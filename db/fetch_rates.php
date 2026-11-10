@@ -40,7 +40,7 @@ function getCurrencyId($conn, $code)
 	    error_log(date("Y/m/d H:i:s").": COULD NOT GET CURRENCY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
 	    return ["FAILED TO GET CURRENCIES"];
     }
-    error_log(date("Y/m/d H:i:s").": SUCCESSFULLY FETCHED CURRENCY $code".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log"); 
+    error_log(date("Y/m/d H:i:s").": SUCCESSFULLY FETCHED CURRENCY $code".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
     return $result["currency_id"];
 }
 
