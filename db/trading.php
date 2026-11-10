@@ -62,6 +62,7 @@ function usdRate($code)
 	}
 }
 
+//Note: If another function calls this function, do not log it. Logging will be done from here
 function executeTrade($userId, $fromCode, $toCode, $amount)
 {
         global $conn;
@@ -70,23 +71,29 @@ function executeTrade($userId, $fromCode, $toCode, $amount)
         $toCode   = strtoupper(trim($toCode));
         $amount   = (float)$amount;
 
-        if ($amount <= 0) {
+	if ($amount <= 0) {
+	error_log(date("Y/m/d H:i:s").": COULD NOT EXECUTE TRADE: AMOUNT MUST BE GREATER THAN ZERO".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
                 return tradeError("Amount must be greater than zero");
         }
 
-        if ($fromCode === $toCode) {
+	if ($fromCode === $toCode) {
+
+	error_log(date("Y/m/d H:i:s").": COULD NOT EXECUTE TRADE: TRADE WAS IN THE SAME CURRENCY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
                 return tradeError("Choose two different currencies");
         }
 
         $fromId = currencyId($fromCode);
         $toId   = currencyId($toCode);
-        if (!$fromId || !$toId) {
+	if (!$fromId || !$toId) {
+	error_log(date("Y/m/d H:i:s").": COULD NOT EXECUTE TRADE: UNKNOWN CURRENCY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
                 return tradeError("Unknown currency");
         }
 
         $fromRate = usdRate($fromCode);
         $toRate   = usdRate($toCode);
-        if (!$fromRate || !$toRate) {
+	if (!$fromRate || !$toRate) {
+	error_log(date("Y/m/d H:i:s").": COULD NOT EXECUTE TRADE: RATES ARE UNAVAILABLE".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
+
                 return tradeError("No rate available for that pair");
         }
 
@@ -107,7 +114,9 @@ function executeTrade($userId, $fromCode, $toCode, $amount)
                 $stmt->execute();
                 $row = $stmt->get_result()->fetch_assoc();
 
-                if (!$row || (float)$row["amount"] < $amount) {
+		if (!$row || (float)$row["amount"] < $amount) {
+
+	 error_log(date("Y/m/d H:i:s").": COULD NOT EXECUTE TRADE: INSUFFICIENT BALANCE".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
                         $conn->rollback();
                         return tradeError("Insufficient balance");
                 }
@@ -118,7 +127,14 @@ function executeTrade($userId, $fromCode, $toCode, $amount)
                 );
 
                 $stmt->bind_param("dii", $amount, $userId, $fromId);
-                $stmt->execute();
+                $r1= $stmt->execute(); //Making sure nothing gets mixed up
+		if(!$r1){ 
+	error_log(date("Y/m/d H:i:s".": COULD NOT EXECUTE TRADE: THERE WAS AN ERROR:".$stmt->error.PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log";
+		return null
+		}
+		else{ 
+			error_log(date("Y/m/d H:i:s").": TRADE EXECUTED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
+		}
 
                 $stmt = $conn->prepare(
                         "INSERT into positions (user_id, currency_id, amount)
@@ -127,7 +143,16 @@ function executeTrade($userId, $fromCode, $toCode, $amount)
                 );
 
                 $stmt->bind_param("iid", $userId, $toId, $toAmount);
-                $stmt->execute();
+                $r2=$stmt->execute();
+
+		
+		if(!$r2){ 
+	error_log(date("Y/m/d H:i:s".": COULD NOT EXECUTE TRADE: THERE WAS AN ERROR:".$stmt->error.PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log";
+		return null;
+		}
+		else{ 
+			error_log(date("Y/m/d H:i:s").": TRADE EXECUTED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
+		}
 
                 $stmt = $conn->prepare(
                         "INSERT INTO trades
@@ -136,7 +161,16 @@ function executeTrade($userId, $fromCode, $toCode, $amount)
                 );
 
                 $stmt->bind_param("iiiddd", $userId, $fromId, $toId, $amount, $toAmount, $rate);
-                $stmt->execute();
+		$r3=$stmt->execute();
+
+
+		if(!$r3){ 
+	error_log(date("Y/m/d H:i:s".": COULD NOT EXECUTE TRADE: THERE WAS AN ERROR:".$stmt->error.PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log";
+		return null;
+		}
+		else{ 
+			error_log(date("Y/m/d H:i:s").": TRADE EXECUTED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
+		}
 
                 $conn->commit();
         } catch (mysqli_sql_exception $e) {
