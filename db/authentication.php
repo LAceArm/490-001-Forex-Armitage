@@ -57,12 +57,19 @@ function validateSession($key)
 
 function destroySession($key)
 {
+    error_log(date("Y/m/d H:i:s").": DESTROYING SESSION".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log"); 
     global $conn;
     $stmt = $conn->prepare("DELETE FROM sessions WHERE session_key = ?");
     $stmt->bind_param("s", $key);
-    $stmt->execute();
-
-    return ["success" => true];
+    $row=$stmt->execute();
+    if($row){ 
+	    error_log(date("Y/m/d H:i:s").": SESSION DESTROYED".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log");
+	   return ["success"=>true]; 
+    }
+    else{    
+	    error_log(date("Y/m/d H:i:s").": QUERY FAILED".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log");
+	   return ["success"=>false]; 
+    }
 }
 
 function registerUser($username, $email, $password, $firstName = null, $lastName = null)
