@@ -53,9 +53,11 @@ function usdRate($code)
 	//if row return float row rate else return null
 
 	if($row){
+        	error_log(date("Y/m/d H:i:s").": RETURNED EXCHANGE RATE".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log"); 
 		return (float)$row["rate"];
 	} 
 	else{
+               error_log(date("Y/m/d H:i:s").": COULD NOT RESOLVE EXCHANGE RATE TO USD".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log"); 
 	       return null;	
 	}
 }
