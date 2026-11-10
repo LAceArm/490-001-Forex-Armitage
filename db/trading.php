@@ -174,11 +174,15 @@ function getTrades($userId)
         $stmt->execute();
 
         $trades = [];
-        $result = $stmt->get_result();
+	$result = $stmt->get_result();
+	if(!$result){
+		error_log(date("Y/m/d H:i:s").": COULD NOT GET TRADES".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trades.log"); 
+		return ["success" => false];
+	}
         while ($row = $result->fetch_assoc()) {
                 $trades[] = $row;
         }
-
+        error_log(date("Y/m/d H:i:s").": FETCHED TRADES".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trades.log"); 
         return ["success" => true, "trades" => $trades];
 }
 ?>
