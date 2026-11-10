@@ -95,14 +95,22 @@ function createWatchlist($userId, $name)
         global $conn;
 
         $name = trim($name);
-        if ($name === "" || strlen($name) > 50) {
+	if ($name === "" || strlen($name) > 50) {
+
+		error_log(date("Y/m/d H:i:s").": WATCHLIST COULD NOT BE ADDED: NAME TOO LONG".PHP_EOL,3,"/home/seif490/WebsiteLogs/Watchlist.log");	
                 return ["success" => false, "error" => "Enter a name up to 50 characters"];
         }
 
         $stmt = $conn->prepare("INSERT INTO watchlists (user_id, name) VALUES (?, ?)");
         $stmt->bind_param("is", $userId, $name);
-        $stmt->execute();
+        $result=$stmt->execute();
 
+	if(!$result){
+		error_log(date("Y/m/d H:i:s").": COULD NOT CREATE WATCHLIST: ".$stmt->error.PHP_EOL,3,"/home/seif490/WebsiteLogs/Watchlist.log");
+		return null;	
+	} 
+	error_log(date("Y/m/d H:i:s").": WATCHLIST CREATED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Watchlist.log");	
+	
         return ["success" => true, "watchlist_id" => $conn->insert_id];
 }
 
@@ -113,8 +121,14 @@ function deleteWatchlist($userId, $watchlistId)
 
         $stmt = $conn->prepare("DELETE FROM watchlists WHERE watchlist_id = ? AND user_id = ?");
         $stmt->bind_param("ii", $watchlistId, $userId);
-        $stmt->execute();
+        $result=$stmt->execute();
 
+	if(!$result){
+		error_log(date("Y/m/d H:i:s").": COULD NOT DELETE WATCHLIST: ".$result->error.PHP_EOL,3,"/home/seif490/WebsiteLogs/Watchlist.log");
+		return null;	
+	}
+	
+	error_log(date("Y/m/d H:i:s").": WATCHLIST DELETED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Watchlist.log");	
         return ["success" => $stmt->affected_rows > 0];
 }
 
