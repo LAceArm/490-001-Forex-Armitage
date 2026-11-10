@@ -167,7 +167,11 @@ function removeWatchlistItem($userId, $watchlistId, $code)
                 WHERE w.watchlist_id = ? AND w.user_id = ? AND c.currency_code = ?"
         );
         $stmt->bind_param("iis", $watchlistId, $userId, $code);
-        $stmt->execute();
+	$result=$stmt->execute();
+	if(!$result){
+		error_log(date("Y/m/d H:i:s").": COULD NOT DELETE WATCHLIST ITEM: ".$stmt->error.PHP_EOL,3,"/home/seif490/WebsiteLogs/Watchlist.log");		      return null;
+	}
 
+	error_log(date("Y/m/d H:i:s").": WATCHLIST ITEM DELETED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Watchlist.log");	
         return ["success" => true];
 }
