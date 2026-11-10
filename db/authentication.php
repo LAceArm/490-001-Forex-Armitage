@@ -4,6 +4,7 @@ require_once "database.php";
 
 function createSession($userId)
 {
+    error_log(date("Y/m/d H:i:s").": CREATING SESSION".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log");	
     global $conn;
 
     $key = bin2hex(random_bytes(32));
@@ -13,7 +14,16 @@ function createSession($userId)
          VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 1 HOUR))"
     );
     $stmt->bind_param("si", $key, $userId);
-    $stmt->execute();
+    $result=$stmt->execute();
+
+    if($result){
+	    error_log(date("Y/m/d H:i:s").": SESSION CREATED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log");
+	    //Will change once migration is done
+    } 
+    else{
+	    error_log(date("Y/m/d H:i:s".": SESSION COULD NOT BE CREATED".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log"));
+	   //ditto 
+    }
 
     return $key;
 }
@@ -21,7 +31,7 @@ function createSession($userId)
 function validateSession($key)
 {
     global $conn;
-
+ 
     $stmt = $conn->prepare(
         "SELECT u.user_id, u.username, u.role
          FROM sessions s
