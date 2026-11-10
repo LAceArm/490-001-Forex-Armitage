@@ -154,6 +154,7 @@ function addWatchlistItem($userId, $watchlistId, $code)
 	       return null;	
 	}
 
+	error_log(date("Y/m/d H:i:s").": WATCHLIST ITEM ADDED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Watchlist.log");	
         return ["success" => true];
 }
 
