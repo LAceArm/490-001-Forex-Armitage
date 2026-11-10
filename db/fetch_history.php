@@ -52,9 +52,14 @@ foreach ($symbols as $symbol) {
 
     $response = file_get_contents($url);
 
-    if ($response === false) {
+    if ($response === false) {    
+        error_log(date("Y/m/d H:i:s").": FAILED TO FETCH HISTORY FOR $symbol".PHP_EOL,3,"/home/seif490/WebsiteLogs/Requests.log"); //Note: Be ready to update this value 
         echo "Failed to fetch history for $symbol" . PHP_EOL;
         continue;
+    }
+    else{ 
+	    error_log(date("Y/m/d H:i:s").": HISTORY FOR $symbol FETCHED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Requests.log"); 
+	    //ditto
     }
 
     $data = json_decode($response, true);
