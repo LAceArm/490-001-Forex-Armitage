@@ -39,6 +39,7 @@ function currencyId($code)
 function usdRate($code)
 {
         global $conn;
+	global $daystr;
 
         if ($code === "USD") {
                 return 1.0;
@@ -52,18 +53,20 @@ function usdRate($code)
                 WHERE b.currency_code = 'USD' AND q.currency_code = ?"
         );
         $stmt->bind_param("s", $code);
-        $stmt->execute();
+        $r1=$stmt->execute();
         $row = $stmt->get_result()->fetch_assoc();
 
 	//if row return float row rate else return null
 
-	if($row){
-        	error_log(date("Y/m/d H:i:s").": RETURNED EXCHANGE RATE".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log"); 
+	if($r1){
+		$msg=$daystr."RETURNED EXCHANGE RATE".PHP_EOL;
+        	error_log($msg,3,"/home/jdk39/WebsiteLogs/Trade.log"); 
 		return (float)$row["rate"];
 	} 
 	else{
-               error_log(date("Y/m/d H:i:s").": COULD NOT RESOLVE EXCHANGE RATE TO USD".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log"); 
-	       return null;	
+	       $msg=$daystr."COULD NOT RESOLVE EXCHANGE RATE TO USD".PHP_EOL;	
+               error_log($msg,3,"/home/jdk39/WebsiteLogs/Trade.log"); 
+	       return -1.0;	
 	}
 }
 
