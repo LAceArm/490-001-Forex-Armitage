@@ -146,8 +146,9 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
 
 function loginUser($username, $password)
 {	
-	error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT FROM $username".PHP_EOL,3,"/home/seif490/WebsiteLogs/Login.log");
-	 global $conn;
+//	error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT FROM $username".PHP_EOL,3,"/home/seif490/WebsiteLogs/Login.log");
+	global $conn;
+	global $daystr;
 
     $stmt = $conn->prepare(
         "SELECT user_id, username, password_hash, role, is_active
@@ -162,30 +163,34 @@ function loginUser($username, $password)
 
 	    $result= $stmt->get_result();
 
-	    if($result->num_rows !== 1){ 
-error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT WAS UNSUCCESSFUL; USER $username DOES NOT EXIST".PHP_EOL,3,"/home/seif490/WebsiteLogs/Login.log");
+	    if($result->num_rows !== 1){
+		    $msg=$daystr."LOGIN ATTEMPT WAS UNSUCCESSFUL: USER $username DOES NOT EXIST".PHP_EOL;
+		   error_log($msg,3,"/home/jdk39/WebsiteLogs/Login.log"); 
 		    return ["success"=>false];
 	    }
 
 	    $user = $result->fetch_assoc();
 
 	    if(!$user["is_active"]){ 
-	error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT WAS UNSUCCESSUL; USER $username IS INACTIVE".PHP_EOL,3,"/home/seif490/WebsiteLogs/Login.log");
+		    $msg=$daystr."LOGIN ATTEMPT WAS UNSUCCESSFUL: USER $username IS INACTIVE".PHP_EOL;
+		    error_log(date($msg,3,"/home/seif490/WebsiteLogs/Login.log");
 		    return ["success"=>false];
 	    }
 
 	    if(!password_verify($password,$user["password_hash"])){ 
-		  error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT WAS UNSUCCESSUL; PASSWORD MISMATCH".PHP_EOL,3,"/home/seif490/WebsiteLogs/Login.log");
+		    	$msg=$daystr."LOGIN ATTEMPT WAS UNSUCCESSFUL: PASSWORD DOES NOT MATCH".PHP_EOL;
+		  	error_log($msg,3,"/home/jdk39/WebsiteLogs/Login.log");
 		    	return["success"=>false];
 	    }
-	    error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT WAS SUCCESSFUL".PHP_EOL,3,"/home/seif490/WebsiteLogs/Login.log");
+	  //  error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT WAS SUCCESSFUL".PHP_EOL,3,"/home/seif490/WebsiteLogs/Login.log");
 	    return ["success"=>true,"user_id"=>$user["user_id"],"username"=>$user["username"],"role"=>$user["role"], "session_key"=>createSession($user["user_id"])];
 
     }
 
 	catch (Exception $e){ 
-	error_log(date("Y/m/d H:i:s").": LOGIN ATTEMPT WAS UNSUCCESSFUL; AN EXCEPTION OCCURED: ".$e->getMessage().PHP_EOL,3,"/home/seif490/WebsiteLogs/Login.log");	
-	    return array("success"=>false);
+		$msg=$daystr."LOGIN ATTEMPT WAS UNSUCCESSFUL: AN EXCEPTION OCCURED:".$e->getMessage().PHP_EOL;
+		error_log(date($msg,3,"/home/jdk39/WebsiteLogs/Login.log");	
+	    	return array("success"=>false);
     }
 }
 
