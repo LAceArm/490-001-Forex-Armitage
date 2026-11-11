@@ -176,6 +176,7 @@ function addWatchlistItem($userId, $watchlistId, $code)
 function removeWatchlistItem($userId, $watchlistId, $code)
 {
         global $conn;
+	global $daystr;
 
         $code = strtoupper(trim($code));
 
@@ -188,9 +189,11 @@ function removeWatchlistItem($userId, $watchlistId, $code)
         $stmt->bind_param("iis", $watchlistId, $userId, $code);
 	$result=$stmt->execute();
 	if(!$result){
-		error_log(date("Y/m/d H:i:s").": COULD NOT DELETE WATCHLIST ITEM: ".$stmt->error.PHP_EOL,3,"/home/seif490/WebsiteLogs/Watchlist.log");		      return null;
+		$msg=$daystr."COULD NOT DELETE WATCHLIST ITEM: ".$stmt->error.PHP_EOL;
+		error_log(date($msg,3,"/home/seif490/WebsiteLogs/Watchlist.log");		      
+		return ["success"=>false];
 	}
-
-	error_log(date("Y/m/d H:i:s").": WATCHLIST ITEM DELETED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Watchlist.log");	
+	$msg=$daystr."WATCHLIST ITEM DELETED SUCCESSFULLY".PHP_EOL;
+	error_log(date($msg,3,"/home/seif490/WebsiteLogs/Watchlist.log");	
         return ["success" => true];
 }
