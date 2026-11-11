@@ -8,11 +8,14 @@
 
 require_once "database.php";
 
+$daystr=date("Y/m/d H:i:s").": ";
+
 // All of a user's watchlists, each with its currencies, the latest USD price
 // of each, and the % change in that price since the previous day.
 function getWatchlists($userId)
 {
-        global $conn;
+	global $conn;
+	global $daystr;
 
         // The user's lists with their currencies. LEFT JOINs keep a list that
         // has no currencies yet.
@@ -28,8 +31,9 @@ function getWatchlists($userId)
         $stmt->execute();
 	$result = $stmt->get_result();
 	if(!$result){
-		error_log(date("Y/m/d H:i:s").": COULD NOT GET WATCHLIST: ".$stmt->error.PHP_EOL,3,"/home/seif490/Watchlist.log");
-		return null;
+		$msg=$daystr."COULD NOT GET WATCHLIST: ".$stmt->error.PHP_EOL;
+		error_log($msg,3,"/home/seif490/Watchlist.log");
+		return ["success"=>false,"Message"=>$msg];
 	} 
 
         // Latest rate per currency (units per 1 USD), from the rates table.
