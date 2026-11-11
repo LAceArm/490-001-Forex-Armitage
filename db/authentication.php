@@ -2,10 +2,13 @@
 
 require_once "database.php";
 
+$daystr=date("Y/m/d H:i:s").": ";
+
 function createSession($userId)
 {
-    error_log(date("Y/m/d H:i:s").": CREATING SESSION".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log");	
-    global $conn;
+    //error_log(date("Y/m/d H:i:s").": CREATING SESSION".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log");	
+	global $conn;
+	global $daystr;
 
     $key = bin2hex(random_bytes(32));
 
@@ -17,12 +20,16 @@ function createSession($userId)
     $result=$stmt->execute();
 
     if($result){
-	    error_log(date("Y/m/d H:i:s").": SESSION CREATED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log");
-	    //Will change once migration is done
+	    $msg=$daystr."SESSION CREATED SUCCESSFULLY".PHP_EOL;
+	    error_log($msg,3,"/home/jdk39/WebsiteLogs/Session.log");
+	    // publish, fanout
+	    //Might change once migration is done
     } 
     else{
-	    error_log(date("Y/m/d H:i:s".": SESSION COULD NOT BE CREATED".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log"));
-	   //ditto 
+	    $msg=$daystr."SESSION COULD NOT BE CREATED: ".$stmt->error.PHP_EOL;
+	    error_log(date($msg,3,"/home/jdk39/WebsiteLogs/Session.log"));
+   		 //publish, fanout
+	    return null;
     }
 
     return $key;
