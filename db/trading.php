@@ -211,6 +211,7 @@ function executeTrade($userId, $fromCode, $toCode, $amount)
 function getTrades($userId)
 {
         global $conn;
+	global $daystr;
 
         $stmt = $conn->prepare(
                 "SELECT t.trade_id, f.currency_code AS from_code, k.currency_code AS to_code,
@@ -223,18 +224,19 @@ function getTrades($userId)
                 LIMIT 1000"
         );
         $stmt->bind_param("i", $userId);
-        $stmt->execute();
+	if(!$stmt->execute()){
+		$msg=$daystr."COULD NOT GET TRADES: "$stmt->error.PHP_EOL;
+		error_log($msg,3,"/home/jdk39/WebsiteLogs/Trades.log");
+		return ["success"=>false];	
+	}
 
         $trades = [];
 	$result = $stmt->get_result();
-	if(!$result){
-		error_log(date("Y/m/d H:i:s").": COULD NOT GET TRADES".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trades.log"); 
-		return ["success" => false];
-	}
         while ($row = $result->fetch_assoc()) {
                 $trades[] = $row;
-        }
-        error_log(date("Y/m/d H:i:s").": FETCHED TRADES".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trades.log"); 
+	}
+	$msg=$daystr."FETCHED TRADES".PHP_EOL;
+        error_log($msg,3,"/home/seif490/WebsiteLogs/Trades.log"); 
         return ["success" => true, "trades" => $trades];
 }
 ?>
