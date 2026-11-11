@@ -72,19 +72,21 @@ foreach ($symbols as $symbol) {
 
     if ($response === false) {
 	    echo "Failed to fetch $symbol" . PHP_EOL;
-
-        error_log(date("Y/m/d H:i:s").": FAILED TO FETCH $symbol".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
+	$msg=$daystr."FAILED TO FETCH $symbol".PHP_EOL;
+        error_log($msg,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
         continue;
     }
     else{
-       error_log(date("Y/m/d H:i:s").": FETCHED $symbol SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
+	$msg=$daystr."FETCHED SYMBOL SUCCESSFULLY".PHP_EOL;    
+       error_log(date($msg,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
     } 
 
     $data = json_decode($response, true);
 
     if (!isset($data["rate"])) {
 	    echo "No rate returned for $symbol" . PHP_EOL;
-        error_log(date("Y/m/d H:i:s").": NO RATE RETURNED FOR $symbol".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
+	    $msg=$daystr."NO RATE RETURNED FOR $symbol".PHP_EOL;
+        error_log($msg,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
         continue;
     }
 
@@ -111,10 +113,12 @@ foreach ($symbols as $symbol) {
 
     if ($stmt->execute()) {
 	    echo "$symbol = $rate saved successfully" . PHP_EOL;
-        error_log(date("Y/m/d H:i:s").": $rate SAVED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
+	    $msg=$daystr."$rate SAVED SUCCESSFULLY".PHP_EOL;
+        error_log($msg,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
     } else {
-	    echo "Failed to save $symbol: " . $stmt->error . PHP_EOL;   
-        error_log(date("Y/m/d H:i:s").": FAILED TO SAVE $symbol: ". $stmt->error .PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
+	    echo "Failed to save $symbol: " . $stmt->error . PHP_EOL; 
+	    $msg=$daystr."FAILED TO SAVE $symbol: ".$stmt->error.PHP_EOL;	  
+        error_log($msg,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
     }
 }
 
