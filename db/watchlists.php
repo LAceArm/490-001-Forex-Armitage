@@ -100,12 +100,14 @@ function getWatchlists($userId)
 // Creates an empty list with the given name.
 function createWatchlist($userId, $name)
 {
-        global $conn;
+	global $conn;
+	global $daystr;
 
         $name = trim($name);
 	if ($name === "" || strlen($name) > 50) {
+		$msg=$daystr."WATCHLIST COULD NOT BE ADDED: NAME TOO LONG".PHP_EOL;
 
-		error_log(date("Y/m/d H:i:s").": WATCHLIST COULD NOT BE ADDED: NAME TOO LONG".PHP_EOL,3,"/home/seif490/WebsiteLogs/Watchlist.log");	
+		error_log($msg,3,"/home/seif490/WebsiteLogs/Watchlist.log");	
                 return ["success" => false, "error" => "Enter a name up to 50 characters"];
         }
 
@@ -114,10 +116,12 @@ function createWatchlist($userId, $name)
         $result=$stmt->execute();
 
 	if(!$result){
-		error_log(date("Y/m/d H:i:s").": COULD NOT CREATE WATCHLIST: ".$stmt->error.PHP_EOL,3,"/home/seif490/WebsiteLogs/Watchlist.log");
+		$msg=$daystr."COULD NOT CREATE WATCHLIST: ".$stmt->error.PHP_EOL;
+		error_log($msg,3,"/home/seif490/WebsiteLogs/Watchlist.log");
 		return null;	
 	} 
-	error_log(date("Y/m/d H:i:s").": WATCHLIST CREATED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Watchlist.log");	
+	$msg=$daystr."WATCHLIST CREATED SUCCESSFULLY".PHP_EOL;
+	error_log(date($msg,3,"/home/seif490/WebsiteLogs/Watchlist.log");	
 	
         return ["success" => true, "watchlist_id" => $conn->insert_id];
 }
