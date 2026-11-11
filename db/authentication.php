@@ -71,17 +71,20 @@ function validateSession($key)
 
 function destroySession($key)
 {
-    error_log(date("Y/m/d H:i:s").": DESTROYING SESSION".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log"); 
+	// error_log(date("Y/m/d H:i:s").": DESTROYING SESSION".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log"); 
+    global $daystr;
     global $conn;
     $stmt = $conn->prepare("DELETE FROM sessions WHERE session_key = ?");
     $stmt->bind_param("s", $key);
     $row=$stmt->execute();
     if($row){ 
-	    error_log(date("Y/m/d H:i:s").": SESSION DESTROYED".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log");
+	    $msg=$daystr."SESSION DESTROYED".PHP_EOL;
+	    error_log($msg,3,"/home/jdk39/WebsiteLogs/Session.log");
 	   return ["success"=>true]; 
     }
     else{    
-	    error_log(date("Y/m/d H:i:s").": QUERY FAILED".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log");
+	    $msg=$daystr."COULD NOT DESTROY SESSION".PHP_EOL;
+	    error_log($msg,3,"/home/jdk39/WebsiteLogs/Session.log");
 	   return ["success"=>false]; 
     }
 }
