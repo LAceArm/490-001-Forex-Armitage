@@ -91,7 +91,8 @@ function destroySession($key)
 
 function registerUser($username, $email, $password, $firstName = null, $lastName = null)
 {
-    error_log(date("Y/m/d H:i:s").": REGISTRATION ATTEMPT".PHP_EOL,3,"/home/seif490/WebsiteLogs/Registration.log");
+	//error_log(date("Y/m/d H:i:s").": REGISTRATION ATTEMPT".PHP_EOL,3,"/home/seif490/WebsiteLogs/Registration.log");
+    global $daystr;
     global $conn;
 
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
@@ -116,7 +117,9 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
 	$pstmt = $conn->prepare("INSERT INTO portfolios (user_id) VALUES (?)");
 	$pstmt->bind_param("i", $newUserId);
 	$pstmt->execute();
-	
+
+	$msg=$daystr."REGISTRATION WAS SUCCESSFUL".PHP_EOL;
+
 	$ustmt = $conn->prepare(
 		"INSERT INTO positions (user_id, currency_id, amount)
 		SELECT p.user_id, c.currency_id, p.starting_cash
@@ -127,13 +130,14 @@ function registerUser($username, $email, $password, $firstName = null, $lastName
 	$ustmt->bind_param("i", $newUserId);
 	$ustmt->execute();
 
-	error_log(date("Y/m/d H:i:s").": REGISTRATION WAS SUCCESSFUL".PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
+	error_log(date($msg, 3, "/home/jdk39/WebsiteLogs/Registration.log");
         return [
             "success" => true,
             "user_id" => $conn->insert_id
         ];
     }
-    error_log(date("Y/m/d H:i:s").": REGISTRATION ATTEMPT WAS UNSUCCESSFUL".PHP_EOL,3,"/home/seif490/WebsiteLogs/Registration.log");
+    $msg=$daystr."REGISTRATION ATTEMPT WAS UNSUCCESSFUL".PHP_EOL;
+    error_log($msg,3,"/home/jdk39/WebsiteLogs/Registration.log");
     return [
         "success" => false,
         "error" => $stmt->error
