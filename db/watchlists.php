@@ -130,18 +130,20 @@ function createWatchlist($userId, $name)
 function deleteWatchlist($userId, $watchlistId)
 {
         global $conn;
+	global $daystr;
 
         $stmt = $conn->prepare("DELETE FROM watchlists WHERE watchlist_id = ? AND user_id = ?");
         $stmt->bind_param("ii", $watchlistId, $userId);
         $result=$stmt->execute();
 
 	if(!$result){
-		error_log(date("Y/m/d H:i:s").": COULD NOT DELETE WATCHLIST: ".$result->error.PHP_EOL,3,"/home/seif490/WebsiteLogs/Watchlist.log");
-		return null;	
+		$msg=$daystr."COULD NOT DELETE WATCHLIST: ".$stmt->error.PHP_EOL;
+		error_log($msg,3,"/home/seif490/WebsiteLogs/Watchlist.log");
+		return ["success"=>false];	
 	}
-	
-	error_log(date("Y/m/d H:i:s").": WATCHLIST DELETED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Watchlist.log");	
-        return ["success" => $stmt->affected_rows > 0];
+	$msg=$daystr."WATCHLIST DELETED SUCCESSFULLY".PHP_EOL;
+	error_log($msg,3,"/home/seif490/WebsiteLogs/Watchlist.log");	
+        return ["success" => true];
 }
 
 // Adds a currency to one of this user's lists. Adding it twice does nothing.
