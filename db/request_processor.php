@@ -4,6 +4,8 @@ require_once "authentication.php";
 require_once "trading.php";
 require_once "watchlists.php";
 
+$datestr=date("Y/m/d H:i:s").": ";
+
 function getRates()
 {
     global $conn;
@@ -25,7 +27,8 @@ function getRates()
     $result = $conn->query($sql);
 
     if (!$result) {
-	error_log(date("Y/m/d H:i:s").": COULD NOT EXECUTE QUERY: ".$conn->error,3,"/home/seif490/WebisteLogs/Rates.log");
+	    $msg=$datestr."COULD NOT EXECUTE QUERY: ".$conn->error.PHP_EOL;
+	    error_log($msg,3,"/home/seif490/WebisteLogs/Rates.log");
         return [
             "success" => false,
             "error" => $conn->error
@@ -47,6 +50,7 @@ function getRates()
 function getPortfolio($userId)
 {
     global $conn;
+    global $datestr;	
 
     $stmt = $conn->prepare("SELECT starting_cash FROM portfolios WHERE user_id = ?");
     $stmt->bind_param("i", $userId);
@@ -54,6 +58,8 @@ function getPortfolio($userId)
     $portfolio = $stmt->get_result()->fetch_assoc();
 
     if (!$portfolio) {
+	    $msg=$datestr."PORTFOLIO NOT FOUND".PHP_EOL;
+	 error_log($msg,3,"/home/seif490/WebsiteLogs/Portfolio.log");   
         return ["success" => false, "error" => "Portfolio not found"];
     }
 
@@ -73,7 +79,8 @@ function getPortfolio($userId)
     $result = $stmt->get_result();
 
     if(!$result){ 
-	    error_log(date("Y/m/d H:i:s").": COULD NOT GET PORTFOLIO: ".$stmt->error.PHP_EOL,3,"/home/seif490/WebsiteLogs/Portfolio.log");
+	    $msg=$datestr."COULD NOT GET PORTFOLIO: ".$stmt->error.PHP_EOL;
+	    error_log($msg,3,"/home/seif490/WebsiteLogs/Portfolio.log");
 	    return ["success"=>false];
     }
 
