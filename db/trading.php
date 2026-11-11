@@ -2,6 +2,8 @@
 
 require_once "database.php";
 
+$daystr=date("Y/m/d H:i:s").": ";
+
 //Function returns an error and does nothing else.
 function tradeError($message)
 {
@@ -11,21 +13,24 @@ function tradeError($message)
 function currencyId($code)
 {
         global $conn;
-	
+	global $daystr;
+
         $stmt = $conn->prepare("SELECT currency_id FROM currencies WHERE currency_code = ?");
         $stmt->bind_param("s", $code);
-        $stmt->execute();
+        $r1=$stmt->execute();
         $row = $stmt->get_result()->fetch_assoc();
 
 	//if !row return $row[currency_id" else return null
 	
-	if($row){	
-               error_log(date("Y/m/d H:i:s").": FOUND CURRENCY ID".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log"); 
+	if($r1){
+		$msg=$daystr."FOUND CURRENCY ID".PHP_EOL;	
+               error_log($msg,3,"/home/jdk39/WebsiteLogs/Trade.log"); 
 	       return (int)$row["currency_id"];	
 	}
 	else{ 
-        	error_log(date("Y/m/d H:i:s").": COULD NOT GET CURRENCY ID".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log"); 
-		return null;
+		$msg=$daystr."COULD NOT FIND CURRENCY ID".PHP_EOL;
+        	error_log($msg,3,"/home/seif490/WebsiteLogs/Trade.log"); 
+		return -1;
 	}
 
 }
