@@ -37,8 +37,9 @@ function createSession($userId)
 
 function validateSession($key)
 {
-    global $conn;
-    error_log(date("Y/m/d H:i:s").": VALIDATING SESSION".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log"); //Note: File does not exist
+	global $conn;
+	global $daystr;
+    //error_log(date("Y/m/d H:i:s").": VALIDATING SESSION".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log"); //Note: File does not exist
     $stmt = $conn->prepare(
         "SELECT u.user_id, u.username, u.role
          FROM sessions s
@@ -46,14 +47,20 @@ function validateSession($key)
          WHERE s.session_key = ? AND s.expires_at > NOW()"
     );
     $stmt->bind_param("s", $key);
-    $stmt->execute();
+    $result=$stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
 
-    if (!$row) {	    
-        error_log(date("Y/m/d H:i:s").": INVALID SESSION".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log"); 
+    if (!$result) {
+	$msg=$daystr."COULD NOT EXECUTE QUERY: ".$stmt->error.PHP_EOL;	    
+        error_log($msg,3,"/home/jdk39/WebsiteLogs/Session.log"); 
         return ["success" => false];
     }
-    error_log(date("Y/m/d H:i:s").": VALID SESSION".PHP_EOL,3,"/home/seif490/WebsiteLogs/Session.log"); 
+    else if (!$row["session_key"]) { 
+	    $msg=$daystr."NO SESSION KEY FOUND".PHP_EOL;
+	    error_log($msg,3,"/home/jdk39/WebsiteLogs/Session.log");
+    }
+    $msg=$daystr."VALID SESSION".PHP_EOL;
+    error_log(date($msg,3,"/home/jdk39/WebsiteLogs/Session.log"); 
     return [
         "success" => true,
         "user_id" => $row["user_id"],
