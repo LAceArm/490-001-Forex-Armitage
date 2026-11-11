@@ -11,6 +11,9 @@ $symbols = [
     "USD/AED"
 ];
 
+//Not changing This function.. Will use the abbreviated function in the future
+
+$daystr=date("Y/m/d H:i:s").": ";
 function getCurrencyId($conn, $code)
 {	
     error_log(date("Y/m/d H:i:s").": GETTING CURRENCY ID".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
@@ -52,13 +55,15 @@ foreach ($symbols as $symbol) {
 
     $response = file_get_contents($url);
 
-    if ($response === false) {    
-        error_log(date("Y/m/d H:i:s").": FAILED TO FETCH HISTORY FOR $symbol".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); //Note: Be ready to update this value 
+    if ($response === false) {   
+	   $msg=$daystr." FAILED TO FETCH HISTORY FOR $symbol".PHP_EOL; 
+        error_log($msg,3,"/home/seif490/WebsiteLogs/Fetch.log"); //Note: Be ready to update this value 
         echo "Failed to fetch history for $symbol" . PHP_EOL;
         continue;
     }
     else{ 
-	    error_log(date("Y/m/d H:i:s").": HISTORY FOR $symbol FETCHED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
+	    $msg=$daystr.": FAILED TO FETCH HISTORY FOR $symbol".PHP_EOL;
+	    error_log($msg,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
 	    //ditto
     }
 
@@ -76,7 +81,9 @@ foreach ($symbols as $symbol) {
         $rateDate = $row["date"];
         $rate = $row["rate"];
 	
-        error_log(date("Y/m/d H:i:s").": INSERTING CURRENCY INFORMATION INTO DATABASE".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
+	$msg=$daystr."INSERTING CURRENCY INFORMATION INTO DATABASE".PHP_EOL;
+
+        error_log(date($msg,3,"/home/jdk39/WebsiteLogs/Fetch.log"); 
 	
 	$stmt = $conn->prepare(
             "INSERT INTO rate_history
@@ -100,13 +107,16 @@ foreach ($symbols as $symbol) {
 
 	$result=$stmt->execute();
 	if($result){
-            error_log(date("Y/m/d H:i:s").": QUERY EXECUTED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
+            $msg=$daystr."QUERY EXECUTED SUCCESSFULLY".PHP_EOL;  		
+            error_log($msg,3,"/home/jdk39/WebsiteLogs/Fetch.log"); 
 	}
 	else{ 
-        	error_log(date("Y/m/d H:i:s").": COULD NOT INSERT CURRENCY INFORMATION".PHP_EOL,3,"/home/seif490/WebsiteLogs/Fetch.log"); 
+		$msg=$daystr."QUERY COULD NOT BE EXECUTED: "$stmt->error.PHP_EOL;
+        	error_log($msg,3,"/home/jdk39/WebsiteLogs/Fetch.log"); 
 	}
     }
-
+   $msg=$daystr."$symbol HISTORY SAVED".PHP_EOL; 
+   error_log($msg,3,"/home/jdk39/WebsiteLogs/Fetch.log")    
     echo "$symbol history saved" . PHP_EOL;
 }
 
