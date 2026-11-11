@@ -74,34 +74,37 @@ function usdRate($code)
 function executeTrade($userId, $fromCode, $toCode, $amount)
 {
         global $conn;
+	global $daystr;
 
         $fromCode = strtoupper(trim($fromCode));
         $toCode   = strtoupper(trim($toCode));
         $amount   = (float)$amount;
 
 	if ($amount <= 0) {
-	error_log(date("Y/m/d H:i:s").": COULD NOT EXECUTE TRADE: AMOUNT MUST BE GREATER THAN ZERO".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
+		$msg=$daystr."COULD NOT EXECUTE TRADE: AMOUNT MUST BE GREATER THAN ZERO".PHP_EOL;
+		error_log(date($msg,3,"/home/jdk39/WebsiteLogs/Trade.log");
                 return tradeError("Amount must be greater than zero");
         }
 
 	if ($fromCode === $toCode) {
-
-	error_log(date("Y/m/d H:i:s").": COULD NOT EXECUTE TRADE: TRADE WAS IN THE SAME CURRENCY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
+		$msg=$daystr."COULD NOT EXECUTE TRADE: TRADE WAS IN THE SAME CURRENCY".PHP_EOL;
+		error_log($msg,3,"/home/seif490/WebsiteLogs/Trade.log");
                 return tradeError("Choose two different currencies");
         }
 
         $fromId = currencyId($fromCode);
         $toId   = currencyId($toCode);
 	if (!$fromId || !$toId) {
-	error_log(date("Y/m/d H:i:s").": COULD NOT EXECUTE TRADE: UNKNOWN CURRENCY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
+		$msg=$daystr."COULD NOT EXECUTE TRADE: UNKOWN CURRENCY".PHP_EOL;
+		error_log($msg,3,"/home/seif490/WebsiteLogs/Trade.log");
                 return tradeError("Unknown currency");
         }
 
         $fromRate = usdRate($fromCode);
         $toRate   = usdRate($toCode);
 	if (!$fromRate || !$toRate) {
-	error_log(date("Y/m/d H:i:s").": COULD NOT EXECUTE TRADE: RATES ARE UNAVAILABLE".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
-
+		$msg=$daystr."COULD NOT EXECUTE TRADE: RATES ARE UNAVAILABLE".PHP_EOL;
+		error_log($msg,3,"/home/seif490/WebsiteLogs/Trade.log");
                 return tradeError("No rate available for that pair");
         }
 
@@ -123,8 +126,8 @@ function executeTrade($userId, $fromCode, $toCode, $amount)
                 $row = $stmt->get_result()->fetch_assoc();
 
 		if (!$row || (float)$row["amount"] < $amount) {
-
-	 error_log(date("Y/m/d H:i:s").": COULD NOT EXECUTE TRADE: INSUFFICIENT BALANCE".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
+			$msg=$daystr."COULD NOT EXECUTE TRADE: INSUFFICIENT BALANCE".PHP_EOL;
+	 		error_log(date($msg,3,"/home/seif490/WebsiteLogs/Trade.log");
                         $conn->rollback();
                         return tradeError("Insufficient balance");
                 }
@@ -137,8 +140,9 @@ function executeTrade($userId, $fromCode, $toCode, $amount)
                 $stmt->bind_param("dii", $amount, $userId, $fromId);
                 $r1= $stmt->execute(); //Making sure nothing gets mixed up
 		if(!$r1){ 
-	error_log(date("Y/m/d H:i:s".": COULD NOT EXECUTE TRADE: THERE WAS AN ERROR:".$stmt->error.PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log";
-		return null
+			$msg=$daystr."COULD NOT EXECUTE TRADE: THERE WAS AN ERROR: ".$stmt->error.PHP_EOL;
+			error_log(date($msg,3,"/home/seif490/WebsiteLogs/Trade.log";
+			return null;
 		}
 		else{ 
 			error_log(date("Y/m/d H:i:s").": TRADE EXECUTED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
@@ -155,11 +159,13 @@ function executeTrade($userId, $fromCode, $toCode, $amount)
 
 		
 		if(!$r2){ 
-	error_log(date("Y/m/d H:i:s".": COULD NOT EXECUTE TRADE: THERE WAS AN ERROR:".$stmt->error.PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log";
-		return null;
+			$msg=$daystr."COULD NOT EXECUTE TRADE: THERE WAS AN ERROR: ".$stmt->error.PHP_EOL;
+			error_log($msg,3,"/home/seif490/WebsiteLogs/Trade.log";
+			return null;
 		}
 		else{ 
-			error_log(date("Y/m/d H:i:s").": TRADE EXECUTED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
+			$msg=$daystr."TRADE EXECUTED SUCCESSFULLY".PHP_EOL;
+			error_log($msg,3,"/home/seif490/WebsiteLogs/Trade.log");
 		}
 
                 $stmt = $conn->prepare(
@@ -173,16 +179,20 @@ function executeTrade($userId, $fromCode, $toCode, $amount)
 
 
 		if(!$r3){ 
-	error_log(date("Y/m/d H:i:s".": COULD NOT EXECUTE TRADE: THERE WAS AN ERROR:".$stmt->error.PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log";
-		return null;
+			$msg=$daystr."COULD NOT EXECUTE TRADE: THERE WAS AN ERROR: "$stmt->error.PHP_EOL;
+			error_log(date($msg,3,"/home/seif490/WebsiteLogs/Trade.log";
+			return null;
 		}
 		else{ 
-			error_log(date("Y/m/d H:i:s").": TRADE EXECUTED SUCCESSFULLY".PHP_EOL,3,"/home/seif490/WebsiteLogs/Trade.log");
+			$msg=$daystr."TRADE EXECUTED SUCCESSFULLY".PHP_EOL;
+			error_log($msg,3,"/home/seif490/WebsiteLogs/Trade.log");
 		}
 
                 $conn->commit();
         } catch (mysqli_sql_exception $e) {
-                $conn->rollback();
+		$conn->rollback();
+		$msg=$daystr."TRADE FAILED: ".$e->getMessage().PHP_EOL;
+		error_log($msg,3,"/home/jdk39/WebsiteLogs/Trade.log";
                 return tradeError("Trade failed");
         }
 
