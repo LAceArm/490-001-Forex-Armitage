@@ -2,7 +2,7 @@
 <?php
 //Note: this is a published message eater. It will do things when it processes a published message. It will not return ***anything***. 
 function scp_requestor($request){
-	if(isset($request["from"]){
+	if(!isset($request["from"])){
 		//Do nothing
 	}       		
 	$from=$request["from"];
