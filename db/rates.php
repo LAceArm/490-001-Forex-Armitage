@@ -87,7 +87,8 @@ function getPreviousRates()
         FROM rate_history
         WHERE rate_date = (
             SELECT DISTINCT rate_date FROM rate_history
-            ORDER BY rate_date DESC)"
+            ORDER BY rate_date DESC
+	    LIMIT 1 OFFSET 1)"
     );
     $stmt->execute();
     $result = $stmt->get_result();
