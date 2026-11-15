@@ -5,7 +5,7 @@ function registerUser($username, $email, $password)
 {
 	global $conn;
 
-	error_log(date("Y/m/d H:i:s").": REGISTRATION ATTEMPT".PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
+	error_log(date("Y/m/d H:i:s").": REGISTRATION ATTEMPT".PHP_EOL, 3, "/home/jdk39/WebsiteLogs/Registration.log");
 
 	// Hash password for security
 	$passwordHash = password_hash($password, PASSWORD_DEFAULT);
@@ -41,7 +41,7 @@ function registerUser($username, $email, $password)
 		$positionStmt->execute();
 
 		// User successfully registered
-		error_log(date("Y/m/d H:i:s").": REGISTRATION WAS SUCCESSFUL".PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
+		error_log(date("Y/m/d H:i:s").": REGISTRATION WAS SUCCESSFUL".PHP_EOL, 3, "/home/jdk39/WebsiteLogs/Registration.log");
 		
 		return [
 			"success" => true,
@@ -50,7 +50,7 @@ function registerUser($username, $email, $password)
 	}
 
 	// Reaches if user failed to register
-	error_log(date("Y/m/d H:i:s").": REGISTRATION ATTEMPT WAS UNSUCCESSFUL".PHP_EOL, 3, "/home/seif490/WebsiteLogs/Registration.log");
+	error_log(date("Y/m/d H:i:s").": REGISTRATION ATTEMPT WAS UNSUCCESSFUL".PHP_EOL, 3, "/home/jdk39/WebsiteLogs/Registration.log");
 
 	return [
 		"success" => false,
