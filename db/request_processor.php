@@ -17,7 +17,7 @@ function requestProcessor($request)
     if (!in_array($request["type"], $openTypes)) {
         $session = validateSession($request["session_key"] ?? "");
 
-        if (!$session(["success"])) {
+        if (!$session["success"]) {
             return ["success" => false, "error" => "Not logged in"];
         }
     

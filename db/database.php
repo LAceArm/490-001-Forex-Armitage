@@ -8,3 +8,4 @@ $conn = new mysqli($cfg['host'], $cfg['user'], $cfg['pass'], $cfg['name']);
 if ($conn->connect_error) {
     die("DB connection failed: " . $conn->connect_error . PHP_EOL);
 }
+?>
