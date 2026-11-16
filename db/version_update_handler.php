@@ -18,9 +18,24 @@
 			//Ruh roh, Raggy
 			exec("rm /home/username/frontdev.tar.gz"); 
 			$response["success"]=false;
-			return $response; //A tad confusing 
+			return $response; 
 		}
 	}
 	
-	function version_update_prod(){}
+	function version_update_prod(){
+		$response=array();
+
+		exec("tar -tzf frontqa.tar.gz > /dev/null",$output,$canary);
+
+		if($canary==0){ 
+			//Do some stuff
+			$response["success"]=true;
+
+		}
+		else{ 
+			exec("rm /home/username/frontqa.tar.gz");
+			$response["success"]=false;
+			return $response;
+		}
+	}
 ?>
