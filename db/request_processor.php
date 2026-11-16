@@ -195,6 +195,8 @@ function requestProcessor($request)
                         case "remove_watchlist_item": return removeWatchlistItem($uid, $wid, $code);
                 }
                 break;
+	case "version_update":
+		break;
 
         default:
             return [
