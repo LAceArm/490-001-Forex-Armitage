@@ -3,6 +3,7 @@
 require_once "authentication.php";
 require_once "trading.php";
 require_once "watchlists.php";
+require_once "version_update_handler.php";
 
 function getRates()
 {
