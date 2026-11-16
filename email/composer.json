@@ -2,6 +2,7 @@
        	
     "require": {
         "phpmailer/phpmailer": "^7.1",
-        "league/oauth2-google": "^5.0"
+        "league/oauth2-google": "^5.0",
+        "symfony/dotenv": "^8.1"
     }
 }
