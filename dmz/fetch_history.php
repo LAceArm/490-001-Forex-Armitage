@@ -1,52 +1,57 @@
 <?php
 
-$symbols = [
-    "USD/JPY",
-    "USD/GBP",
-    "USD/EUR",
-    "USD/CNY",
-    "USD/CHF",
-    "USD/AED"
-];
+function getRateHistory()
+{
+    $symbols = [
+        "USD/JPY",
+        "USD/GBP",
+        "USD/EUR",
+        "USD/CNY",
+        "USD/CHF",
+        "USD/AED"
+    ];
 
-$endDate = date("Y-m-d");
-$startDate = date("Y-m-d", strtotime("-1 year"));
+    $endDate = date("Y-m-d");
+    $startDate = date("Y-m-d", strtotime("-1 year"));
 
-foreach ($symbols as $symbol) {
+    $history = [];
 
-    [$baseCode, $quoteCode] = explode("/", $symbol);
+    foreach ($symbols as $symbol) {
 
-    $url = "https://api.frankfurter.dev/v2/rates"
-         . "?base=" . strtolower($baseCode)
-         . "&quotes=" . strtolower($quoteCode)
-         . "&from=" . $startDate
-         . "&to=" . $endDate;
+        [$baseCode, $quoteCode] = explode("/", $symbol);
 
-    $response = file_get_contents($url);
+        $url = "https://api.frankfurter.dev/v2/rates"
+             . "?base=" . strtolower($baseCode)
+             . "&quotes=" . strtolower($quoteCode)
+             . "&from=" . $startDate
+             . "&to=" . $endDate;
 
-    if ($response === false) {
-        echo "Failed to fetch history for $symbol" . PHP_EOL;
-        continue;
-    }
+        $response = file_get_contents($url);
 
-    $data = json_decode($response, true);
-
-    foreach ($data as $row) {
-
-        if (!isset($row["date"]) || !isset($row["rate"])) {
+        if ($response === false) {
             continue;
         }
 
-        $request = [
-            "type" => "update_history",
-            "base" => $baseCode,
-            "quote" => $quoteCode,
-            "rate" => $row["rate"],
-            "date" => $row["date"]
-        ];
+        $data = json_decode($response, true);
 
-        print_r($request);
+        foreach ($data as $row) {
+
+            if (!isset($row["date"]) || !isset($row["rate"])) {
+                continue;
+            }
+
+            $history[] = [
+                "base" => $baseCode,
+                "quote" => $quoteCode,
+                "rate" => $row["rate"],
+                "date" => $row["date"]
+            ];
+        }
     }
-}
 
+    return [
+        "success" => true,
+        "history" => $history
+    ];
+}
 ?>
