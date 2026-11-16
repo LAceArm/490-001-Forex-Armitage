@@ -24,7 +24,7 @@
 		$request=array();
 
 		$request["Message"]="New Version has been sent";
-		$request["type"]="Version Update";
+		$request["type"]="version_update";
 		//Send_request to Appropiate Machine.
 		//Whether it returns true or false it does not matter. 
 		//Log the occurrence
