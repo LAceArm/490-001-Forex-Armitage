@@ -1,10 +1,19 @@
 <!DOCTYPE html>
+
+<!--One neat feature of PHPMailer is that you can send HTML emails (a thing you can do apparently). Since Chris already made the CSS
+for a Push notifications page I decided to use some of what he wrote for this email.-->
 <html>
 	<head>
-		<title> TEST GMAIL </title>
+		<title> Notification </title>
+		<link rel="stylesheet" href="../web/public/assets/notifications.css">
 	</head>
-	<body>
-		<h1> This is a test email! </h1>
-		<p> This email is a test. This means that your code works!</p>
+	<body class="notification-item"> 
+		<h1 class="notification-content"> Good Day, </h1> <br>
+		<p class="notification-content"> We are writing to notify you that one of the Currencies on your watchlist has had a drastic change in 		      value</p>
+		<br>
+		<p class="notification-content"> We strongly advise that you log in to investigate this occurence </p> 
+		<br>
+		<p class="notification-content"> Kind Regards, </p>
+		<p class="notification-content"> The Forex-Armitage Team </p>
 	</body>
 </html>
