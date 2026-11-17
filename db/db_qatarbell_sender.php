@@ -16,4 +16,5 @@
 	}
 
 	//Publish Message to SCP telling it that a new Version of a file is available 
+	$request["from"]="BackQA";	
 ?>

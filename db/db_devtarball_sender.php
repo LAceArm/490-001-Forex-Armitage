@@ -15,5 +15,7 @@
 		return;
 	}
 
-	//Publish Message to SCP telling it that a new Version of a file is available 
+	//Publish Message to SCP telling it that a new Version of a file is available
+	$request=array();
+	$request["from"]="BackDev";	
 ?>
