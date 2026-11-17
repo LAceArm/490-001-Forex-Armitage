@@ -7,6 +7,6 @@
 
 	echo "EMAIL IS NOW LISTENING".PHP_EOL;
 
-	$server->process_requests('SendEmail');
+//	$server->process_requests('SendEmail');
 ?>
 
