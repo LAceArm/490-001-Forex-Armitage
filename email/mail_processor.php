@@ -2,7 +2,7 @@
 <?php 
 	require_once __DIR__."/mail.php";
 
-	function requestProcessor($request) {
+	function SendEmail($request) {
 		$postman=getMail();
 
 		if(!isset($request["emails"])){ 
