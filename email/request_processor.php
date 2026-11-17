@@ -5,17 +5,34 @@
 	function requestProcessor($request) {
 		$postman=getMail();
 
-		$postman->addAddress("briantheduck259@gmail.com","Luis I");
+		if(!isset($request["emails"])){ 
+			return array("success"=>false,"message"=>"No emails sent");
+		}
+		else if (gettype($request["emails"]) !== "array"){
+		       return array("success"=>false,"message"=>"Emails must be of type Array");	
+		}
+		else if (empty($request["emails"])){ 
+			return array("success"=>false,"message"=>"Email Array must not be empty");
+		}
+		
+		//Note: the following loop assumes an associative array Where the Email is the key and the Username is the value
+		$mailinglist=$request["emails"];
+
+		foreach($mailinglist as $email => $username){ 
+			$postman->addAddress($email,$username);
+		}
 
 		$postman->Subject="Important Update Regarding your investments";
 
-		$postman->isHTML(false);$postman->Body="Good Evening. We are writing to inform you of a major shakeup in one of the currencies you follow. Please log in to view this matter";
+		$postman->isHTML(false);
+		$postman->Body="Good Evening. We are writing to inform you of a major shakeup in one of 
+			        the currencies you follow. Please log in to view this matter";
 
-		$postman->Send();
-	       return array("Message" => "Currently nothing!");	
+		if($postman->Send()){
+		       return array("Message"=>"Email Sent Successfully","success"=>true);	
+		}
+		else{
+	       		return array("Message" => "Email could not be sent","success"=>false);
+		}	
 	}
-
-	$request=array();
-
-	requestProcessor($request);
 ?>
