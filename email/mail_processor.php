@@ -24,9 +24,7 @@
 
 		$postman->Subject="Important Update Regarding your investments";
 
-		$postman->isHTML(false);
-		$postman->Body="Good Evening. We are writing to inform you of a major shakeup in one of 
-			        the currencies you follow. Please log in to view this matter";
+		$postman->msgHTML(file_get_contents("email.html"),__DIR__);
 
 		if($postman->Send()){
 		       return array("Message"=>"Email Sent Successfully","success"=>true);	
