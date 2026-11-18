@@ -1,27 +1,29 @@
 #!/usr/bin/php
 <?php
-//Note: this is a published message eater. It will do things when it processes a published message. It will not return ***anything***. 
+//Version Updating!!!!
 function scp_requestor($request){
-	if(!isset($request["from"])){
+	if(!isset($request["action"])){
 		//Do nothing
 	}       		
-	$from=$request["from"];
-	switch($from){ 
-		case "FrontDev":
-			//Send file to QA, Send message to process it
-		case "BackDev":
-			//Ditto
-		case "DMZDev":
-			//Ditto
-		case "FrontQA":
-			//Send file to Prod. Send message to process it
-		case "BackQA":
-			//Ditto
-		case "DMZQA":
-			//Ditto
-		default:
-			//Who the hell is this guy? 
-		     	break;
+	$action=$request["action"];
+	switch($action){ 
+		case "Update":
+			if(!isset($request["System Name"]) || !isset($request["File Name"]) || !isset($request["Version Number"])){ 
+				return array("Message"=>"Missing Necessary fields","success"=>false);
+			}
+			$name=$request["System Name"];
+			$file=$request["File Name"];
+			$num=$request["Version Number"];
+
+			return VersionUpdate($num,$file,$name);
+		case "Revert":
+			if(!isset($request["System Name"])){ 
+				return array("Message" => "Missing Necessary Fields","success"=>false);
+			}
+			$name=$request["System Name"];
+
+			return RevertVersion($name);
+
 	}
 
 }
