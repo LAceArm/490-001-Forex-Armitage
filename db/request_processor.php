@@ -3,6 +3,7 @@
 require_once "authentication.php";
 require_once "trading.php";
 require_once "watchlists.php";
+require_once "version_update_handler.php";
 
 function getRates()
 {
@@ -195,6 +196,10 @@ function requestProcessor($request)
                         case "remove_watchlist_item": return removeWatchlistItem($uid, $wid, $code);
                 }
                 break;
+	case "version_update_qa":
+		break;
+	case "version_update_prod":
+		break
 
         default:
             return [
