@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     switch ($action) {
         case 'create': // Create watchlist
-            $r = send_to_broker([
+            $r = sendToBackend([
                 'type' => 'create_watchlist',
                 'name' => trim($_POST['name'] ?? ''),
                 'session_key' => $key
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'delete': // Delete a whole watchlist
-            $r = send_to_broker([
+            $r = sendToBackend([
                 'type' => 'delete_watchlist',
                 'watchlist_id' => (int)($_POST['watchlist_id'] ?? 0),
                 'session_key' => $key
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'add': // Add currency to watchlist
-            $r = send_to_broker([
+            $r = sendToBackend([
                 'type' => 'add_watchlist_item',
                 'watchlist_id' => (int)($_POST['watchlist_id'] ?? 0),
                 'currency_code' => $_POST['currency_code'] ?? '',
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'remove': // Remove currency from watchlist
-            $r = send_to_broker([
+            $r = sendToBackend([
                 'type' => 'remove_watchlist_item',
                 'watchlist_id' => (int)($_POST['watchlist_id'] ?? 0),
                 'currency_code' => $_POST['currency_code'] ?? '',
@@ -62,11 +62,11 @@ $flash = $_SESSION['flash'] ?? '';
 unset($_SESSION['flash']);
 
 // The user's watchlists, with each currency's latest USD price and daily change.
-$reply = send_to_broker(['type' => 'get_watchlists', 'session_key' => $key]);
+$reply = sendToBackend(['type' => 'get_watchlists', 'session_key' => $key]);
 $watchlists = $reply['watchlists'] ?? [];
 
 $available = [];
-$ratesReply = send_to_broker(['type' => 'get_rates']);
+$ratesReply = sendToBackend(['type' => 'get_rates']);
 
 foreach ($ratesReply['rates'] ?? [] as $row) {
     $available[] = $row['currency_code'];

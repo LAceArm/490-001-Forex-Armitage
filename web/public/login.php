@@ -1,14 +1,14 @@
 <?php
 session_start(); // Start session
 
-require_once __DIR__ . '/../clients/backend_client.php'; // Loads send_to_broker()
+require_once __DIR__ . '/../clients/backend_client.php'; // Loads sendToBackend()
 
 $error = ''; // Error message; empty means no error
 
 // Runs when form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	// Bothers DB to check username and password
-	$r = send_to_broker([
+	$r = sendToBackend([
 		'type'     => 'login',
 		'username' => $_POST['username'] ?? '',
 		'password' => $_POST['password'] ?? '',

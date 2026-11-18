@@ -6,7 +6,7 @@ require_once __DIR__ . '/../helpers/format.php';
 $key = $_SESSION['session_key'];
 $currencyRows = [];
 
-$rates = send_to_broker(['type' => 'get_rates']); // Bother DB for rates
+$rates = sendToBackend(['type' => 'get_rates']); // Bother DB for rates
 
 foreach ($rates['rates'] as $row) {
     if ($row['units_per_usd'] > 0) {
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $tradeAmount = $amount;
             }
 
-            $result = send_to_broker([
+            $result = sendToBackend([
                 'type' => 'trade',
                 'session_key' => $key,
                 'from_code' => $from,
@@ -73,7 +73,7 @@ unset($_SESSION['flash']);
 
 // User's holdings
 $holdings = [];
-$portfolio = send_to_broker(['type' => 'get_portfolio', 'session_key' => $key]);
+$portfolio = sendToBackend(['type' => 'get_portfolio', 'session_key' => $key]);
 
 foreach ($portfolio['holdings'] as $row) {
     $holdings[$row['currency_code']] = $row['amount'];

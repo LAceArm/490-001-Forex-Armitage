@@ -4,7 +4,7 @@ require_once __DIR__ . '/../data/currencies.php'; // Defines $currencyNames (e.g
 
 $currencyRows = [];
 
-$reply = send_to_broker(['type' => 'get_rates']); // Bother DB for rates
+$reply = sendToBackend(['type' => 'get_rates']); // Bother DB for rates
 
 // Processing rates
 foreach ($reply['rates'] as $row) {

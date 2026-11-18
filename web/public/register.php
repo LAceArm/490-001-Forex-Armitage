@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = "Password needs at least 8 characters, 1 number, an uppercase and a lowercase letter, and a symbol";
         } else {
                 // Bothers DB to create account
-                $r = send_to_broker([
+                $r = sendToBackend([
                         'type'     => 'register',
                         'username' => $username,
                         'email'    => $email,

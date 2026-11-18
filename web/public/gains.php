@@ -4,13 +4,13 @@ require_once __DIR__ . '/../broker/session_check.php'; // Checks if session key 
 require_once __DIR__ . '/../helpers/format.php';
 
 // Asks DB side for user's holdings
-$portfolioReply = send_to_broker([
+$portfolioReply = sendToBackend([
     'type'        => 'get_portfolio',
     'session_key' => $_SESSION['session_key']
 ]);
 
 // Asks DB side for user's trade history
-$tradesReply = send_to_broker([
+$tradesReply = sendToBackend([
     'type'        => 'get_trades',
     'session_key' => $_SESSION['session_key']
 ]);

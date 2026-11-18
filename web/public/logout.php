@@ -5,7 +5,7 @@ require_once __DIR__ . '/../clients/backend_client.php'; // Loads send_to_broker
 
 // Bothers DB to delete this session's key
 if (!empty($_SESSION['session_key'])) {
-        send_to_broker([
+        sendToBackend([
                 'type'        => 'logout',
                 'session_key' => $_SESSION['session_key'],
         ]);
