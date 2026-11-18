@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/broker_client.php';
+require_once __DIR__ . '/../clients/backend_client.php';
 
 // If session doesn't exist, start it
 if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -13,7 +13,7 @@ if (empty($_SESSION['session_key'])) {
 }
 
 // Check if session key is valid
-$reply = send_to_broker([
+$reply = sendToBackend([
         'type' => 'validate_session',
         'session_key' => $_SESSION['session_key']
 ]);
