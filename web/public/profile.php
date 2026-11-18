@@ -1,3 +1,4 @@
+
 <?php
 
 require_once __DIR__ . '/../broker/session_check.php';
@@ -11,133 +12,142 @@ $email = $_SESSION['email'] ?? '';
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Profile | Forex Armitage</title>
 
-    <link rel="stylesheet" href="assets/style.css?v=5">
-    <link rel="stylesheet" href="assets/profile.css?v=7">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body class="home-page">
+<body class="bg-light">
 
     <!-- Navigation Bar -->
-    <nav class="main-navbar">
-        <div class="main-nav-container">
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm py-3">
+        <div class="container">
 
-            <a href="home.php" class="main-logo">
+            <a href="home.php" class="navbar-brand fw-bold fs-4 text-primary">
                 Forex Armitage
             </a>
 
-            <div class="main-nav-links">
-                <a href="dashboard.php">Dashboard</a>
-                <a href="notifications.php">Notifications</a>
-                <a href="profile.php">Profile</a>
-                <a href="logout.php">Logout</a>
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <a href="dashboard.php" class="text-decoration-none text-dark fw-semibold">Dashboard</a>
+                <a href="notifications.php" class="text-decoration-none text-dark fw-semibold">Notifications</a>
+                <a href="profile.php" class="text-decoration-none text-dark fw-semibold">Profile</a>
+                <a href="logout.php" class="btn btn-outline-danger btn-sm fw-semibold">Logout</a>
             </div>
 
         </div>
     </nav>
 
     <!-- Profile Content -->
-    <main class="profile-container">
+    <main class="container py-5">
 
-        <div class="profile-header">
-            <h1>My Profile</h1>
-            <p>View and edit your account information.</p>
+        <div class="text-center mb-4">
+            <h1 class="fw-bold fs-2 mb-3">My Profile</h1>
+            <p class="text-secondary fs-6">
+                View and edit your account information.
+            </p>
         </div>
 
-        <div class="profile-card">
+        <div class="card shadow-sm border-0 rounded-4 mx-auto" style="max-width: 650px;">
 
-            <h2>Account Information</h2>
+            <div class="card-body p-4">
 
-            <!-- Profile Information -->
-            <div id="profile-view">
+                <h2 class="fs-5 fw-bold mb-4">Account Information</h2>
 
-                <div class="profile-info">
+                <!-- Profile Information -->
+                <div id="profile-view">
 
-                    <div class="info-row">
-                        <span class="info-label">Username</span>
-                        <span class="info-value">
-                            <?php echo htmlspecialchars($username); ?>
-                        </span>
+                    <div class="mb-4">
+
+                        <div class="d-flex justify-content-between align-items-center border-bottom py-3 gap-3">
+                            <span class="fw-semibold">Username</span>
+                            <span class="text-secondary">
+                                <?php echo htmlspecialchars($username); ?>
+                            </span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center border-bottom py-3 gap-3">
+                            <span class="fw-semibold">Email</span>
+                            <span class="text-secondary">
+                                <?php echo htmlspecialchars($email); ?>
+                            </span>
+                        </div>
+
                     </div>
 
-                    <div class="info-row">
-                        <span class="info-label">Email</span>
-                        <span class="info-value">
-                            <?php echo htmlspecialchars($email); ?>
-                        </span>
+                    <div class="d-flex flex-wrap gap-3">
+                        <button
+                            type="button"
+                            class="btn btn-primary fw-semibold px-4 py-2"
+                            onclick="showEditForm()">
+                            Edit Profile
+                        </button>
+
+                        <a href="home.php" class="btn btn-outline-primary fw-semibold px-4 py-2">
+                            Back to Home
+                        </a>
                     </div>
 
                 </div>
 
-                <div class="profile-actions">
-                    <button
-                        type="button"
-                        class="profile-button"
-                        onclick="showEditForm()">
-                        Edit Profile
-                    </button>
+                <!-- Edit Profile Form -->
+                <form
+                    id="profile-edit"
+                    class="d-none"
+                    onsubmit="return false;">
 
-                    <a href="home.php" class="back-button">
-                        Back to Home
-                    </a>
-                </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label fw-semibold mb-2">
+                            Username
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="username"
+                            name="username"
+                            value="<?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?>"
+                            required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-semibold mb-2">
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="email"
+                            name="email"
+                            value="<?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>"
+                            required>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3 mt-4">
+                        <button
+                            type="submit"
+                            class="btn btn-primary fw-semibold px-4 py-2">
+                            Save Changes
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary fw-semibold px-4 py-2"
+                            onclick="cancelEdit()">
+                            Cancel
+                        </button>
+                    </div>
+
+                    <p class="text-secondary small mt-3 mb-0">
+                        Saving account changes will be available
+                        after backend integration.
+                    </p>
+
+                </form>
 
             </div>
-
-            <!-- Edit Profile Form -->
-            <form
-                id="profile-edit"
-                class="edit-form"
-                style="display: none;"
-                onsubmit="return false;">
-
-                <div class="form-group">
-                    <label for="username">Username</label>
-
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        value="<?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?>"
-                        required>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email</label>
-
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value="<?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>"
-                        required>
-                </div>
-
-                <div class="profile-actions">
-                    <button
-                        type="submit"
-                        class="profile-button">
-                        Save Changes
-                    </button>
-
-                    <button
-                        type="button"
-                        class="cancel-button"
-                        onclick="cancelEdit()">
-                        Cancel
-                    </button>
-                </div>
-
-                <p class="edit-note">
-                    Saving account changes will be available
-                    after backend integration.
-                </p>
-
-            </form>
 
         </div>
 
@@ -145,14 +155,14 @@ $email = $_SESSION['email'] ?? '';
 
     <script>
         function showEditForm() {
-            document.getElementById('profile-view').style.display = 'none';
-            document.getElementById('profile-edit').style.display = 'block';
+            document.getElementById('profile-view').classList.add('d-none');
+            document.getElementById('profile-edit').classList.remove('d-none');
         }
 
         function cancelEdit() {
             document.getElementById('profile-edit').reset();
-            document.getElementById('profile-edit').style.display = 'none';
-            document.getElementById('profile-view').style.display = 'block';
+            document.getElementById('profile-edit').classList.add('d-none');
+            document.getElementById('profile-view').classList.remove('d-none');
         }
     </script>
 

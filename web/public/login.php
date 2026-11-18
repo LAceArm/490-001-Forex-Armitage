@@ -1,8 +1,7 @@
-
 <?php
 session_start(); // Start session
 
-require_once __DIR__ . '/../broker/broker_client.php'; // Loads send_to_broker()
+require_once __DIR__ . '/../clients/backend_client.php'; // Loads send_to_broker()
 
 $error = ''; // Error message; empty means no error
 

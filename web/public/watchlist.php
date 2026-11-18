@@ -1,3 +1,4 @@
+
 <?php
 require_once __DIR__ . '/../broker/session_check.php';
 require_once __DIR__ . '/../data/currencies.php';
@@ -8,44 +9,47 @@ $key = $_SESSION['session_key'];
 // Handle a submitted form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
-    $r      = null;
+    $r = null;
 
-    switch($action) {
-    	case 'create': // Create watchlist
+    switch ($action) {
+        case 'create': // Create watchlist
             $r = send_to_broker([
-                'type'        => 'create_watchlist',
-                'name'        => trim($_POST['name'] ?? ''),
-                'session_key' => $key,
+                'type' => 'create_watchlist',
+                'name' => trim($_POST['name'] ?? ''),
+                'session_key' => $key
             ]);
-	        break;
-	    case 'delete': // Delete a whole watchlist
+            break;
+
+        case 'delete': // Delete a whole watchlist
             $r = send_to_broker([
-                'type'         => 'delete_watchlist',
+                'type' => 'delete_watchlist',
                 'watchlist_id' => (int)($_POST['watchlist_id'] ?? 0),
-                'session_key'  => $key,
+                'session_key' => $key
             ]);
             break;
-	    case 'add': // Add currency to watchlist
+
+        case 'add': // Add currency to watchlist
             $r = send_to_broker([
-                'type'          => 'add_watchlist_item',
-                'watchlist_id'  => (int)($_POST['watchlist_id'] ?? 0),
+                'type' => 'add_watchlist_item',
+                'watchlist_id' => (int)($_POST['watchlist_id'] ?? 0),
                 'currency_code' => $_POST['currency_code'] ?? '',
-                'session_key'   => $key,
+                'session_key' => $key
             ]);
             break;
-	    case 'remove': // Remove currency from watchlist
+
+        case 'remove': // Remove currency from watchlist
             $r = send_to_broker([
-                'type'          => 'remove_watchlist_item',
-                'watchlist_id'  => (int)($_POST['watchlist_id'] ?? 0),
+                'type' => 'remove_watchlist_item',
+                'watchlist_id' => (int)($_POST['watchlist_id'] ?? 0),
                 'currency_code' => $_POST['currency_code'] ?? '',
-                'session_key'   => $key,
+                'session_key' => $key
             ]);
-	        break;
+            break;
     }
 
     // Check for errors. If broker does not return an error, a default message is used.
-	if ($r !== null && empty($r['success'])) {
-        $_SESSION['flash']=  $r['error'] ?? 'That did not work, please try again';
+    if ($r !== null && empty($r['success'])) {
+        $_SESSION['flash'] = $r['error'] ?? 'That did not work, please try again';
     }
 
     // Averts duplicates by reloading the page
@@ -59,64 +63,74 @@ unset($_SESSION['flash']);
 
 // The user's watchlists, with each currency's latest USD price and daily change.
 $reply = send_to_broker(['type' => 'get_watchlists', 'session_key' => $key]);
-
 $watchlists = $reply['watchlists'] ?? [];
 
 $available = [];
 $ratesReply = send_to_broker(['type' => 'get_rates']);
+
 foreach ($ratesReply['rates'] ?? [] as $row) {
-	$available[] = $row['currency_code'];
+    $available[] = $row['currency_code'];
 }
 
 sort($available); // Makes the list accessible
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Watchlists | Forex Armitage</title>
-    <link rel="stylesheet" href="assets/style.css">
-    <link rel="stylesheet" href="assets/watchlist.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body class="home-page">
+<body class="bg-light">
 
     <!-- Navigation bar (same links as the other pages) -->
-    <nav class="main-navbar">
-        <div class="main-nav-container">
-            <a href="home.php" class="main-logo">Forex Armitage</a>
+    <nav class="navbar bg-white shadow-sm py-3">
+        <div class="container">
+            <a href="home.php" class="navbar-brand fw-bold text-primary">Forex Armitage</a>
 
-            <div class="main-nav-links">
-                <a href="dashboard.php">Dashboard</a>
-                <a href="notifications.php">Notifications</a>
-                <a href="profile.php">Profile</a>
-                <a href="logout.php">Logout</a>
+            <div class="d-flex gap-3 align-items-center flex-wrap">
+                <a href="dashboard.php" class="text-dark text-decoration-none">Dashboard</a>
+                <a href="notifications.php" class="text-dark text-decoration-none">Notifications</a>
+                <a href="profile.php" class="text-dark text-decoration-none">Profile</a>
+                <a href="logout.php" class="btn btn-outline-danger btn-sm">Logout</a>
             </div>
         </div>
     </nav>
 
-    <main class="watchlist-container">
+    <main class="container py-5">
 
-        <div class="watchlist-header">
+        <div class="text-center mb-4">
             <h1>My Watchlists</h1>
-            <p>Create watchlists to organize and track currencies.</p>
+            <p class="text-secondary">Create watchlists to organize and track currencies.</p>
         </div>
 
         <!-- An error from the last action, if there was one -->
         <?php if ($flash !== ''): ?>
-            <p class="watchlist-message"><?= htmlspecialchars($flash) ?></p>
+            <div class="alert alert-danger">
+                <?= htmlspecialchars($flash) ?>
+            </div>
         <?php endif; ?>
 
         <!-- Create a new, empty watchlist -->
-        <section class="watchlist-card">
-            <h2>Create New Watchlist</h2>
+        <section class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h2 class="fs-5 mb-3">Create New Watchlist</h2>
 
-            <form method="POST" action="watchlist.php" class="watchlist-form">
-                <input type="hidden" name="action" value="create">
-                <input type="text" name="name" placeholder="Enter watchlist name" maxlength="50" required>
-                <button type="submit" class="watchlist-button">Create Watchlist</button>
-            </form>
+                <form method="POST" action="watchlist.php" class="d-flex gap-2 flex-wrap">
+                    <input type="hidden" name="action" value="create">
+
+                    <input type="text" name="name" class="form-control flex-grow-1"
+                           style="width: 250px;" placeholder="Enter watchlist name"
+                           maxlength="50" required>
+
+                    <button type="submit" class="btn btn-primary">
+                        Create Watchlist
+                    </button>
+                </form>
+            </div>
         </section>
 
         <!-- One card per watchlist -->
@@ -125,91 +139,120 @@ sort($available); // Makes the list accessible
             // Currencies already in this list, so the dropdown only offers new ones.
             $inList = array_column($list['currencies'], 'currency_code');
             ?>
-            <section class="watchlist-card">
 
-                <div class="watchlist-section-header">
-                    <h2><?= htmlspecialchars($list['name']) ?></h2>
+            <section class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-body p-4">
 
-                    <!-- Delete the whole list (its currencies go with it) -->
-                    <form method="POST" action="watchlist.php"
-                          onsubmit="return confirm('Delete this watchlist?');">
-                        <input type="hidden" name="action" value="delete">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+                        <h2 class="fs-5 mb-0"><?= htmlspecialchars($list['name']) ?></h2>
+
+                        <!-- Delete the whole list (its currencies go with it) -->
+                        <form method="POST" action="watchlist.php"
+                              onsubmit="return confirm('Delete this watchlist?');">
+
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="watchlist_id" value="<?= (int)$list['watchlist_id'] ?>">
+
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                Delete Watchlist
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Add a currency to this list -->
+                    <form method="POST" action="watchlist.php" class="d-flex gap-2 flex-wrap mb-4">
+                        <input type="hidden" name="action" value="add">
                         <input type="hidden" name="watchlist_id" value="<?= (int)$list['watchlist_id'] ?>">
-                        <button type="submit" class="delete-watchlist-button">Delete Watchlist</button>
-                    </form>
-                </div>
 
-                <!-- Add a currency to this list -->
-                <form method="POST" action="watchlist.php" class="watchlist-form">
-                    <input type="hidden" name="action" value="add">
-                    <input type="hidden" name="watchlist_id" value="<?= (int)$list['watchlist_id'] ?>">
+                        <select name="currency_code" class="form-select flex-grow-1"
+                                style="width: 250px;" required>
+                            <option value="">Select a currency</option>
 
-                    <select name="currency_code" required>
-                        <option value="">Select a currency</option>
-                        <?php foreach ($available as $code): ?>
-                            <?php if (!in_array($code, $inList, true)): ?>
-                                <option value="<?= $code ?>">
-                                   <?= $code ?> - <?= $currencyNames[$code] ?>
-                                </option>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    </select>
-
-                    <button type="submit" class="watchlist-button">Add Currency</button>
-                </form>
-
-                <!-- The currencies in this list -->
-                <div class="watchlist-table-wrapper">
-                    <table class="watchlist-table">
-
-                        <thead>
-                            <tr>
-                                <th>Currency Code</th>
-                                <th>Currency Name</th>
-                                <th>Exchange Rate (USD)</th>
-                                <th>Rate Change</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <?php foreach ($list['currencies'] as $c): ?>
-                                <tr>
-				                    <td><?=$c['currency_code'] ?></td>
-				                    <td> <?=$currencyNames[$c['currency_code']] ?></td>
-                                    <td><?= formatRate($c['usd_per_unit']) ?></td>
-                                    <td>
-					<?= number_format($c['change_percent'],2).'%' ?>
-                                    </td>
-                                    <td>
-                                        <form method="POST" action="watchlist.php">
-                                            <input type="hidden" name="action" value="remove">
-                                            <input type="hidden" name="watchlist_id" value="<?= (int)$list['watchlist_id'] ?>">
-                                            <input type="hidden" name="currency_code" value="<?= $c['currency_code'] ?>">
-                                            <button type="submit" class="remove-button">Remove</button>
-                                        </form>
-                                    </td>
-                                </tr>
+                            <?php foreach ($available as $code): ?>
+                                <?php if (!in_array($code, $inList, true)): ?>
+                                    <option value="<?= htmlspecialchars($code) ?>">
+                                        <?= htmlspecialchars($code) ?> -
+                                        <?= htmlspecialchars($currencyNames[$code] ?? $code) ?>
+                                    </option>
+                                <?php endif; ?>
                             <?php endforeach; ?>
-                        </tbody>
+                        </select>
 
-                    </table>
+                        <button type="submit" class="btn btn-primary">
+                            Add Currency
+                        </button>
+                    </form>
+
+                    <!-- The currencies in this list -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle">
+
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Currency Code</th>
+                                    <th>Currency Name</th>
+                                    <th>Exchange Rate (USD)</th>
+                                    <th>Rate Change</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <?php foreach ($list['currencies'] as $c): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($c['currency_code']) ?></td>
+
+                                        <td>
+                                            <?= htmlspecialchars($currencyNames[$c['currency_code']] ?? $c['currency_code']) ?>
+                                        </td>
+
+                                        <td><?= formatRate($c['usd_per_unit']) ?></td>
+
+                                        <td>
+                                            <?= number_format($c['change_percent'], 2) ?>%
+                                        </td>
+
+                                        <td>
+                                            <form method="POST" action="watchlist.php">
+                                                <input type="hidden" name="action" value="remove">
+                                                <input type="hidden" name="watchlist_id" value="<?= (int)$list['watchlist_id'] ?>">
+                                                <input type="hidden" name="currency_code" value="<?= htmlspecialchars($c['currency_code']) ?>">
+
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                    Remove
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                    <?php if (!$list['currencies']): ?>
+                        <p class="text-secondary">This watchlist is empty. Add a currency to get started.</p>
+                    <?php endif; ?>
+
                 </div>
-
-                <?php if (!$list['currencies']): ?>
-                    <p class="watchlist-message">This watchlist is empty. Add a currency to get started.</p>
-                <?php endif; ?>
-
             </section>
+
         <?php endforeach; ?>
 
         <?php if (!$watchlists): ?>
-            <p class="watchlist-message">No watchlists created yet. Create one to get started.</p>
+            <p class="text-center text-secondary">
+                No watchlists created yet. Create one to get started.
+            </p>
         <?php endif; ?>
 
-        <div class="watchlist-actions">
-            <a href="currency_browser.php" class="watchlist-button">Browse Currencies</a>
-            <a href="home.php" class="back-home-button">Back to Home</a>
+        <div class="text-center mt-4">
+            <a href="currency_browser.php" class="btn btn-primary me-2">
+                Browse Currencies
+            </a>
+
+            <a href="home.php" class="btn btn-outline-primary">
+                Back to Home
+            </a>
         </div>
 
     </main>

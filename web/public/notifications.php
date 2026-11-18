@@ -2,7 +2,6 @@
 <?php
 session_start();
 
-
 if (empty($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
@@ -33,212 +32,175 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <title>Notifications | Forex Armitage</title>
 
-    <link rel="stylesheet" href="assets/style.css">
-    <link rel="stylesheet" href="assets/notifications.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body class="home-page">
+<body class="bg-light">
 
-    <nav class="main-navbar">
-        <div class="main-nav-container">
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm py-3">
+        <div class="container">
 
-            <a href="home.php" class="main-logo">
+            <a href="home.php" class="navbar-brand fw-bold fs-4 text-primary">
                 Forex Armitage
             </a>
 
-            <div class="main-nav-links">
-                <a href="dashboard.php">Dashboard</a>
-                <a href="notifications.php">Notifications</a>
-                <a href="profile.php">Profile</a>
-                <a href="logout.php">Logout</a>
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <a href="dashboard.php" class="text-decoration-none text-dark fw-semibold">Dashboard</a>
+                <a href="notifications.php" class="text-decoration-none text-dark fw-semibold">Notifications</a>
+                <a href="profile.php" class="text-decoration-none text-dark fw-semibold">Profile</a>
+                <a href="logout.php" class="btn btn-outline-danger btn-sm fw-semibold">Logout</a>
             </div>
 
         </div>
     </nav>
 
-    <main class="notifications-container">
+    <main class="container py-5">
 
-        <div class="notifications-header">
+        <div class="text-center mb-4">
 
-            <div>
-                <h1>Notifications</h1>
-                <p>View your trading updates, currency alerts, and account activity.</p>
-            </div>
+            <h1 class="fw-bold fs-2 mb-3">Notifications</h1>
 
-            <div class="notifications-count">
+            <p class="text-secondary fs-6 mb-3">
+                View your trading updates, currency alerts, and account activity.
+            </p>
+
+            <span class="badge bg-primary rounded-pill px-3 py-2">
                 <?php echo $unreadCount; ?> Unread
-            </div>
+            </span>
 
         </div>
 
-        <section class="notifications-card">
+        <section class="card shadow-sm border-0 rounded-4 mb-4">
 
-            <div class="notifications-toolbar">
+            <div class="card-body p-4">
 
-                <h2>All Notifications</h2>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
 
-                <form method="POST" action="notifications.php">
-                    <input type="hidden" name="action" value="mark_all_read">
+                    <h2 class="fs-5 fw-bold mb-0">All Notifications</h2>
 
-                    <button
-                        type="submit"
-                        class="mark-all-button"
-                        <?php echo empty($notifications) ? 'disabled' : ''; ?>
-                    >
-                        Mark All as Read
-                    </button>
-                </form>
+                    <form method="POST" action="notifications.php">
+                        <input type="hidden" name="action" value="mark_all_read">
 
-            </div>
+                        <button
+                            type="submit"
+                            class="btn btn-primary btn-sm fw-semibold"
+                            <?php echo empty($notifications) ? 'disabled' : ''; ?>
+                        >
+                            Mark All as Read
+                        </button>
+                    </form>
 
-            <?php if ($message !== ''): ?>
-
-                <p class="notifications-message">
-                    <?php echo htmlspecialchars($message); ?>
-                </p>
-
-            <?php endif; ?>
-
-            <?php if (empty($notifications)): ?>
-
-                <div class="notifications-empty">
-                    <h3>No Notifications Yet</h3>
-                    <p>
-                        Your trade confirmations, currency alerts,
-                        and account updates will appear here.
-                    </p>
                 </div>
 
-            <?php else: ?>
+                <?php if ($message !== ''): ?>
 
-                <div class="notifications-list">
+                    <div class="alert alert-info">
+                        <?php echo htmlspecialchars($message); ?>
+                    </div>
 
-                    <?php foreach ($notifications as $notification): ?>
+                <?php endif; ?>
 
-                        <div class="notification-item <?php
-                            echo empty($notification['is_read'])
-                                ? 'notification-unread'
-                                : '';
-                        ?>">
+                <?php if (empty($notifications)): ?>
 
-                            <div class="notification-content">
+                    <div class="text-center py-5">
 
-                                <div class="notification-top">
+                        <h3 class="fs-5 fw-bold mb-3">No Notifications Yet</h3>
 
-                                    <h3>
-                                        <?php
-                                        echo htmlspecialchars(
-                                            $notification['title'] ?? ''
-                                        );
-                                        ?>
+                        <p class="text-secondary mb-0">
+                            Your trade confirmations, currency alerts,
+                            and account updates will appear here.
+                        </p>
+
+                    </div>
+
+                <?php else: ?>
+
+                    <div class="list-group">
+
+                        <?php foreach ($notifications as $notification): ?>
+
+                            <div class="list-group-item p-4 <?php
+                                echo empty($notification['is_read'])
+                                    ? 'bg-primary-subtle'
+                                    : '';
+                            ?>">
+
+                                <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-2">
+
+                                    <h3 class="fs-6 fw-bold mb-0">
+                                        <?php echo htmlspecialchars($notification['title'] ?? ''); ?>
                                     </h3>
 
-                                    <span class="notification-date">
-                                        <?php
-                                        echo htmlspecialchars(
-                                            $notification['date'] ?? ''
-                                        );
-                                        ?>
+                                    <span class="text-secondary small">
+                                        <?php echo htmlspecialchars($notification['date'] ?? ''); ?>
                                     </span>
 
                                 </div>
 
-                                <p>
-                                    <?php
-                                    echo htmlspecialchars(
-                                        $notification['message'] ?? ''
-                                    );
-                                    ?>
+                                <p class="text-secondary mb-3">
+                                    <?php echo htmlspecialchars($notification['message'] ?? ''); ?>
                                 </p>
 
-                                <span class="notification-type">
-                                    <?php
-                                    echo htmlspecialchars(
-                                        $notification['type'] ?? 'General'
-                                    );
-                                    ?>
+                                <span class="badge bg-secondary mb-3">
+                                    <?php echo htmlspecialchars($notification['type'] ?? 'General'); ?>
                                 </span>
 
-                            </div>
+                                <div class="d-flex flex-wrap gap-2">
 
-                            <div class="notification-actions">
+                                    <?php if (empty($notification['is_read'])): ?>
 
-                                <?php if (empty($notification['is_read'])): ?>
+                                        <form method="POST" action="notifications.php">
+
+                                            <input type="hidden" name="action" value="mark_read">
+
+                                            <input
+                                                type="hidden"
+                                                name="notification_id"
+                                                value="<?php echo htmlspecialchars((string)($notification['id'] ?? '')); ?>"
+                                            >
+
+                                            <button type="submit" class="btn btn-outline-primary btn-sm fw-semibold">
+                                                Mark as Read
+                                            </button>
+
+                                        </form>
+
+                                    <?php endif; ?>
 
                                     <form method="POST" action="notifications.php">
 
-                                        <input
-                                            type="hidden"
-                                            name="action"
-                                            value="mark_read"
-                                        >
+                                        <input type="hidden" name="action" value="delete">
 
                                         <input
                                             type="hidden"
                                             name="notification_id"
-                                            value="<?php
-                                                echo htmlspecialchars(
-                                                    (string)($notification['id'] ?? '')
-                                                );
-                                            ?>"
+                                            value="<?php echo htmlspecialchars((string)($notification['id'] ?? '')); ?>"
                                         >
 
-                                        <button
-                                            type="submit"
-                                            class="mark-read-button"
-                                        >
-                                            Mark as Read
+                                        <button type="submit" class="btn btn-outline-danger btn-sm fw-semibold">
+                                            Delete
                                         </button>
 
                                     </form>
 
-                                <?php endif; ?>
-
-                                <form method="POST" action="notifications.php">
-
-                                    <input
-                                        type="hidden"
-                                        name="action"
-                                        value="delete"
-                                    >
-
-                                    <input
-                                        type="hidden"
-                                        name="notification_id"
-                                        value="<?php
-                                            echo htmlspecialchars(
-                                                (string)($notification['id'] ?? '')
-                                            );
-                                        ?>"
-                                    >
-
-                                    <button
-                                        type="submit"
-                                        class="delete-button"
-                                    >
-                                        Delete
-                                    </button>
-
-                                </form>
+                                </div>
 
                             </div>
 
-                        </div>
+                        <?php endforeach; ?>
 
-                    <?php endforeach; ?>
+                    </div>
 
-                </div>
+                <?php endif; ?>
 
-            <?php endif; ?>
+            </div>
 
         </section>
 
-        <div class="notifications-footer">
-
-            <a href="home.php" class="back-home-button">
+        <div class="text-center mt-4">
+            <a href="home.php" class="btn btn-outline-primary fw-semibold px-4 py-2">
                 Back to Home
             </a>
-
         </div>
 
     </main>
