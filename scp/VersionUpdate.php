@@ -5,7 +5,7 @@
 	 * If there is a need to revert, the file will also update the current version to be the previous version. The previous version field 
 	 * will then be updated manually. */
 	function VersionUpdate($versionNumber,$versionName,$system){ 
-		$current=file_get_contents(__DIR__."/Versions.json");
+		$current=file_get_contents(__DIR__."/../../../Deploys/Versions.json");
 		$data=json_decode($current,true);
 		$sys=$data[$system];
 
@@ -23,7 +23,7 @@
 		file_put_contents(__DIR__."/Versions.json",$update);
 	}
 	function RevertVersion($system){ 
-		$currJSON=file_get_contents(__DIR__."/Versions.json");
+		$currJSON=file_get_contents(__DIR__."/../../../Deploys/Versions.json");
 		$data=json_decode($currJSON,true);
 		$prev=$data[$system]["Previous Version"];
 		$prevFile=$data[$system]["Previous Version File"];
