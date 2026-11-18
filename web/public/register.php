@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../clients/backend_client.php'; // Loads send_to_broker()
+require_once __DIR__ . '/../clients/backend_client.php'; // Loads sendToBackend()
 
 $error = ''; // Error message; empty means no error
 
