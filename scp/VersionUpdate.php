@@ -44,4 +44,60 @@
 		}
 		return true;
 	}
+
+	function GetNewUpdate($system,$directory,$username,$ip){ 
+		global $filedb;
+		$data=json_decode($filedb,true);
+
+		$update=$data[$system]["Update Version File"];
+
+		exec("scp /home/laa55-scp-server/Deploys/$system/$update $username@$ip:$directory",$output,$flag);
+
+		if($flag !== 0){
+			return false;
+		}
+		$flag=UpdateCurrentVersion($system);
+
+		if(!$flag){ 
+			return false;
+		}
+		return true;
+	}
+
+	/*Will overwrite previous version */
+	function RevertPrevious($system){ 
+		global $filedb;
+
+		$data=json_decode($filedb,true);
+
+		$data[$system]["Current Version File"]=$data[$system]["Previous Version File"];
+
+		$new=json_encode($data);
+
+		$flag=file_put_contents("/home/laa55-scp-server/Deploys/Versions.json",$new);
+
+		if(!$flag){ 
+			return false;
+		}
+		return true;
+	}
+
+	function GetPreviousVersion($system,$directory,$username,$ip){ 
+		global $filedb;
+		$data=json_decode($filedb,true);
+
+		$prev=$data[$system]["Previous Version File"];
+
+		exec("scp /home/laa55-scp-server/Deploys/$system/$previous $username@$ip:$directory",$output,$flag);
+
+		if($flag !== 0){
+			return false;
+		}
+		$flag=RevertPrevious($system);
+
+		if(!$flag){ 
+			return false;
+		}
+		return true;
+
 ?>
