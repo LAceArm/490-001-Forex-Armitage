@@ -4,34 +4,44 @@
 	 * fille will update a json file to use the new version of the file (1.0, 2.0, 3.0, .etc) as well as the previous version.
 	 * If there is a need to revert, the file will also update the current version to be the previous version. The previous version field 
 	 * will then be updated manually. */
-	function VersionUpdate($versionNumber,$versionName,$system){ 
-		$current=file_get_contents(__DIR__."/../../../Deploys/Versions.json");
-		$data=json_decode($current,true);
-		$sys=$data[$system];
+	require_once __DIR__"/lib/rabbitMQLib.inc";
 
-		$currVer=$sys["Current Version"];
-		$currFile=$sys["Current Version File"];
+	$filedb=file_get_contents(__DIR__."/home/laa55-scp-server/Deploys/Versions.json");
 
-		$data[$system]["Current Version"]=$versionNumber;
+	/* Updates the update field in the Versions json file. Does NOT send new version
+		* System needs to be one of the valid JSON names */
+	function NewUpdate($versionName,$system){ 
+		global $fliedb;
+		$data=json_decode($filedb,true);
+		
+		$data[$system]["Update Version File"]=$versionName;
 
-		$data[$system]["Current Version File"]=$versionName;
+		$new=json_encode($data);
 
-		$data[$system]["Previous Version"]=$currVer;
-		$data[$system]["Previous Version File"]=$currFile;
+		$flag=$file_put_contents("/home/laa55-scp-server/Deploys/Versions.json",$new);
 
-		$update=json_encode($data);
-		file_put_contents(__DIR__."/Versions.json",$update);
+		if(!$flag){ 
+			return $flag
+		}
+		return true; //file put contents returns false on failure.
 	}
-	function RevertVersion($system){ 
-		$currJSON=file_get_contents(__DIR__."/../../../Deploys/Versions.json");
-		$data=json_decode($currJSON,true);
-		$prev=$data[$system]["Previous Version"];
-		$prevFile=$data[$system]["Previous Version File"];
-		$data[$system]["Current Version"]=$prev;
-		$data[$system]["Current Version File"]=$prevFile;
+	
+	//Updates the JSON file. Does NOT send an update file
+	function UpdateCurrentVersion($system){ 
+		global $filedb;
+		$data=json_decode($filedb,true);
 
-		$update=json_encode($data);
-		file_put_contents(__DIR__."/Versions.json",$update);
-		echo "FILE HAS REVERTED TO A PREVIOUS VERSION. PLEASE UPDATE ACCORDINGLY".PHP_EOL;
+		$current=$data[$system]["Current Version File"];
+		$data[$system]["Current Version File"]=$data[$system]["Update Version File"];
+		$data[$system]["Previous Version File"]=$current;
+		
+		$new=json_encode($data);
+
+		$flag=file_put_contents("/home/laa55-scp-server/Deploys/Versions.json",$new);
+		
+		if(!$flag){ 
+			return $flag;
+		}
+		return true;
 	}
 ?>
