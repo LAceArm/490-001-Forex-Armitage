@@ -1,17 +1,44 @@
 <?php
-//tar -cfl exportedTar.tar db web
-//tar -tzf exportedTar.tar>/dev/null
-$doThis = "tar -czvf archive.tar";
-$addDirs = "";
-exec("ls -d */",$lsOutput, $result);
 
-foreach ($lsOutput as $directory){
-    $addDirs .= " " . $directory;
-    echo "Addding " . $directory . " to tar file\n";
+$doThis;
+$addDirs = "";
+$verID;
+$tarName;
+
+//get cli arguments and put them in variables to be used;
+if ($argv[1]){
+    echo "\nTar file name will be " . $argv[1] . ".tar";
+    $tarName = $argv[1] . ".tar";
+} else {
+    echo "\nCannot create tar without a given name";
+    exit;
+}
+if ($argv[2]){
+    echo "\nVersion ID will be " . $argv[2];
+    $verId = $argv[2];
+} else {
+    echo "\nCannot create tar without a given version ID";
+    exit;
 }
 
+//assign variable with universal cli command to
+// -czf c creates new archive, f uses next provided string as archive file name, z compressses with GZip
+$doThis = "tar -czf " . $tarName;
+
+//lists all directories within current directory and adds name to an array
+exec("ls -d */",$lsOutput, $result);
+
+//adds each directory name as received above to the string command that will build the tar with these directories contents
+foreach ($lsOutput as $directory){
+    $addDirs .= " " . $directory;
+    echo "\nAddding " . $directory . " to tar file";
+}
+
+//combines the tar making command with the list of directories string
 $doThis .= $addDirs;
 
+//executes the command made above, assigns the output of the command, and assigns the status/result
 exec($doThis, $output, $result);
+
 echo "\nAfter tar status $result\n";
 ?>
