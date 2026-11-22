@@ -1,0 +1,16 @@
+<?php
+session_start(); // Start session
+
+require_once __DIR__ . '/../clients/backend_client.php'; // Loads sendToBackend()
+
+// Bothers DB to delete this session's key
+if (!empty($_SESSION['session_key'])) {
+        sendToBackend([
+                'type'        => 'logout',
+                'session_key' => $_SESSION['session_key'],
+        ]);
+}
+
+session_destroy(); // Stop session
+
+header('Location: login.php'); // Redirect to login.php
