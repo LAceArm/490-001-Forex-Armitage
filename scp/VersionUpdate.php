@@ -21,9 +21,9 @@
 		$flag=$file_put_contents("/home/laa55-scp-server/Deploys/Versions.json",$new);
 
 		if(!$flag){ 
-			return $flag
+			return array("success"=>false,"Message"=>"Could not  Update");
 		}
-		return true; //file put contents returns false on failure.
+		return array("success"=>true,"Message"=>"Updated Database");//file put contents returns false on failure.
 	}
 	
 	//Updates the JSON file. Does NOT send an update file
@@ -53,15 +53,15 @@
 
 		exec("scp /home/laa55-scp-server/Deploys/$system/$update $username@$ip:$directory",$output,$flag);
 
-		if($flag !== 0){
-			return false;
+		if($flag !== 0){ //exec returns 0 if the command was executed successfully
+			return array("success"=>false, "Message"=>"Could not send new version");
 		}
 		$flag=UpdateCurrentVersion($system);
 
 		if(!$flag){ 
-			return false;
+			return array("success"=>false,"Message"=>"File sent, but database not updated. Please update the JSON file accordingly");
 		}
-		return true;
+		return array("success"=>false, "Message"=>"File Sent and Database Updated");
 	}
 
 	/*Will overwrite previous version */
@@ -91,13 +91,13 @@
 		exec("scp /home/laa55-scp-server/Deploys/$system/$previous $username@$ip:$directory",$output,$flag);
 
 		if($flag !== 0){
-			return false;
+			return array("success"=>false,"Message"=>"Could not send file");
 		}
 		$flag=RevertPrevious($system);
 
 		if(!$flag){ 
-			return false;
+			return array("success"=>false,"Message"=>"Could Not update JSON File. Please update it manually");
 		}
-		return true;
+		return array("success"=>false,"Message"=>"Sucessfully reverted");
 
 ?>
