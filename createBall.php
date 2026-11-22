@@ -10,14 +10,7 @@ if ($argv[1]){
     echo "\nTar file name will be " . $argv[1] . ".tar";
     $tarName = $argv[1] . ".tar";
 } else {
-    echo "\nCannot create tar without a given name";
-    exit;
-}
-if ($argv[2]){
-    echo "\nVersion ID will be " . $argv[2];
-    $verId = $argv[2];
-} else {
-    echo "\nCannot create tar without a given version ID";
+    echo "\nThere must also be a valid version number\n";
     exit;
 }
 
