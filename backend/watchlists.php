@@ -60,6 +60,16 @@ function createWatchlist($userId, $name)
         return ["success" => false, "error" => "Enter a name up to 50 characters"];
     }
 
+    // A user cannot have lists with the same name
+    $check = $conn->prepare("SELECT 1 FROM watchlists WHERE user_id = ? AND name = ?");
+    $check->bind_param("is", $userId, $name);
+    $check->execute();
+    $check->store_result();
+
+    if ($check->num_rows > 0) {
+	return ["success" => false, "error" => "You already have a list with that name"];
+    }
+
     $stmt = $conn->prepare("INSERT INTO watchlists (user_id, name) VALUES (?, ?)");
     $stmt->bind_param("is", $userId, $name);
     $stmt->execute();

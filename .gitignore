@@ -1,5 +1,3 @@
 *.ini
-*.ini
 *.log
 .env
-vendor/
