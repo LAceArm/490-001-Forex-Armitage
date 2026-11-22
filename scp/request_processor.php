@@ -7,13 +7,34 @@
 //3. Revert to a previous version.
 //Because of how I picture this thing working, revert will be done on demand. If a tarball has been corrupted, it will be deleted by the host system 
 //and the download will stop.
+require_once __DIR__."/VersionUpdate.php"
 function scp_requestor($request){
 	if(!isset($request["action"])){
 		//Do nothing
 	}       		
 	$action=$request["action"];
 	switch($action){ 
-		case 
+		case "New Update": 
+			if(!isset($request["System Name"]) || !isset($request["Version Name"])){ 
+				return array("success"=>false,"Message"=> "Missing necessary fields");
+			}
+			$system=$request["System Name"];
+			$versionName=$request["Version Name"];
+			return NewUpdate($versionName,$system);
+		case "Get New Update":
+			$canary= isset($request["Address"]) && isset($request["Username"]) 
+				&& isset($request["Directory"]) && isset($request["System Name"]); //Basically all of these have to be set.
+			if(!$canary){ 
+				return array("success"=>false,"Message"=>"Missing necessary fields");
+			}
+			return GetNewUpdate($request["System Name"],$request["Directory"],$request["Username"],$request["Address"]);
+		case "Get Previous Version":	
+			$canary= isset($request["Address"]) && isset($request["Username"]) 
+				&& isset($request["Directory"]) && isset($request["System Name"]); //Basically all of these have to be set.
+			if(!$canary){ 
+				return array("success"=>false,"Message"=>"Missing necessary fields");
+			}
+			return GetPreviousVersion($request["System Name"],$request["Directory"],$request["Username"],$request["Address"]);
 
 	}
 
