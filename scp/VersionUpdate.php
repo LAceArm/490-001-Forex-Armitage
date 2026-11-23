@@ -51,7 +51,7 @@
 		return true;
 	}
 
-	function GetNewUpdate($system,$directory,$username,$ip){ 
+	function GetNewUpdate($system){ 
 		global $filedb;
 		global $datestr;
 		$data=json_decode($filedb,true);
@@ -89,7 +89,7 @@
 		return true;
 	}
 
-	function GetPreviousVersion($system,$directory,$username,$ip){ 
+	function GetPreviousVersion($system){ 
 		global $filedb;
 		global $datestr;
 		global $filepath;
@@ -109,5 +109,6 @@
 			return array("success"=>false,"Message"=>"Could Not update JSON File. Please update it manually");
 		}
 		return array("success"=>true,"Message"=>"Sucessfully reverted","File Path"=>$file);
+	}
 
 ?>
