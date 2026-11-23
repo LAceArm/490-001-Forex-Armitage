@@ -7,6 +7,7 @@
 	require_once __DIR__"/lib/rabbitMQLib.inc";
 
 	$filedb=file_get_contents(__DIR__."/home/laa55-scp-server/Deploys/Versions.json");
+	$filepath="/home/laa55-scp-server/Deploys/";
 	$datestr=date("Y/m/d H:i:s").": ";
 
 	/* Updates the update field in the Versions json file. Does NOT send new version
@@ -57,21 +58,17 @@
 
 		$update=$data[$system]["Update Version File"];
 
-		exec("scp /home/laa55-scp-server/Deploys/$system/$update $username@$ip:$directory",$output,$flag);
+		//exec("scp /home/laa55-scp-server/Deploys/$system/$update $username@$ip:$directory",$output,$flag);
 
-		if($flag !== 0){ //exec returns 0 if the command was executed successfully
-			$msg=$datestr."COULD NOT SEND FILE";
-			error_log($msg,3,"/home/laa55-scp-server/WebsiteLogs/SCP.log");
-			return array("success"=>false, "Message"=>"Could not send new version");
-		}
 		$flag=UpdateCurrentVersion($system);
 
+		$destination=$filepath.$update;
 		if(!$flag){ 
 			$msg=$datestr."COULD NOT UPDATE JSON";
 			error_log($msg,3,"/home/laa55-scp-server/WebsiteLogs/SCP.log");
 			return array("success"=>false,"Message"=>"File sent, but database not updated. Please update the JSON file accordingly");
 		}
-		return array("success"=>false, "Message"=>"File Sent and Database Updated");
+		return array("success"=>true, "Message"=>"Database Updated","File Path"=> $destination);
 	}
 
 	/*Will overwrite previous version */
@@ -95,24 +92,22 @@
 	function GetPreviousVersion($system,$directory,$username,$ip){ 
 		global $filedb;
 		global $datestr;
+		global $filepath;
 		$data=json_decode($filedb,true);
 
 		$prev=$data[$system]["Previous Version File"];
 
-		exec("scp /home/laa55-scp-server/Deploys/$system/$previous $username@$ip:$directory",$output,$flag);
+		//exec("scp /home/laa55-scp-server/Deploys/$system/$previous $username@$ip:$directory",$output,$flag);
 
-		if($flag !== 0){
-			$msg=$datestr."COULD NOT SEND FILE";
-			error_log($msg,3,"/home/laa55-scp-server/WebsiteLogs/SCP.log");
-			return array("success"=>false,"Message"=>"Could not send file");
-		}
 		$flag=RevertPrevious($system);
+
+		$file=$filepath.$prev;
 
 		if(!$flag){ 
 			$msg=$datestr."COULD NOT UPDATE JSON";
 			error_log($msg,3,"/home/laa55-scp-server/WebsiteLogs/SCP.log");
 			return array("success"=>false,"Message"=>"Could Not update JSON File. Please update it manually");
 		}
-		return array("success"=>false,"Message"=>"Sucessfully reverted");
+		return array("success"=>true,"Message"=>"Sucessfully reverted","File Path"=>$file);
 
 ?>
