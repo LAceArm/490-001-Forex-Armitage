@@ -15,6 +15,7 @@ function getRateHistory()
     $startDate = date("Y-m-d", strtotime("-1 year"));
 
     $history = [];
+    $errors = [];
 
     foreach ($symbols as $symbol) {
 
@@ -26,13 +27,19 @@ function getRateHistory()
              . "&from=" . $startDate
              . "&to=" . $endDate;
 
-        $response = file_get_contents($url);
+        $response = @file_get_contents($url);
 
         if ($response === false) {
+            $errors[] = "Failed to fetch history for $symbol";
             continue;
         }
 
         $data = json_decode($response, true);
+
+        if (!is_array($data)) {
+            $errors[] = "Invalid history response for $symbol";
+            continue;
+        }
 
         foreach ($data as $row) {
 
@@ -49,9 +56,18 @@ function getRateHistory()
         }
     }
 
+    if (empty($history)) {
+        return [
+            "success" => false,
+            "error" => "Unable to retrieve rate history",
+            "details" => $errors
+        ];
+    }
+
     return [
         "success" => true,
-        "history" => $history
+        "history" => $history,
+        "errors" => $errors
     ];
 }
 ?>

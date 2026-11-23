@@ -12,6 +12,7 @@ function getCurrentRates()
     ];
 
     $rates = [];
+    $errors = [];
 
     foreach ($symbols as $symbol) {
 
@@ -22,15 +23,17 @@ function getCurrentRates()
              . "/"
              . strtolower($quoteCode);
 
-        $response = file_get_contents($url);
+        $response = @file_get_contents($url);
 
         if ($response === false) {
+            $errors[] = "Failed to fetch $symbol";
             continue;
         }
 
         $data = json_decode($response, true);
 
-        if (!isset($data["rate"])) {
+        if (!is_array($data) || !isset($data["rate"])) {
+            $errors[] = "Invalid API response for $symbol";
             continue;
         }
 
@@ -42,9 +45,18 @@ function getCurrentRates()
         ];
     }
 
+    if (empty($rates)) {
+        return [
+            "success" => false,
+            "error" => "Unable to retrieve currency rates",
+            "details" => $errors
+        ];
+    }
+
     return [
         "success" => true,
-        "rates" => $rates
+        "rates" => $rates,
+        "errors" => $errors
     ];
 }
 ?>

@@ -1,14 +1,17 @@
 <?php
+
 require_once __DIR__ . '/logger.php';
 require_once __DIR__ . '/fetch_rates.php';
 require_once __DIR__ . '/fetch_history.php';
 
 function requestProcessor($request)
 {
-    writeLog("Received request: " . ($request['type'] ?? 'UNKNOWN'));
+    $type = $request['type'] ?? 'UNKNOWN';
+
+    writeLog("Received request: " . $type);
 
     if (!isset($request['type'])) {
-        writeLog("Error: Missing request type");
+        writeLog("ERROR: Missing request type");
 
         return [
             'success' => false,
@@ -17,16 +20,39 @@ function requestProcessor($request)
     }
 
     switch ($request['type']) {
+
         case 'get_current_rates':
             writeLog("Fetching current rates from Frankfurter API");
-            return getCurrentRates();
+
+            $result = getCurrentRates();
+
+            if ($result['success']) {
+                writeLog("Current rates request completed successfully");
+            } else {
+                writeLog("ERROR: Current rates request failed");
+            }
+
+            return $result;
 
         case 'get_rate_history':
             writeLog("Fetching rate history from Frankfurter API");
-            return getRateHistory();
+
+            $result = getRateHistory();
+
+            if ($result['success']) {
+                $count = count($result['history']);
+                writeLog(
+                    "Rate history request completed successfully. Rows returned: "
+                    . $count
+                );
+            } else {
+                writeLog("ERROR: Rate history request failed");
+            }
+
+            return $result;
 
         default:
-            writeLog("Error: Unknown request type - " . $request['type']);
+            writeLog("ERROR: Unknown request type: " . $request['type']);
 
             return [
                 'success' => false,
@@ -34,4 +60,5 @@ function requestProcessor($request)
             ];
     }
 }
+
 ?>
