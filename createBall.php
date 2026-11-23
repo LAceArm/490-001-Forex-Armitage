@@ -7,10 +7,10 @@ $tarName;
 
 //get cli arguments and put them in variables to be used;
 if ($argv[1]){
-    echo "\nTar file name will be " . $argv[1] . ".tar";
-    $tarName = $argv[1] . ".tar";
+    echo "\nTar file name will be " . $argv[1] . ".tar.gz";
+    $tarName = $argv[1] . ".tar.gz";
 } else {
-    echo "\nThere must also be a valid version number\n";
+    echo "\nThere must also be a tar file name\n";
     exit;
 }
 
