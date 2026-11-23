@@ -17,6 +17,7 @@
 		echo "MISSING FILE NAME ARGUMENT \n";
 		exit;
 	}
+	$name=$argv[2];
 
 	exec("scp $path laa55-scp-server@deploy:/home/laa55-scp-server/Deploys/BackEndQualityAssurance/",$output,$canary);
 
@@ -24,5 +25,11 @@
 		echo "COULD NOT SEND FILE\n";
 		exit;
 	}
+
+	$client=new rabbitMQClient('SCPFoundation.ini','Foundation');
+	
+	$message=array("type"=>"New Update","System Name"=>"BackEndQualityAssurance","Version Name"=>$name);
+		
+	$client->publish($message); // Does not expect a response at all  
 
 ?>
