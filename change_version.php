@@ -4,27 +4,27 @@
 	function request_update($directory,$name,$address,$directory,$username){
 		$requestor=new rabbitMQClient("SCPFoundation.ini","Foundation");
 		
-		$request=array("System Name"=>$name,"Username"=>$username,"Directory"=>$directory,"Address"=>$address);
+		$request=array("System Name"=>$name);
 
 		$response=$requestor->send_request($request);
 
 		if(!$response["success"){ 
 			return false;
 		}
-		return true;
+		return $response["File Path"];
 	}
 
 
 	function revert_previous($system,$address,$directory,$username){ 
 		$requestor=new rabbitMQClient("SCPFoundation.ini","Foundation");
 
-		$request=array("System Name" => $system, "Address"=>$address,"Directory"=>$directory,"Username"=>$username);
+		$request=array("System Name" => $system);
 
 		$response=$requestor->send_request($request);
 
 		if(!$response["success"]){ 
 			return false;
 		}
-		return true;
+		return $response["File Path"];
 	}
 ?>

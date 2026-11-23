@@ -22,19 +22,17 @@ function scp_requestor($request){
 			$versionName=$request["Version Name"];
 			return NewUpdate($versionName,$system);
 		case "Get New Update":
-			$canary= isset($request["Address"]) && isset($request["Username"]) 
-				&& isset($request["Directory"]) && isset($request["System Name"]); //Basically all of these have to be set.
+			$canary= isset($request["System Name"]); //Basically all of these have to be set.
 			if(!$canary){ 
 				return array("success"=>false,"Message"=>"Missing necessary fields");
 			}
-			return GetNewUpdate($request["System Name"],$request["Directory"],$request["Username"],$request["Address"]);
+			return GetNewUpdate($request["System Name"]);
 		case "Get Previous Version":	
-			$canary= isset($request["Address"]) && isset($request["Username"]) 
-				&& isset($request["Directory"]) && isset($request["System Name"]); //Basically all of these have to be set.
+			$canary= isset($request["System Name"]); //Basically all of these have to be set.
 			if(!$canary){ 
 				return array("success"=>false,"Message"=>"Missing necessary fields");
 			}
-			return GetPreviousVersion($request["System Name"],$request["Directory"],$request["Username"],$request["Address"]);
+			return GetPreviousVersion($request["System Name"]);
 
 	}
 
