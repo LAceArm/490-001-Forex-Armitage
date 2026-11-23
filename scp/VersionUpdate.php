@@ -62,7 +62,7 @@
 
 		$flag=UpdateCurrentVersion($system);
 
-		$destination=$filepath.$update;
+		$destination=$filepath.$system."/".$update;
 		if(!$flag){ 
 			$msg=$datestr."COULD NOT UPDATE JSON";
 			error_log($msg,3,"/home/laa55-scp-server/WebsiteLogs/SCP.log");
@@ -101,7 +101,7 @@
 
 		$flag=RevertPrevious($system);
 
-		$file=$filepath.$prev;
+		$file=$filepath.$system."/".$prev;
 
 		if(!$flag){ 
 			$msg=$datestr."COULD NOT UPDATE JSON";
