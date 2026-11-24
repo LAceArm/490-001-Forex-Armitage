@@ -7,11 +7,19 @@ $tarName;
 
 //get cli arguments and put them in variables to be used;
 if ($argv[1]){
-    echo "\nTar file name will be " . $argv[1] . ".tar.gz";
+    echo "\nTar file name will be " . $argv[1] . ".tar.gz\n";
     $tarName = $argv[1] . ".tar.gz";
 } else {
     echo "\nThere must also be a tar file name\n";
     exit;
+}
+if(isset($argv[2])){ 
+	echo "\n The following directory will be compressed:".$argv[2];
+	$directory=$argv[2];
+}
+else{ 
+	echo"\n Please specify the directory to be compressed\n";
+	exit;
 }
 
 //assign variable with universal cli command to
@@ -19,7 +27,7 @@ if ($argv[1]){
 $doThis = "tar -czf " . $tarName;
 
 //lists all directories within current directory and adds name to an array
-exec("ls -d */",$lsOutput, $result);
+exec("ls -d $directory",$lsOutput, $result);
 
 //adds each directory name as received above to the string command that will build the tar with these directories contents
 foreach ($lsOutput as $directory){
