@@ -40,4 +40,3 @@ function getTrades($userId)
 
     return ["success" => true, "trades" => $trades];
 }
-?>

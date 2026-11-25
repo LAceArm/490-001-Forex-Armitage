@@ -27,4 +27,3 @@ function getPortfolio($userId)
         "holdings" => $holdings
     ];
 }
-?>

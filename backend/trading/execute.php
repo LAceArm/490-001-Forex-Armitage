@@ -7,26 +7,28 @@ function executeTrade($userId, $fromCode, $toCode, $fromAmount)
     $toCode     = strtoupper(trim($toCode));
     $fromAmount = (float)$fromAmount;
 
-    //makes sure number isn't negative or zero
-    if ($fromAmount <= 0)
-    return ["success" => false, "error" => "Invalid amount"];
+    // Makes sure number isn't negative or zero
+    if ($fromAmount <= 0) {
+        return ["success" => false, "error" => "Invalid amount"];
+    }
 
-    //makes sure it doesn't make s useless trade like trading USD to USD
-    if ($fromCode == $toCode)
-    return ["success" => false, "error" => "Choose different currencies"];
+    // Makes sure it doesn't make a useless trade like trading USD to USD
+    if ($fromCode == $toCode) {
+        return ["success" => false, "error" => "Choose different currencies"];
+    }
 
     $fromCurrency = getCurrencyIdAndRate($fromCode);
     $toCurrency   = getCurrencyIdAndRate($toCode);
 
-    // stops the trade if currency doesn't exist or has no rate
-    if (!$fromCurrency || !$toCurrency)
-    return ["success" => false, "error" => "Currency not found"];
+    // Stops the trade if currency doesn't exist or has no rate
+    if (!$fromCurrency || !$toCurrency) {
+        return ["success" => false, "error" => "Currency not found"];
+    }
 
     $toAmount = $fromAmount / $fromCurrency["units_per_usd"] * $toCurrency["units_per_usd"];
     $tradeRate = $toAmount / $fromAmount;
 
     try {
-
         $conn->begin_transaction();
 
         if (!sellCurrency($userId, $fromCurrency["currency_id"], $fromAmount)) {
@@ -61,4 +63,3 @@ function executeTrade($userId, $fromCode, $toCode, $fromAmount)
         "trade_rate"  => $tradeRate
     ];
 }
-?>
