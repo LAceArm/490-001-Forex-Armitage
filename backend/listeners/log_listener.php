@@ -9,5 +9,4 @@ function saveLog($log)
 }
 
 $server = new rabbitMQServer('backend_logging_mq.ini', 'logging');
-echo "Logging listener BEGIN\n";
 $server->process_requests('saveLog');

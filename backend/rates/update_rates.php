@@ -41,4 +41,3 @@ foreach ($reply["rates"] as $entry) {
 }
 
 echo "Rates updated\n";
-?>

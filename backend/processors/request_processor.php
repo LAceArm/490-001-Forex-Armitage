@@ -1,11 +1,9 @@
 <?php
-require_once __DIR__ . '/authentication.php';
-require_once __DIR__ . '/trading.php';
-require_once __DIR__ . '/portfolio.php';
-require_once __DIR__ . '/rates.php';
-require_once __DIR__ . '/watchlists.php';
-require_once __DIR__ . '/notifications.php';
-require_once __DIR__ . '/email/mail_processor.php';
+require_once __DIR__ . '/../authentication/authentication.php';
+require_once __DIR__ . '/../communication/notifications.php';
+require_once __DIR__ . '/../trading/trading.php';
+require_once __DIR__ . '/../rates/rates.php';
+require_once __DIR__ . '/../rates/watchlists.php';
 
 function requestProcessor($request)
 {
@@ -96,4 +94,3 @@ function requestProcessor($request)
             return ["success" => false, "error" => "Unknown request type"];
     }
 }
-?>

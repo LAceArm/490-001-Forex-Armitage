@@ -100,4 +100,3 @@ function getPreviousRates()
 
     return $rates;
 }
-?>
