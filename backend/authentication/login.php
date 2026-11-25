@@ -38,4 +38,3 @@ function loginUser($username, $password)
 		"session_key" => createSession($user["user_id"])
 	];
 }
-?>

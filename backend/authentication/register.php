@@ -55,4 +55,3 @@ function registerUser($username, $email, $password)
 		"error" => "Registration failed!"
 	];
 }
-?>
