@@ -33,7 +33,16 @@ function scp_requestor($request){
 				return array("success"=>false,"Message"=>"Missing necessary fields");
 			}
 			return GetPreviousVersion($request["System Name"]);
-
+		case "Downloaded Update":
+			if(!isset($request["System Name"])){ 
+				return array("success"=>false,"Message"=>"Missing necessary fields");
+			}
+			return UpdateCurrentVersion($request["System Name"]);
+		case "Downloaded Previous":
+			if(!isset($request["System Name"])){
+				return array("success"=>false,"Message"=>"Missing necessary fields");
+			}
+			return RevertPrevious($request["System Name"]);
 	}
 
 }
