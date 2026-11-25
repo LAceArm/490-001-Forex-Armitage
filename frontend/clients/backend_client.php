@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../broker/log_publisher.php';
+
 function sendToBackend(array $payload): array
 {
         $previousFolder = getcwd(); // Save location
@@ -25,6 +27,15 @@ function sendToBackend(array $payload): array
         if (is_array($reply)) {
                 return $reply;
         }
+
+        $requestType = $payload['type'] ?? 'unknown';
+
+        error_log('Backend communication failed for request: ' . $requestType);
+
+        publishLog(
+                'Backend communication failed for request: ' . $requestType,
+                'backend_error'
+        );
 
         return array('success' => false, 'error' => 'Service unavailable');
 }
