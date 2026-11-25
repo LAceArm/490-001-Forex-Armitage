@@ -60,7 +60,7 @@
 
 		//exec("scp /home/laa55-scp-server/Deploys/$system/$update $username@$ip:$directory",$output,$flag);
 
-		$flag=UpdateCurrentVersion($system);
+	//	$flag=UpdateCurrentVersion($system);
 
 		$destination=$filepath.$system."/".$update;
 		if(!$flag){ 
@@ -99,7 +99,7 @@
 
 		//exec("scp /home/laa55-scp-server/Deploys/$system/$previous $username@$ip:$directory",$output,$flag);
 
-		$flag=RevertPrevious($system);
+	//	$flag=RevertPrevious($system);
 
 		$file=$filepath.$system."/".$prev;
 
