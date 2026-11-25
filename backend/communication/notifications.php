@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/database.php';
+require_once __DIR__ . '/../database.php';
+require_once __DIR__ . '/../processors/mail_processor.php';
 
 function sendUserEmail($userId, $username)
 {
@@ -16,4 +17,3 @@ function sendUserEmail($userId, $username)
 
     return SendEmail(["emails" => [$row["email"] => $username]]);
 }
-?>
