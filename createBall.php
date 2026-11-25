@@ -15,7 +15,7 @@ if ($argv[1]){
 }
 if(isset($argv[2])){ 
 	echo "\n The following directory will be compressed:".$argv[2];
-	$directory=$argv[2];
+	$folder=$argv[2];
 }
 else{ 
 	echo"\n Please specify the directory to be compressed\n";
@@ -27,7 +27,7 @@ else{
 $doThis = "tar -czf " . $tarName;
 
 //lists all directories within current directory and adds name to an array
-exec("ls -d $directory",$lsOutput, $result);
+exec("ls -d $folder",$lsOutput, $result);
 
 //adds each directory name as received above to the string command that will build the tar with these directories contents
 foreach ($lsOutput as $directory){
