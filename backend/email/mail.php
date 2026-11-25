@@ -9,7 +9,7 @@
 	require_once __DIR__ . '/vendor/autoload.php';
 
 	function getMail(){
-		$env = @parse_ini_file(__DIR__ . '/env');
+		$env = @parse_ini_file(__DIR__ . '/.env');
 
 		$host = $env["SMTP_HOST"];
 		$port = $env["SMTP_PORT"];
