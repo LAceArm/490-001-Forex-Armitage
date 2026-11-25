@@ -1,14 +1,14 @@
 <?php
-require_once __DIR__ . '/../broker/log_publisher.php';
+require_once __DIR__ . '/../logging/log_publisher.php';
 
 function sendToBackend(array $payload): array
 {
         $previousFolder = getcwd(); // Save location
 
-        chdir(__DIR__ . '/../lib'); // The ini file is in lib
+        chdir(__DIR__ . '/../config'); // The ini file is in config
 
-        require_once('get_host_info.inc');
-        require_once('rabbitMQLib.inc');
+        require_once __DIR__ . '/../lib/get_host_info.inc';
+        require_once __DIR__ . '/../lib/rabbitMQLib.inc';
 
         $reply = null; // Default reply
 
