@@ -27,7 +27,8 @@
 
 		if ($postman->Send()) {
 	       		return array("Message"=>"Email Sent Successfully", "success"=>true);
-		} else {
+		}
+		else {
        			return array("Message"=>"Email could not be sent", "success"=>false);
 		}
 	}

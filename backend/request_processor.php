@@ -4,6 +4,7 @@ require_once __DIR__ . "/trading.php";
 require_once __DIR__ . "/portfolio.php";
 require_once __DIR__ . "/rates.php";
 require_once __DIR__ . "/watchlists.php";
+require_once __DIR__ . "/email/mail_processor.php";
 
 function requestProcessor($request)
 {
@@ -61,10 +62,16 @@ function requestProcessor($request)
             return getWatchlists($userId);
         
         case "create_watchlist":
-            return createWatchlist($userId, $request["name"] ?? "");
+            return createWatchlist(
+		$userId,
+		$request["name"] ?? ""
+	    );
 
         case "delete_watchlist":
-            return deleteWatchlist($userId, (int)($request["watchlist_id"] ?? 0));
+            return deleteWatchlist(
+		$userId,
+		(int)($request["watchlist_id"] ?? 0)
+	    );
 
         case "add_watchlist_item":
             return addWatchlistItem(
@@ -72,13 +79,17 @@ function requestProcessor($request)
                 (int)($request["watchlist_id"] ?? 0),
                 $request["currency_code"] ?? ""
             );
-        
+
         case "remove_watchlist_item":
             return removeWatchlistItem(
                 $userId,
                 (int)($request["watchlist_id"] ?? 0),
                 $request["currency_code"] ?? ""
             );
+
+	/* Notifications */
+	case "send_email":
+	    return sendEmail($request);
 
         default:
             return ["success" => false, "error" => "Unknown request type"];
